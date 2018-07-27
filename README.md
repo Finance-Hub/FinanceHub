@@ -1,2 +1,2 @@
-# QuantFin
+# Quantequim
 Materials for a Quantitative Finance Course
