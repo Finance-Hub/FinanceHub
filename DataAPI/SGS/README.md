@@ -1,4 +1,4 @@
-# getsgsdata
+# SGS
 The `SGS` class allows you to grab time series data from the database of
 the brazilian central bank (BCB).
 
@@ -34,6 +34,3 @@ dates of the series.
 
 # Author
 Gustavo Curi Amarante
-
-# License
-For license details, view the LICENSE.md file.

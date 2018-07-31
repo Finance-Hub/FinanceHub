@@ -1,3 +1,3 @@
 __all__ = ['SGS']
 
-from DataAPI.getsgsdata import SGS
+from DataAPI.SGS.getsgsdata import SGS
