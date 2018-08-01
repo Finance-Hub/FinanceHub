@@ -91,6 +91,4 @@ class SGS(object):
 NEXT STEPS
 - If the user passes a dict with seriesID on the keys and Series Name on the values, the code returns a DataFrame with
   the respective column names.
-
-- Write the README.md file
 """
