@@ -15,7 +15,8 @@ series (or a list of IDs) and returns a pandas DataFrame with the
 series.
 
 ### Simple Example
-The series ID for the Seasonally Adjusted Real GDP Index is 22109.
+The series ID for the Seasonally Adjusted Real GDP Index of Brazil
+is 22109.
 
 ``` python
 from DataAPI import SGS
