@@ -26,6 +26,16 @@ class SGS(object):
 
             df.sort_index(inplace=True)
 
+        elif type(series_id) is dict:
+
+            df = pd.DataFrame()
+
+            for cod in series_id.keys():
+                single_series = self._fetch_single_code(cod, initial_date, end_date)
+                df = pd.concat([df, single_series], axis=1)
+
+            df.columns = series_id.values()
+
         else:
             df = self._fetch_single_code(series_id, initial_date, end_date)
 
@@ -85,10 +95,3 @@ class SGS(object):
             df = df[df.index <= dt_end]
 
         return df
-
-
-"""
-NEXT STEPS
-- If the user passes a dict with seriesID on the keys and Series Name on the values, the code returns a DataFrame with
-  the respective column names.
-"""
