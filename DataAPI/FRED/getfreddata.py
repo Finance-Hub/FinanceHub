@@ -10,10 +10,11 @@ class FRED(object):
         """
         Grabs series from the FRED website
 
-        :param series_id: string or list of strings of the series tickers
+        :param series_id: string with series ID, list of strings of the series ID or dict with series ID as keys
         :param initial_date: string in the format 'yyyy-mm-dd' (optional)
         :param end_date: string in the format 'yyyy-mm-dd' (optional)
-        :return: pandas DataFrame withe the requested series
+        :return: pandas DataFrame withe the requested series. If a dict is passed as series ID, the dict values are used
+                 as column names.
         """
 
         if type(series_id) is list:
@@ -25,6 +26,16 @@ class FRED(object):
                 df = pd.concat([df, single_series], axis=1)
 
             df.sort_index(inplace=True)
+
+        elif type(series_id) is dict:
+
+            df = pd.DataFrame()
+
+            for cod in series_id.keys():
+                single_series = self._fetch_single_code(cod)
+                df = pd.concat([df, single_series], axis=1)
+
+            df.columns = series_id.values()
 
         else:
 
@@ -59,10 +70,3 @@ class FRED(object):
             df = df[df.index <= dt_end]
 
         return df
-
-
-"""
-NEXT STEPS
-- If the user passes a dict with seriesID on the keys and Series Name on the values, the code returns a DataFrame with
-  the respective column names.
-"""

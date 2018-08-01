@@ -13,7 +13,8 @@ class SGS(object):
         :param series_id: series code on the SGS. (int, str, list of int or list of str)
         :param initial_date: initial date for the result (optional)
         :param end_date: end date for the result (optional)
-        :return: pandas DataFrame
+        :return: pandas DataFrame withe the requested series. If a dict is passed as series ID, the dict values are used
+                 as column names.
         """
 
         if type(series_id) is list:  # loop all series codes

@@ -1,5 +1,6 @@
 """
-This example grabs the US Seasonally Adjusted Real GDP from the FRED database. Its series ID is GDPC1
+This example grabs the US Seasonally Adjusted Industrial production and Core CPI from the FRED database using the FRED
+class.
 """
 
 from DataAPI import FRED
@@ -7,7 +8,10 @@ import matplotlib.pyplot as plt
 
 fred = FRED()
 
-df_GDP = fred.fetch('GDPC1')
+series_dict = {'INDPRO': 'Industrial Production',
+               'CPILFESL': 'CPI Core Index'}
 
-df_GDP.plot()
+df = fred.fetch(series_dict)
+
+df.plot()
 plt.show()

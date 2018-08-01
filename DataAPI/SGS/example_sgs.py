@@ -1,5 +1,6 @@
 """
-This example grabs the Brazilian Seasonally Adjusted Real GDP Index from the SGS database. Its series ID is 22109
+This example grabs the Monthly proxy for the Brazilian Seasonally Adjusted Real GDP Index and monthly inflation rate
+from the SGS database.
 """
 
 from DataAPI import SGS
