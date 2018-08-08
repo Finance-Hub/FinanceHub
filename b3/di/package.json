@@ -1,0 +1,16 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "B3 DI tax crawler",
+  "main": "index.js",
+  "dependencies": {
+    "lowdb": "^1.0.0",
+    "puppeteer": "^1.6.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
