@@ -1,6 +1,6 @@
 """
 This example grabs the US Seasonally Adjusted Industrial production and Core CPI from the FRED database using the FRED
-class.
+class and plots the result.
 """
 
 from DataAPI import FRED
