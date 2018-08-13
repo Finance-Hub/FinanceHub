@@ -1,3 +1,5 @@
+name = "DataAPI"
+
 __all__ = ['SGS', 'FRED', 'IMF']
 
 from DataAPI.SGS.getsgsdata import SGS
