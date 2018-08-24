@@ -1,4 +1,4 @@
-from DataAPI import IMF
+from fldataapi import IMF
 import matplotlib.pyplot as plt
 
 imf = IMF()

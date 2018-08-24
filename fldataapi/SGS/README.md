@@ -19,7 +19,7 @@ The series ID for the Seasonally Adjusted Real GDP Index of Brazil
 is 22109.
 
 ``` python
-from DataAPI import SGS
+from fldataapi import SGS
 sgs = SGS()
 df_GDP = sgs.fetch(22109)
 ```
