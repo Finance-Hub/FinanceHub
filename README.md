@@ -1,3 +1,3 @@
-# Finance Lab
+## Welcome to the Finance Lab
 
-Repository for quantitative finance.
+This is a repository for quantitative finance and our mission is world domination.
