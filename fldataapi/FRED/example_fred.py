@@ -3,7 +3,7 @@ This example grabs the US Seasonally Adjusted Industrial production and Core CPI
 class and plots the result.
 """
 
-from DataAPI import FRED
+from fldataapi import FRED
 import matplotlib.pyplot as plt
 
 fred = FRED()

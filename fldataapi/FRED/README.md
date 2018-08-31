@@ -16,7 +16,7 @@ and returns a pandas DataFrame with the series.
 The series ID for the Seasonally Adjusted Real GDP of the US is GDPC1.
 
 ``` python
-from DataAPI import FRED
+from fldataapi import FRED
 fred = FRED()
 df = fred.fetch('GDPC1')
 ```
