@@ -1,38 +1,43 @@
-import requests
 import pandas as pd
-from bs4 import BeautifulSoup
-import execjs
+import requests
+
+key_string_center = '</tr><td class="text-center">'
+sep_string_center = '<td class="text-center">'
+sep_string_right = '<td class="text-right">'
+str_sep = '</td>'
+merc_identifier = 'MercFut3 = MercFut3 + '
+item_sep = ';'
+
+mercadoria = 'DI1'
+data = '08/01/2018'
 
 url = 'http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-sistema-pregao-enUS.asp'
 
-response = requests.get(url, params={'Data': '08/01/2018', 'Mercadoria': 'DI1'})
+header = ['MATURITY_CODE', 'OPEN_INTEREST_OPEN', 'OPEN_INTEREST_CLOSE', 'NUMBER_OF_TRADES', 'TRADING_VOLUME',
+          'FINANCIAL_VOLUME', 'JUNK1', 'PREVIOUS_SETTLEMENT', 'INDEXED_SETTLEMENT', 'OPENING_PRICE', 'MINIMUM_PRICE',
+          'MAXIMUM_PRICE', 'AVERAGE_PRICE', 'LAST_PRICE', 'SETTLEMENT_PRICE', 'CHANGE', 'LAST_BID', 'LAST_OFFER']
 
-soup = BeautifulSoup(response.text, 'html.parser')
+response = requests.get(url, params={'Data': data, 'Mercadoria': mercadoria})
 
-script = soup.find("script", text=lambda text: text and 'tableShow' in text and "<table" in text).get_text()
+resp_str = response.text
 
-# script = """
-# var MercadoFut0 = {},
-#     MercadoFut1 = {},
-#     MercadoFut2 = {};
-# var tableShow = function () {};
-#
-# function getTables() {
-#     %s
-#     return [MercFut1, MercFut2, MercFut3];
-# }
-# """ % script
-#
-# ctx = execjs.compile(script)
-# table1, table2, table3 = ctx.call("getTables")
-#
-# # parse tables into dataframes
-# df1 = pd.read_html(table1)[0]
-# df2 = pd.read_html(table2)[0]
-# df3 = pd.read_html(table3)[0]
-#
-# print(df1)
-# print(df2)
-# print(df3)
+df = pd.DataFrame(columns=header)
 
-shit = 1
+isrunning = True
+
+lkeyc = len(key_string_center)
+lsepc = len(sep_string_center)
+lsepr = len(sep_string_right)
+
+while isrunning:
+    if resp_str.find(key_string_center) > -1:
+        sidx = resp_str.find(key_string_center)  # start of core string
+        eidx = sidx + lkeyc + resp_str[sidx + lkeyc:].find(merc_identifier)  # end of core string
+        core = resp_str[sidx:eidx]
+        core_v = core.split(item_sep)
+        resp_str = resp_str[eidx:]  # trimming
+        row_df = pd.DataFrame(index=data, columns=header)
+
+"""
+* parei na parte em que tenho que procurar os valores dentro da lista core_v
+"""
