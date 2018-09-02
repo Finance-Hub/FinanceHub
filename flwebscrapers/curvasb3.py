@@ -3,6 +3,20 @@ import requests
 
 
 class ScraperB3(object):
+    """
+    Scrapper for B3 prices. The key of this object is the `scrape` method.
+
+    Supported contracts are:
+        * DI1 - 1 day interbank deposits
+        * DAP - DI x IPCA spread
+        * DDI - DI x US Dollar spread
+        * FRC - Forward Rate Agreement (FRA) on DI x US Dollar spread
+        * DOL - US Dollar Futures
+        * BGI - Live Cattle Futures (Options are not supported yet)
+        * ICF - 4/5 Arabica Coffee Futures
+        * CCM - Cash-Settled Corn Futures (Options are not supported yet)
+        * AUD - Australian Dolar Futures
+    """
 
     url = 'http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-sistema-pregao-enUS.asp'
 
@@ -19,7 +33,7 @@ class ScraperB3(object):
                'PREVIOUS_SETTLEMENT', 'INDEXED_SETTLEMENT', 'OPENING_PRICE', 'MINIMUM_PRICE', 'MAXIMUM_PRICE',
                'AVERAGE_PRICE', 'LAST_PRICE', 'SETTLEMENT_PRICE', 'LAST_BID', 'LAST_OFFER'}
 
-    # Columns that need to be dropped
+    # Columns that need to be dropped. They are either HTML junk or redundant information
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
     @staticmethod
@@ -92,7 +106,7 @@ class ScraperB3(object):
                       'AVERAGE_PRICE', 'LAST_PRICE', 'SETTLEMENT_PRICE', 'CHANGE', 'LAST_BID', 'LAST_OFFER']
 
         elif contract in ['FRC']:
-            header = ['MATURITY_CODE', 'NUMBER_OF_TRADES','TRADING_VOLUME', 'FINANCIAL_VOLUME', 'JUNK1',
+            header = ['MATURITY_CODE', 'NUMBER_OF_TRADES', 'TRADING_VOLUME', 'FINANCIAL_VOLUME', 'JUNK1',
                       'OPENING_PRICE', 'MINIMUM_PRICE', 'MAXIMUM_PRICE', 'AVERAGE_PRICE', 'LAST_PRICE',
                       'SETTLEMENT_PRICE', 'CHANGE', 'LAST_BID', 'LAST_OFFER']
 
