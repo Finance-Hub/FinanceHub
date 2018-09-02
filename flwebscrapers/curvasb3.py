@@ -80,9 +80,19 @@ class ScraperB3(object):
     @staticmethod
     def _get_header(contract):
 
-        if contract in ['DI1']:
+        if contract in ['DI1', 'DAP', 'DDI']:
             header = ['MATURITY_CODE', 'OPEN_INTEREST_OPEN', 'OPEN_INTEREST_CLOSE', 'NUMBER_OF_TRADES',
                       'TRADING_VOLUME', 'FINANCIAL_VOLUME', 'JUNK1', 'PREVIOUS_SETTLEMENT', 'INDEXED_SETTLEMENT',
+                      'OPENING_PRICE', 'MINIMUM_PRICE', 'MAXIMUM_PRICE', 'AVERAGE_PRICE', 'LAST_PRICE',
+                      'SETTLEMENT_PRICE', 'CHANGE', 'LAST_BID', 'LAST_OFFER']
+
+        elif contract in ['DOL', 'BGI', 'ICF', 'CCM', 'AUD']:
+            header = ['MATURITY_CODE', 'OPEN_INTEREST_OPEN', 'OPEN_INTEREST_CLOSE', 'NUMBER_OF_TRADES',
+                      'TRADING_VOLUME', 'FINANCIAL_VOLUME', 'JUNK1', 'OPENING_PRICE', 'MINIMUM_PRICE', 'MAXIMUM_PRICE',
+                      'AVERAGE_PRICE', 'LAST_PRICE', 'SETTLEMENT_PRICE', 'CHANGE', 'LAST_BID', 'LAST_OFFER']
+
+        elif contract in ['FRC']:
+            header = ['MATURITY_CODE', 'NUMBER_OF_TRADES','TRADING_VOLUME', 'FINANCIAL_VOLUME', 'JUNK1',
                       'OPENING_PRICE', 'MINIMUM_PRICE', 'MAXIMUM_PRICE', 'AVERAGE_PRICE', 'LAST_PRICE',
                       'SETTLEMENT_PRICE', 'CHANGE', 'LAST_BID', 'LAST_OFFER']
 
