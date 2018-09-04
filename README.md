@@ -5,7 +5,7 @@ and students in Brazil capable of fostering the research and technology
 that will help the brazilian asset management industry cope with its new
 challenges.
 
-## Motivation
+## Background
 There has been an explosion of interest in systematic trading strategies
 (STS). Varying in complexity, STS is now mainstream and part of any
 large institutional portfolio.
@@ -32,14 +32,14 @@ cope with its new challenges.
 
 ## What We Do
 
-* **Technology**: We built a GitHub repository with codes to support
+* **Technology**: We built a [GitHub repository](https://github.com/Finance-Lab/FinanceLab) with codes to support
 research in finance. Some code helps easily access raw and treated data
 stored in our servers. Some code implements models used on the analysis
 of that data. The objective of this branch is to build tools for
 research which will reduce the cost of data acquisition as well as model
 set up.
 
-* **Education**: We have lectures on python programming for finance and
+* **Education**: We have lectures on [python programming](https://github.com/Finance-Lab/FinanceLab/tree/master/Notebooks/Introduction%20to%20Python) for finance and
 financial theory. All of the material is available in our repository in
 the format of slides and jupyter notebooks, so that everyone can learn
 python and help build up the community and push the project forward.
@@ -48,5 +48,22 @@ python and help build up the community and push the project forward.
 Management and academics from Insper are the initial members of this
 community and activaly discuss research.  To promote this branch we are
 organizing academic seminars on the relevant topics and curating a
-repository of academic research papers on the Mendeley plataform.
+repository of academic research papers on the [Mendeley](https://www.mendeley.com/) plataform.
 
+## Set Up
+
+Here we speak **python**. This is the fastest growing programming
+language. To get started:
+
+- Download the [**Anaconda**](https://www.anaconda.com/download/) distribution
+system and install the python 3.6 version. This system allows you to
+install all the python libraries you need, including the jupyter notebook
+environment, where you can open our lecture files.
+
+- Install [**Git**](https://git-scm.com/downloads). This is a **Version Control
+System** (VCS) that allows everyone to keep their own version of their code.
+(Don't worry about how to use Git. You just need it installed on your computer)
+
+- Our favorite **python editor** is [**PyCharm**](https://www.jetbrains.com/pycharm/download/).
+This is the software that brings everything together and allows you to
+connect directly to our GitHub repository.
