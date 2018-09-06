@@ -67,3 +67,32 @@ System** (VCS) that allows everyone to keep their own version of their code.
 - Our favorite **python editor** is [**PyCharm**](https://www.jetbrains.com/pycharm/download/).
 This is the software that brings everything together and allows you to
 connect directly to our GitHub repository.
+
+## Seminars
+
+Participation in this Seminar is by invitation only. Please contact us
+if you would like to attend, but space is limited and we may not be able
+to welcome you immediately. Each session will have at least two
+presentations of around 45 minutes, including discussion and Q&A. We
+also welcome original research, but the Seminar coordinator will
+evaluate whether your research fits the objectives of this Seminar.
+
+Presenter is expected to present the main features of the paper, promote
+a brief discussion with suggestions for changes or future research and
+should be able to address questions by all participants. Participants
+should come prepared for discussion. All are expected to read at least
+the introduction of all papers. Participants should focus the discussion
+on the themes related to the paper presentations. The role of the
+Seminar coordinator is to guide the discussion during the presentations,
+select topics together with participants and plan sessions. At the end
+of the session, we welcome general discussions.
+
+| Dates     | Themes                                | First Presentations                                                                                                                            | Second Presentation                                                                                                                                         |
+|-----------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2-out-18  | Introduction                          | João   Moreira Salles – Opening Session                                                                                                        | Ruy   Ribeiro – Planning Session                                                                                                                            |
+| 23-out-18 | ERP and   Options                     | Ruy   Ribeiro – Expected Return on the Market (Martin and Wagner, Quarterly Journal   of Economics, forthcoming)                               | Guido   Chagas - Expected Return on a Stock - (Martin and Wagner, Journal of Finance,   forthcoming)                                                        |
+| 6-nov-18  | Premia                                | Gustavo   Soares – Common Factors in Corporate Bond Returns (Israel, Palhares and   Richardson, Journal of Investment Management, forthcoming) | Paulo   Costa – Yield Curve Premia (Brooks and Moskowitz, Working Paper, 2017)                                                                              |
+| 20-nov-18 | Low   Beta/Risk Parity                | Presenter 1   - Betting Against Beta - (Frazzini and Pedersen, Journal of Financial   Economics, 2018)                                         | Presenter 2   - Benchmarks as Limits to Arbitrage: Understanding the Low-Volatility Anomaly   (Baker, Bradley and Wurgler, Financial Analyst Journal, 2011) |
+| 4-dez-18  | Momentum   and Financial Institutions | Presenter 3   - An Institutional Theory of Momentum and Reversal (Vayanos and Woolley,  Review of Financial Studies, 2013)                     | Presenter 4   - Flow-Based Explanation for Return Predictability (Lou, Review of Financial   Studies, 2012)                                                 |
+| 15-jan-19 | Crowded   Trades, Momentum and Carry  | Presenter 5   - Comomentum, (Lou and Polk, Journal of Political Economy, R&R)                                                                  | Presenter 6   - Crowds, Crashes, and the Carry Trade (Sokolovski, 2018, Working Paper)                                                                      |
+| 29-jan-19 | Macro   Announcements and Returns     | Presenter 7   - The Pre‐FOMC Announcement Drift - (Lucca and Moench, Journal of Finance,   2015)                                               | Presenter 8   - Monetary Momentum (Neuhierl and Weber, Working Paper, 2018)                                                                                 |
