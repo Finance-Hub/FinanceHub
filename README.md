@@ -47,7 +47,7 @@ python and help build up the community and push the project forward.
 * **Research**: Investment professionals from BWGI and Itaú Asset
 Management and academics from Insper are the initial members of this
 community and activaly discuss research.  To promote this branch we are
-organizing academic seminars on the relevant topics and curating a
+organizing academic [seminars](##Seminars) on the relevant topics and curating a
 repository of academic research papers on the [Mendeley](https://www.mendeley.com/) plataform.
 
 ## Set Up
