@@ -50,7 +50,9 @@ community and activaly discuss research.  To promote this branch we are
 organizing academic [seminars](#seminars) on the relevant topics and curating a
 repository of academic research papers on the [Mendeley](https://www.mendeley.com/) plataform.
 
-## Set Up
+---
+
+# Set Up
 
 Here we speak **python**. This is the fastest growing programming
 language. To get started:
