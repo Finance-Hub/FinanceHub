@@ -47,7 +47,7 @@ python and help build up the community and push the project forward.
 * **Research**: Investment professionals from BWGI and Itaú Asset
 Management and academics from Insper are the initial members of this
 community and activaly discuss research.  To promote this branch we are
-organizing academic [seminars](##Seminars) on the relevant topics and curating a
+organizing academic [seminars](#seminars) on the relevant topics and curating a
 repository of academic research papers on the [Mendeley](https://www.mendeley.com/) plataform.
 
 ## Set Up
@@ -68,7 +68,9 @@ System** (VCS) that allows everyone to keep their own version of their code.
 This is the software that brings everything together and allows you to
 connect directly to our GitHub repository.
 
-## Seminars
+---
+
+# Seminars
 
 Participation in this Seminar is by invitation only. Please contact us
 if you would like to attend, but space is limited and we may not be able
