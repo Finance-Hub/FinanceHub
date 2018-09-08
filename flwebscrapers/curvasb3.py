@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+from sqlalchemy import create_engine
 
 
 class ScraperB3(object):
@@ -37,8 +38,9 @@ class ScraperB3(object):
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
     @staticmethod
-    def scrape(contract, date):
+    def scrape(contract, date, update_db=False):
 
+        contract = contract.upper()
         header = ScraperB3._get_header(contract)
 
         if not (type(date) is str):
@@ -89,7 +91,10 @@ class ScraperB3(object):
         df = ScraperB3._drop_useless_columns(df)
         df = ScraperB3._append_contract_column(contract, date, df)
 
-        return df
+        if update_db:
+            ScraperB3._send_df_to_db(df, contract, date)
+        else:
+            return df
 
     @staticmethod
     def _get_header(contract):
@@ -146,3 +151,10 @@ class ScraperB3(object):
         df = pd.concat([add_col, df], axis=1)
 
         return df
+
+    @staticmethod
+    def _send_df_to_db(df, contract, date):
+
+        df.columns = map(str.lower, df.columns)
+
+        db_connect = create_engine(f"{flavor}://{username}:{password}@{host}:{port}/{database}")
