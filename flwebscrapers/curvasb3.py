@@ -16,7 +16,7 @@ class ScraperB3(object):
         * BGI - Live Cattle Futures (Options are not supported yet)
         * ICF - 4/5 Arabica Coffee Futures
         * CCM - Cash-Settled Corn Futures (Options are not supported yet)
-        * AUD - Australian Dolar Futures
+        * AUD - Australian Dollar Futures
     """
 
     url = 'http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-sistema-pregao-enUS.asp'
@@ -38,13 +38,30 @@ class ScraperB3(object):
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
     @staticmethod
-    def scrape(contract, date, update_db=False):
+    def scrape(contract, date, update_db=False, connect_dict=None):
+        """
 
-        contract = contract.upper()
-        header = ScraperB3._get_header(contract)
+        :param contract: B3 code for the contract (see list of supported contracts)
+        :param date: should be in american convention mm/dd/yyyy
+        :param update_db: If True, updates the FinanceLab AWS database with the scraped data. Requires the connect_dict
+                          property with the access credentials.
+        :param connect_dict: dict keys should be 'flavor', 'database', 'schema', 'user', 'password', 'host', 'port'.
+                             These will generate the connection string.
+        :return:
+        """
+
+        if update_db:
+            assert type(connect_dict) is dict, "If 'update_db' is True, 'connect_dict' should be a dictionary"
+        else:
+            connect_dict = None
 
         if not (type(date) is str):
             date = date.strftime('%m/%d/%Y')
+        else:
+            date = pd.to_datetime(date).strftime('%m/%d/%Y')
+
+        contract = contract.upper()
+        header = ScraperB3._get_header(contract)
 
         df = pd.DataFrame(columns=header)
 
@@ -91,8 +108,11 @@ class ScraperB3(object):
         df = ScraperB3._drop_useless_columns(df)
         df = ScraperB3._append_contract_column(contract, date, df)
 
+        if df.empty:
+            return
+
         if update_db:
-            ScraperB3._send_df_to_db(df, contract, date)
+            ScraperB3._send_df_to_db(df, connect_dict)
         else:
             return df
 
@@ -153,8 +173,16 @@ class ScraperB3(object):
         return df
 
     @staticmethod
-    def _send_df_to_db(df, contract, date):
+    def _send_df_to_db(df, connect_dict):
 
         df.columns = map(str.lower, df.columns)
 
-        db_connect = create_engine(f"{flavor}://{username}:{password}@{host}:{port}/{database}")
+        db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{database}"
+                                   .format(host=connect_dict['host'],
+                                           database=connect_dict['database'],
+                                           username=connect_dict['user'],
+                                           password=connect_dict['password'],
+                                           port=connect_dict['port'],
+                                           flavor=connect_dict['flavor']))
+
+        df.to_sql('B3curves', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
