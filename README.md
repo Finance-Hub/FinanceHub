@@ -48,29 +48,8 @@ python and help build up the community and push the project forward.
 Management and academics from Insper are the initial members of this
 community and activaly discuss research.  To promote this branch we are
 organizing academic [seminars](#seminars) on the relevant topics and curating a
-repository of academic research papers on the [Mendeley](https://www.mendeley.com/) plataform.
-
----
-
-# Set Up
-
-Here we speak **python**. This is the fastest growing programming
-language. To get started:
-
-- Download the [**Anaconda**](https://www.anaconda.com/download/) distribution
-system and install the python 3.6 version. This system allows you to
-install all the python libraries you need, including the jupyter notebook
-environment, where you can open our lecture files.
-
-- Install [**Git**](https://git-scm.com/downloads). This is a **Version Control
-System** (VCS) that allows everyone to keep their own version of their code.
-(Don't worry about how to use Git. You just need it installed on your computer)
-
-- Our favorite **python editor** is [**PyCharm**](https://www.jetbrains.com/pycharm/download/).
-This is the software that brings everything together and allows you to
-connect directly to our GitHub repository.
-
----
+repository of academic research papers on the [Mendeley](https://www.mendeley.com/)
+plataform.
 
 # Seminars
 
@@ -94,9 +73,49 @@ of the session, we welcome general discussions.
 | Dates  /  Themes                                | First Presentation                                                                                                                             | Second Presentation                                                                                                                                         |
 |--------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 3-out-18  <br> **Introduction**                          | João   Moreira Salles – Opening Session                                                                                                        | Ruy   Ribeiro – Planning Session                                                                                                                            |
+| Dates  /  Themes                                         | First Presentation                                                                                                                             | Second Presentation                                                                                                                                         |
+|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2-out-18  <br> **Introduction**                          | João   Moreira Salles – Opening Session                                                                                                        | Ruy   Ribeiro – Planning Session                                                                                                                            |
 | 23-out-18 <br> **Premia**                                | Gustavo   Soares – Common Factors in Corporate Bond Returns (Israel, Palhares and   Richardson, Journal of Investment Management, forthcoming) | Paulo   Costa – Yield Curve Premia (Brooks and Moskowitz, Working Paper, 2017)                                                                              |
 | 6-nov-18  <br>  **ERP and   Options**                    | Ruy   Ribeiro – Expected Return on the Market (Martin and Wagner, Quarterly Journal   of Economics, forthcoming)                               | Guido   Chagas - Expected Return on a Stock - (Martin and Wagner, Journal of Finance,   forthcoming)                                                        |
 | 20-nov-18 <br> **Low   Beta/Risk Parity**                | Presenter 1   - Betting Against Beta - (Frazzini and Pedersen, Journal of Financial   Economics, 2018)                                         | Presenter 2   - Benchmarks as Limits to Arbitrage: Understanding the Low-Volatility Anomaly   (Baker, Bradley and Wurgler, Financial Analyst Journal, 2011) |
 | 4-dez-18  <br> **Momentum   and Financial Institutions** | Presenter 3   - An Institutional Theory of Momentum and Reversal (Vayanos and Woolley,  Review of Financial Studies, 2013)                     | Presenter 4   - Flow-Based Explanation for Return Predictability (Lou, Review of Financial   Studies, 2012)                                                 |
 | 15-jan-19 <br> **Crowded   Trades, Momentum and Carry**  | Presenter 5   - Comomentum, (Lou and Polk, Journal of Political Economy, R&R)                                                                  | Presenter 6   - Crowds, Crashes, and the Carry Trade (Sokolovski, 2018, Working Paper)                                                                      |
 | 29-jan-19 <br> **Macro   Announcements and Returns**     | Presenter 7   - The Pre‐FOMC Announcement Drift - (Lucca and Moench, Journal of Finance,   2015)                                               | Presenter 8   - Monetary Momentum (Neuhierl and Weber, Working Paper, 2018)                                                                                 |
+
+---
+
+# Set Up
+
+Here we speak **python**. This is the fastest growing programming
+language. To get started:
+
+- Download the [**Anaconda**](https://www.anaconda.com/download/) distribution
+system and install the python 3.6 version. This system allows you to
+install all the python libraries you need, including the jupyter notebook
+environment, where you can open our lecture files.
+
+- Install [**Git**](https://git-scm.com/downloads). This is a **Version Control
+System** (VCS) that allows everyone to keep their own version of their code.
+(Don't worry about how to use Git. You just need it installed on your computer)
+
+- Our favorite **python editor** is [**PyCharm**](https://www.jetbrains.com/pycharm/download/).
+This is the software that brings everything together and allows you to
+connect directly to our GitHub repository.
+
+---
+
+# Websites We Like
+* **[AQR Capital Management](https://www.aqr.com)**: AQR is a global investment
+management firm at the nexus of economics, behavioral finance, data and technology.
+Have a look in the education section of their website.
+
+* **[QuantResearch](http://www.quantresearch.org)**: Marcos Lopéz de Prado personal
+website. There you can find the python codes used in his papers.
+
+* **[Flirting with Models](https://blog.thinknewfound.com)**: Research Library of
+*Newfound Research*, a quantitative asset management firm.
+
+* **[Quantopian](https://www.quantopian.com)**: Quantopian is a crowd-sourced
+quantitative investment firm. They inspire talented people from around the world to
+write investment algorithms.
