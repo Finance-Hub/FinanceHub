@@ -1,4 +1,4 @@
-# Welcome to the Finance Hub
+# Welcome to the FinanceHub
 
 The Finance Hub is a **community** of investment professionals, academics
 and students in Brazil capable of fostering the research and technology
