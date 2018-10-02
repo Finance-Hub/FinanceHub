@@ -1,6 +1,6 @@
-# Welcome to the Finance Lab
+# Welcome to the Finance Hub
 
-The Finance Lab is a **community** of investment professionals, academics
+The Finance Hub is a **community** of investment professionals, academics
 and students in Brazil capable of fostering the research and technology
 that will help the brazilian asset management industry cope with its new
 challenges.
@@ -24,7 +24,7 @@ and complex. Systematization is a transparent and efficient way of
 institutional investors to deal with complexity and lack familiarity
 with certain markets. Our professionals need to be trained in the
 sciences and technologies of this new approach. We need to start
-building a more symbiotic relationship with academia. The Finance Lab is
+building a more symbiotic relationship with academia. The Finance Hub is
 an attempt to create a community of investment professionals and
 academics in Brazil capable of doing just that, fostering the research
 and technology that will help the Brazilian asset management industry
@@ -32,14 +32,14 @@ cope with its new challenges.
 
 ## What We Do
 
-* **Technology**: We built a [GitHub repository](https://github.com/Finance-Lab/FinanceLab) with codes to support
+* **Technology**: We built a [GitHub repository](https://github.com/Finance-Hub/FinanceHub) with codes to support
 research in finance. Some code helps easily access raw and treated data
 stored in our servers. Some code implements models used on the analysis
 of that data. The objective of this branch is to build tools for
 research which will reduce the cost of data acquisition as well as model
 set up.
 
-* **Education**: We have lectures on [python programming](https://github.com/Finance-Lab/FinanceLab/tree/master/Notebooks/Introduction%20to%20Python) for finance and
+* **Education**: We have lectures on [python programming](https://github.com/Finance-Hub/FinanceHub/tree/master/Notebooks/Introduction%20to%20Python) for finance and
 financial theory. All of the material is available in our repository in
 the format of slides and jupyter notebooks, so that everyone can learn
 python and help build up the community and push the project forward.
