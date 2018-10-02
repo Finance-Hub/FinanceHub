@@ -1,6 +1,6 @@
 # Welcome to the FinanceHub
 
-The Finance Hub is a **community** of investment professionals, academics
+The FinanceHub is a **community** of investment professionals, academics
 and students in Brazil capable of fostering the research and technology
 that will help the brazilian asset management industry cope with its new
 challenges.
@@ -24,7 +24,7 @@ and complex. Systematization is a transparent and efficient way of
 institutional investors to deal with complexity and lack familiarity
 with certain markets. Our professionals need to be trained in the
 sciences and technologies of this new approach. We need to start
-building a more symbiotic relationship with academia. The Finance Hub is
+building a more symbiotic relationship with academia. The FinanceHub is
 an attempt to create a community of investment professionals and
 academics in Brazil capable of doing just that, fostering the research
 and technology that will help the Brazilian asset management industry
