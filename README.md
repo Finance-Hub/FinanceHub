@@ -1,6 +1,6 @@
-# Welcome to the Finance Lab
+# Welcome to the FinanceHub
 
-The Finance Lab is a **community** of investment professionals, academics
+The FinanceHub is a **community** of investment professionals, academics
 and students in Brazil capable of fostering the research and technology
 that will help the brazilian asset management industry cope with its new
 challenges.
@@ -24,7 +24,7 @@ and complex. Systematization is a transparent and efficient way of
 institutional investors to deal with complexity and lack familiarity
 with certain markets. Our professionals need to be trained in the
 sciences and technologies of this new approach. We need to start
-building a more symbiotic relationship with academia. The Finance Lab is
+building a more symbiotic relationship with academia. The FinanceHub is
 an attempt to create a community of investment professionals and
 academics in Brazil capable of doing just that, fostering the research
 and technology that will help the Brazilian asset management industry
@@ -32,14 +32,14 @@ cope with its new challenges.
 
 ## What We Do
 
-* **Technology**: We built a [GitHub repository](https://github.com/Finance-Lab/FinanceLab) with codes to support
+* **Technology**: We built a [GitHub repository](https://github.com/Finance-Hub/FinanceHub) with codes to support
 research in finance. Some code helps easily access raw and treated data
 stored in our servers. Some code implements models used on the analysis
 of that data. The objective of this branch is to build tools for
 research which will reduce the cost of data acquisition as well as model
 set up.
 
-* **Education**: We have lectures on [python programming](https://github.com/Finance-Lab/FinanceLab/tree/master/Notebooks/Introduction%20to%20Python) for finance and
+* **Education**: We have lectures on [python programming](https://github.com/Finance-Hub/FinanceHub/tree/master/Notebooks/Introduction%20to%20Python) for finance and
 financial theory. All of the material is available in our repository in
 the format of slides and jupyter notebooks, so that everyone can learn
 python and help build up the community and push the project forward.
@@ -48,7 +48,7 @@ python and help build up the community and push the project forward.
 Management and academics from Insper are the initial members of this
 community and activaly discuss research.  To promote this branch we are
 organizing academic [seminars](#seminars) on the relevant topics and curating a
-repository of academic research papers on the [Mendeley](https://www.mendeley.com/) 
+repository of academic research papers on the [Mendeley](https://www.mendeley.com/)
 plataform.
 
 # Seminars
@@ -70,9 +70,9 @@ Seminar coordinator is to guide the discussion during the presentations,
 select topics together with participants and plan sessions. At the end
 of the session, we welcome general discussions.
 
-| Dates  /  Themes                                         | First Presentation                                                                                                                             | Second Presentation                                                                                                                                         |
-|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 2-out-18  <br> **Introduction**                          | João   Moreira Salles – Opening Session                                                                                                        | Ruy   Ribeiro – Planning Session                                                                                                                            |
+| Dates  /  Themes                                | First Presentation                                                                                                                             | Second Presentation                                                                                                                                         |
+|--------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 3-out-18  <br> **Introduction**                          | João   Moreira Salles – Opening Session                                                                                                        | Ruy   Ribeiro – Planning Session                                                                                                                            |
 | 23-out-18 <br> **Premia**                                | Gustavo   Soares – Common Factors in Corporate Bond Returns (Israel, Palhares and   Richardson, Journal of Investment Management, forthcoming) | Paulo   Costa – Yield Curve Premia (Brooks and Moskowitz, Working Paper, 2017)                                                                              |
 | 6-nov-18  <br>  **ERP and   Options**                    | Ruy   Ribeiro – Expected Return on the Market (Martin and Wagner, Quarterly Journal   of Economics, forthcoming)                               | Guido   Chagas - Expected Return on a Stock - (Martin and Wagner, Journal of Finance,   forthcoming)                                                        |
 | 20-nov-18 <br> **Low   Beta/Risk Parity**                | Presenter 1   - Betting Against Beta - (Frazzini and Pedersen, Journal of Financial   Economics, 2018)                                         | Presenter 2   - Benchmarks as Limits to Arbitrage: Understanding the Low-Volatility Anomaly   (Baker, Bradley and Wurgler, Financial Analyst Journal, 2011) |
@@ -103,16 +103,16 @@ connect directly to our GitHub repository.
 ---
 
 # Websites We Like
-* **[AQR Capital Management](https://www.aqr.com)**: AQR is a global investment 
-management firm at the nexus of economics, behavioral finance, data and technology. 
+* **[AQR Capital Management](https://www.aqr.com)**: AQR is a global investment
+management firm at the nexus of economics, behavioral finance, data and technology.
 Have a look in the education section of their website.
 
-* **[QuantResearch](http://www.quantresearch.org)**: Marcos Lopéz de Prado personal 
+* **[QuantResearch](http://www.quantresearch.org)**: Marcos Lopéz de Prado personal
 website. There you can find the python codes used in his papers.
 
-* **[Flirting with Models](https://blog.thinknewfound.com)**: Research Library of 
+* **[Flirting with Models](https://blog.thinknewfound.com)**: Research Library of
 *Newfound Research*, a quantitative asset management firm.
 
-* **[Quantopian](https://www.quantopian.com)**: Quantopian is a crowd-sourced 
-quantitative investment firm. They inspire talented people from around the world to 
+* **[Quantopian](https://www.quantopian.com)**: Quantopian is a crowd-sourced
+quantitative investment firm. They inspire talented people from around the world to
 write investment algorithms.
