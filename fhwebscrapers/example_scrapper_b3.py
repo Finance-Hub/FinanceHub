@@ -1,5 +1,5 @@
 import pandas as pd
-from flwebscrapers import ScraperB3
+from fhwebscrapers import ScraperB3
 
 b3 = ScraperB3()
 

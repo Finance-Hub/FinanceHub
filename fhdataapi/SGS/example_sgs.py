@@ -3,7 +3,7 @@ This example grabs the Monthly proxy for the Brazilian Seasonally Adjusted Real 
 from the SGS database.
 """
 
-from fldataapi import SGS
+from fhdataapi import SGS
 import matplotlib.pyplot as plt
 
 series_dict = {24364: 'Real Monthly GDP',
