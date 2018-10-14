@@ -88,7 +88,7 @@ Here we speak **python**. This is the fastest growing programming
 language. To get started:
 
 - Download the [**Anaconda**](https://www.anaconda.com/download/) distribution
-system and install the python 3.6 version. This system allows you to
+system and install the python 3.7 version. This system allows you to
 install all the python libraries you need, including the jupyter notebook
 environment, where you can open our lecture files.
 
