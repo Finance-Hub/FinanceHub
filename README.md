@@ -39,7 +39,7 @@ of that data. The objective of this branch is to build tools for
 research which will reduce the cost of data acquisition as well as model
 set up.
 
-* **Education**: We have lectures on [python programming](https://github.com/Finance-Hub/FinanceHub/tree/master/Notebooks/Introduction%20to%20Python) for finance and
+* **Education**: We have lectures on [python programming](https://github.com/Finance-Hub/FinanceHub/tree/master/fhnotebooks/Introduction%20to%20Python) for finance and
 financial theory. All of the material is available in our repository in
 the format of slides and jupyter notebooks, so that everyone can learn
 python and help build up the community and push the project forward.
