@@ -107,12 +107,15 @@ connect directly to our GitHub repository.
 management firm at the nexus of economics, behavioral finance, data and technology.
 Have a look in the education section of their website.
 
-* **[QuantResearch](http://www.quantresearch.org)**: Marcos Lopéz de Prado personal
-website. There you can find the python codes used in his papers.
-
 * **[Flirting with Models](https://blog.thinknewfound.com)**: Research Library of
 *Newfound Research*, a quantitative asset management firm.
+
+* **[Quantitative Economics](https://lectures.quantecon.org)**: This website presents a series of lectures on 
+quantitative economic modeling, designed and written by Thomas J. Sargent and John Stachurski.
 
 * **[Quantopian](https://www.quantopian.com)**: Quantopian is a crowd-sourced
 quantitative investment firm. They inspire talented people from around the world to
 write investment algorithms.
+
+* **[QuantResearch](http://www.quantresearch.org)**: Marcos Lopéz de Prado personal
+website. There you can find the python codes used in his papers.
