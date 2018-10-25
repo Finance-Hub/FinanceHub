@@ -75,4 +75,6 @@ class BBG(object):
 """
 * Test start_date > end_date
 * test for different types of dates
+* write documentation
+* write README
 """
