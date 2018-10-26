@@ -79,7 +79,7 @@ class BBG(object):
             results = {}
 
             while True:
-                ev = session.nextEvent(500)
+                ev = session.nextEvent()
 
                 for msg in ev:
 
@@ -168,6 +168,61 @@ class BBG(object):
         return df
 
     @staticmethod
+    def fetch_cash_flow(self, bond, date):
+
+        session = blpapi.Session()
+
+        if not session.start():
+            raise ConnectionError("Failed to start a connection")
+
+        if not session.openService("//blp/refdata"):
+            raise ConnectionError("Failed to open //blp/refdat")
+
+        service = session.getService("//blp/refdata")
+        request = service.createRequest("ReferenceDataRequest")
+
+        request.append("securities", bond)
+        request.append("fields", "DES_CASH_FLOW")
+        overrides = request.getElement("overrides")
+        override1 = overrides.appendElement()
+        override1.setElement("fieldId", "SETTLE_DT")
+        override1.setElement("value", date.strftime('%Y%m%d'))
+
+        response = session.sendRequest(request)
+
+        df = pd.DataFrame()
+        end_reached = False
+        while not end_reached:
+            ev = session.nextEvent()
+
+            if ev.eventType() == blpapi.Event.RESPONSE:
+
+                for msg in ev:
+
+                    sec_data = msg.getElement('securityData')
+                    field_data = sec_data.getValueAsElement(0).getElement('fieldData')
+
+                    for v in [field_data.getElement(0).getValueAsElement(i) for i in
+                              range(field_data.getElement(0).numValues())]:
+
+                        s = pd.Series()
+
+                        for d in [v.getElement(i) for i in range(v.numElements())]:
+
+                            try:
+                                s[str(d.name())] = d.getValue()
+
+                            except:
+                                s[str(d.name())] = np.nan
+
+                        df = df.append(
+                            s[['Coupon Amount', 'Principal Amount']].to_frame(s['Payment Date']).transpose())
+
+                end_reached = True
+
+        return df
+
+    @staticmethod
     def _parse_cmd_line():
 
         parser = OptionParser(description="Retrive reference data.")
@@ -209,9 +264,10 @@ class BBG(object):
 
 
 """
-* test for different types of dates
-* write documentation
+* Write documentation
     - no more than 30k point per request
-* write README
-* assert variable types
+    - explain the different outputs
+* Write README
+* Assert variable types
+* add fetch_index_weight method
 """
