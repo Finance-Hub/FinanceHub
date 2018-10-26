@@ -168,7 +168,69 @@ class BBG(object):
         return df
 
     @staticmethod
-    def fetch_cash_flow(self, bond, date):
+    def fetch_index_weights(index_name, ref_date):
+
+        session = blpapi.Session()
+
+        if not session.start():
+            raise ConnectionError("Failed to start session.")
+
+        if not session.openService("//blp/refdata"):
+            raise ConnectionError("Failed to open //blp/refdat")
+
+        service = session.getService("//blp/refdata")
+        request = service.createRequest("ReferenceDataRequest")
+
+        request.append("securities", index_name)
+        request.append("fields", "INDX_MWEIGHT_HIST")
+
+        overrides = request.getElement("overrides")
+        override1 = overrides.appendElement()
+        override1.setElement("fieldId", "END_DATE_OVERRIDE")
+        override1.setElement("value", ref_date.strftime('%Y%m%d'))
+        session.sendRequest(request)  # there is no need to save the response as a variable in this case
+
+        end_reached = False
+        while not end_reached:
+
+            ev = session.nextEvent()
+
+            if ev.eventType() == blpapi.Event.RESPONSE:
+
+                for msg in ev:
+
+                    security_data = msg.getElement('securityData')
+                    security_data_list = [security_data.getValueAsElement(i) for i in range(security_data.numValues())]
+
+                    for sec in security_data_list:
+
+                        field_data = sec.getElement('fieldData')
+                        field_data_list = [field_data.getElement(i) for i in range(field_data.numElements())]
+
+                        df = pd.DataFrame()
+                        for fld in field_data_list:
+
+                            for v in [fld.getValueAsElement(i) for i in range(fld.numValues())]:
+
+                                s = pd.Series()
+
+                                for d in [v.getElement(i) for i in range(v.numElements())]:
+                                    s[str(d.name())] = d.getValue()
+
+                                df = df.append(s, ignore_index=True)
+
+                df.columns = ['', ref_date]
+                df = df.set_index(df.columns[0])
+                end_reached = True
+
+        df.index = [x.replace(' BZ', '').replace(' BS', '').replace(' BO', '') for x in df.index]
+
+        return df
+
+    @staticmethod
+    def fetch_cash_flow(bond, date):
+
+        date = BBG._assert_date_type(date)
 
         session = blpapi.Session()
 
@@ -269,5 +331,4 @@ class BBG(object):
     - explain the different outputs
 * Write README
 * Assert variable types
-* add fetch_index_weight method
 """
