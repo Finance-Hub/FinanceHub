@@ -2,6 +2,7 @@ from optparse import OptionParser
 import datetime as dt
 import pandas as pd
 import blpapi
+import numpy as np
 
 
 class BBG(object):
@@ -9,7 +10,6 @@ class BBG(object):
     def __init__(self):
         self.options = BBG._parse_cmd_line()
 
-    # TODO Rename the arguments
     def fetch_series(self, securities, fields, startdate, enddate, period="DAILY", calendar="ACTUAL", fx=None,
                      fperiod=None, verbose=False):
 
@@ -118,10 +118,54 @@ class BBG(object):
         finally:
             session.stop()
 
-        if type(securities) is list:
-            return results
+        if not type(securities) is list:
+            results = results[securities]
+
+        # parse the results as a DataFrame
+        df = pd.DataFrame()
+
+        if not (type(securities) is list) and not (type(fields) is list):
+            # single ticker and single field
+            # returns a dataframe with a single column
+            results = np.array(results)
+            df[securities] = pd.Series(index=results[:, 0], data=results[:, 1])
+
+        elif (type(securities) is list) and not (type(fields) is list):
+            # multiple tickers and single field
+            # returns a single dataframe for the field with the ticker on the columns
+
+            for tick in results.keys():
+                aux = np.array(results[tick])
+                df[tick] = pd.Series(index=aux[:, 0], data=aux[:, 1])
+
+        elif not (type(securities) is list) and (type(fields) is list):
+            # single ticker and multiple fields
+            # returns a single dataframe for the ticker with the fields on the columns
+
+            for fld in results.keys():
+                aux = np.array(results[fld])
+                df[fld] = pd.Series(index=aux[:, 0], data=aux[:, 1])
+
         else:
-            return results[securities]
+            # multiple tickers and multiple fields
+            # returns a multi-index dataframe with [field, ticker] as index
+
+            for tick in results.keys():
+
+                for fld in results[tick].keys():
+                    aux = np.array(results[tick][fld])
+                    df_aux = pd.DataFrame(data={'FIELD': fld,
+                                                'TRADE_DATE': aux[:, 0],
+                                                'TICKER': tick,
+                                                'VALUE': aux[:, 1]})
+                    df = df.append(df_aux)
+
+            df['VALUE'] = df['VALUE'].astype(float)
+            df['TRADE_DATE'] = df['TRADE_DATE'].astype(pd.Timestamp)
+
+            df = pd.pivot_table(data=df, index=['FIELD', 'TRADE_DATE'], columns='TICKER', values='VALUE')
+
+        return df
 
     @staticmethod
     def _parse_cmd_line():
@@ -165,9 +209,9 @@ class BBG(object):
 
 
 """
-* Test start_date > end_date
 * test for different types of dates
 * write documentation
     - no more than 30k point per request
 * write README
+* assert variable types
 """
