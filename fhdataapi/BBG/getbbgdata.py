@@ -191,6 +191,7 @@ class BBG(object):
         session.sendRequest(request)  # there is no need to save the response as a variable in this case
 
         end_reached = False
+        df = pd.DataFrame()
         while not end_reached:
 
             ev = session.nextEvent()
@@ -207,7 +208,6 @@ class BBG(object):
                         field_data = sec.getElement('fieldData')
                         field_data_list = [field_data.getElement(i) for i in range(field_data.numElements())]
 
-                        df = pd.DataFrame()
                         for fld in field_data_list:
 
                             for v in [fld.getValueAsElement(i) for i in range(fld.numValues())]:
@@ -222,8 +222,6 @@ class BBG(object):
                 df.columns = ['', ref_date]
                 df = df.set_index(df.columns[0])
                 end_reached = True
-
-        df.index = [x.replace(' BZ', '').replace(' BS', '').replace(' BO', '') for x in df.index]
 
         return df
 
@@ -250,7 +248,7 @@ class BBG(object):
         override1.setElement("fieldId", "SETTLE_DT")
         override1.setElement("value", date.strftime('%Y%m%d'))
 
-        response = session.sendRequest(request)
+        _ = session.sendRequest(request)
 
         df = pd.DataFrame()
         end_reached = False

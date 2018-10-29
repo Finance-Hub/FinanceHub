@@ -14,9 +14,10 @@ df = bbg.fetch_series(securities=['BRL Curncy', 'DXY Index'],
 print(df)
 
 # Grabs cashflow payments of corporate bonds
-df = bbg.fetch_cash_flow('EK026741@ANBE Corp', pd.to_datetime('03-jul-2017'))
+df = bbg.fetch_cash_flow('EI1436001 Govt', pd.to_datetime('03-jul-2017'))
 print(df)
 
 # Grabs weights of the components of an index
 df = bbg.fetch_index_weights(index_name='IBOV Index', ref_date=pd.to_datetime('03-jul-2017'))
 print(df)
+print(df.sum())
