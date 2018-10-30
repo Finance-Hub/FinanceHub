@@ -21,3 +21,11 @@ print(df)
 df = bbg.fetch_index_weights(index_name='IBOV Index', ref_date=pd.to_datetime('03-jul-2017'))
 print(df)
 print(df.sum())
+
+# Grabs a value
+futures_list = bbg.fetch_futures_list(generic_ticker='TY1 Comdty')
+print(futures_list)
+
+# grabs the first notice date for each contract
+df_fn = bbg.fetch_contract_parameter(securities=futures_list, field='FUT_NOTICE_FIRST')
+print(df_fn)

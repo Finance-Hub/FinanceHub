@@ -160,12 +160,114 @@ class BBG(object):
                                                 'VALUE': aux[:, 1]})
                     df = df.append(df_aux)
 
-            df['VALUE'] = df['VALUE'].astype(float)
+            df['VALUE'] = df['VALUE'].astype(float, errors='ignore')
             df['TRADE_DATE'] = df['TRADE_DATE'].astype(pd.Timestamp)
 
             df = pd.pivot_table(data=df, index=['FIELD', 'TRADE_DATE'], columns='TICKER', values='VALUE')
 
         return df
+
+    @staticmethod
+    def fetch_contract_parameter(securities, field):
+
+        session = blpapi.Session()
+        session.start()
+
+        # if not session.start():
+        #     raise ConnectionError("Failed to start session.")
+
+        if not session.openService("//blp/refdata"):
+            raise ConnectionError("Failed to open //blp/refdat")
+
+        service = session.getService("//blp/refdata")
+        request = service.createRequest("ReferenceDataRequest")
+
+        if type(securities) is list:
+
+            for each in securities:
+                request.append("securities", str(each))
+
+        else:
+            request.append("securities", securities)
+
+        request.append("fields", field)
+        session.sendRequest(request)
+
+        name, val = [], []
+        end_reached = False
+        while not end_reached:
+
+            ev = session.nextEvent()
+
+            if ev.eventType() == blpapi.Event.RESPONSE or ev.eventType() == blpapi.Event.PARTIAL_RESPONSE:
+
+                for msg in ev:
+
+                    for i in range(msg.getElement("securityData").numValues()):
+
+                        sec = str(msg.getElement("securityData").getValue(i).getElement("security").getValue())  # here we get the security
+                        name.append(sec)
+
+                        value = msg.getElement("securityData").getValue(i).getElement("fieldData").getElement(field).getValue()
+                        val.append(value)  # here we get the field we have selected
+
+            if ev.eventType() == blpapi.Event.RESPONSE:
+                end_reached = True
+                session.stop()
+
+        df = pd.DataFrame(val, columns=[field], index=name)
+
+        return df
+
+    @staticmethod
+    def fetch_futures_list(generic_ticker):
+
+        session = blpapi.Session()
+
+        if not session.start():
+            raise ConnectionError("Failed to start session.")
+
+        if not session.openService("//blp/refdata"):
+            raise ConnectionError("Failed to open //blp/refdat")
+
+        service = session.getService("//blp/refdata")
+        request = service.createRequest("ReferenceDataRequest")
+
+        request.append("securities", generic_ticker)
+        request.append("fields", "FUT_CHAIN")
+
+        overrides = request.getElement("overrides")
+        override1 = overrides.appendElement()
+        override1.setElement("fieldId", "INCLUDE_EXPIRED_CONTRACTS")
+        override1.setElement("value", "Y")
+        override2 = overrides.appendElement()
+        override2.setElement("fieldId", "CHAIN_DATE")
+        override2.setElement("value", pd.to_datetime('today').date().strftime('%Y%m%d'))
+
+        session.sendRequest(request)
+
+        # process received events
+        end_reached = True
+        contract_list = []
+        while end_reached:
+
+            ev = session.nextEvent()
+
+            if ev.eventType() == blpapi.Event.RESPONSE or ev.eventType() == blpapi.Event.PARTIAL_RESPONSE:
+
+                for msg in ev:
+
+                    elements = msg.getElement("securityData").getValue().getElement("fieldData").getElement("FUT_CHAIN")
+                    num_values = elements.numValues()
+
+                    for cont in range(num_values):
+                        contract_list.append(elements.getValue(cont).getElement("Security Description").getValue())
+
+            if ev.eventType() == blpapi.Event.RESPONSE:
+                end_reached = False
+                session.stop()
+
+        return contract_list
 
     @staticmethod
     def fetch_index_weights(index_name, ref_date):
