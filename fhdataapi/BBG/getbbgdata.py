@@ -1,17 +1,37 @@
 from optparse import OptionParser
 import datetime as dt
 import pandas as pd
-import blpapi
 import numpy as np
+import blpapi  # See our installation guide to learn how to install this library properly
 
 
 class BBG(object):
+    """
+    This class is a wrapper around the Bloomberg API. To work, it requires an active bloomberg terminal and
+    a python 3.6 environment.
+    """
 
     def __init__(self):
         self.options = BBG._parse_cmd_line()
 
     def fetch_series(self, securities, fields, startdate, enddate, period="DAILY", calendar="ACTUAL", fx=None,
                      fperiod=None, verbose=False):
+        """
+        Fetches time series for given tickers and fields, from startdate to enddate.
+
+        Output is a DataFrame with tickers on the columns. If a single field is passed, the index are the dates.
+        If a list of fields is passed, a multi-index DataFrame is returned, where the index is ['FIELD', date].
+
+        Requests can easily get really big, this method allows for up to 30k data points.
+
+        :param securities: str or list of str
+        :param fields: str or list of str
+        :param startdate: str, datetime or timestamp
+        :param enddate: str, datetime or timestamp
+        :param period: 'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'SEMI ANNUAL' OR 'YEARLY'. Periodicity of the series
+        :param calendar: 'ACTUAL', 'CALENDAR' or 'FISCAL'
+        :return:  DataFrame or Multi-index DataFrame (if more than one field is passed)
+        """
 
         startdate = BBG._assert_date_type(startdate)
         enddate = BBG._assert_date_type(enddate)
@@ -173,12 +193,20 @@ class BBG(object):
 
     @staticmethod
     def fetch_contract_parameter(securities, field):
+        """
+        Grabs a characteristic of a contract, like maturity dates, first notice dates, strikes, contract sizes, etc.
+
+        Returns a DataFrame with the tickers on the index and the field on the columns.
+
+        OBS: For now, it only allows for a single field. An extension that allows for multiple fields is a good idea.
+
+        :param securities: str or list of str
+        :param field: str
+        :return: DataFrame
+        """
 
         session = blpapi.Session()
         session.start()
-
-        # if not session.start():
-        #     raise ConnectionError("Failed to start session.")
 
         if not session.openService("//blp/refdata"):
             raise ConnectionError("Failed to open //blp/refdat")
@@ -225,6 +253,12 @@ class BBG(object):
 
     @staticmethod
     def fetch_futures_list(generic_ticker):
+        """
+        Given a generic ticker for a future contract, it returns all of the historical contracts that composed the
+        generic.
+        :param generic_ticker: str
+        :return: list
+        """
 
         session = blpapi.Session()
 
@@ -275,6 +309,15 @@ class BBG(object):
 
     @staticmethod
     def fetch_index_weights(index_name, ref_date):
+        """
+        Given an index (e.g. S&P500, IBOV) and a date, it returns a DataFrame of its components as the index an
+        their respective weights as the value for the given date.
+        :param index_name: str
+        :param ref_date: str, datetime or timestamp
+        :return: DataFrame
+        """
+
+        ref_date = BBG._assert_date_type(ref_date)
 
         session = blpapi.Session()
 
@@ -333,6 +376,16 @@ class BBG(object):
 
     @staticmethod
     def fetch_cash_flow(bond, date):
+        """
+        Grabs all the future cash flows from a bond and their payment dates.
+
+        Returns a DataFrame with payment dates as the index and cash flows are separated between
+        'Principal' and 'Coupon' payments.
+
+        :param bond: str. Bloomber ID number for the bond (this is not the ticker)
+        :param date: str, datetime or timestamp. Date from which to look ahead and grab the future cash flows
+        :return: DataFrame
+        """
 
         date = BBG._assert_date_type(date)
 
@@ -390,6 +443,9 @@ class BBG(object):
 
     @staticmethod
     def _parse_cmd_line():
+        """
+        creates session options for the bloomberg API session
+        """
 
         parser = OptionParser(description="Retrive reference data.")
 
@@ -406,7 +462,7 @@ class BBG(object):
     @staticmethod
     def _assert_date_type(input_date):
         """
-
+        Assures the date is in datetime format
         :param input_date: str, timestamp, datetime
         :return: input_date in datetime format
         """
@@ -426,13 +482,22 @@ class BBG(object):
 
     @staticmethod
     def _datetime_to_bbg_string(input_date):
+        """
+        converts datetime to string in bloomberg format
+        :param input_date:
+        :return:
+        """
         return str(input_date.year)+str(input_date.month).zfill(2)+str(input_date.day).zfill(2)
 
 
 """
-* Write documentation
-    - no more than 30k point per request
-    - explain the different outputs
+To Dos
 * Write README
 * Assert variable types
+* Correct the empty variables problem
+"""
+
+"""
+FUTURE DEVELOPMENT
+* Since all functions require a session, build a session opening routine.
 """
