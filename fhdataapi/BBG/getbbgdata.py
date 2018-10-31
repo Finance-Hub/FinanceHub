@@ -136,7 +136,11 @@ class BBG(object):
 
             for tick in results.keys():
                 aux = np.array(results[tick])
-                df[tick] = pd.Series(index=aux[:, 0], data=aux[:, 1])
+
+                if len(aux) == 0:
+                    df[tick] = np.nan
+                else:
+                    df = pd.concat([df, pd.Series(index=aux[:, 0], data=aux[:, 1], name=tick)], axis=1, join='outer', sort=True)
 
         elif not (type(securities) is list) and (type(fields) is list):
             # single ticker and multiple fields

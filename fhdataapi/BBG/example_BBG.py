@@ -22,7 +22,7 @@ df = bbg.fetch_index_weights(index_name='IBOV Index', ref_date=pd.to_datetime('0
 print(df)
 print(df.sum())
 
-# Grabs a value
+# Grabs all the contracts from a generic series
 futures_list = bbg.fetch_futures_list(generic_ticker='TY1 Comdty')
 print(futures_list)
 
