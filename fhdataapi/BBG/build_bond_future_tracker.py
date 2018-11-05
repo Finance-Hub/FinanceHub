@@ -21,6 +21,8 @@ df_uc = bbg.fetch_series(securities=['TY1 Comdty', 'TY2 Comdty', 'TY3 Comdty'],
                          fields='FUT_CUR_GEN_TICKER',
                          startdate=start_date,
                          enddate=end_date)
+df_uc = df_uc.reindex(df_generics.index).fillna(method='ffill')
+
 # all contracts
 contract_list = bbg.fetch_futures_list(generic_ticker='TY1 Comdty')
 
@@ -32,6 +34,7 @@ df_prices = bbg.fetch_series(securities=contract_list,
                              fields='PX_LAST',
                              startdate=start_date,
                              enddate=end_date)
+df_prices = df_prices.reindex(df_generics.index).fillna(method='ffill')
 
 # sets up the dataframe that will hold our results
 df_tracker = pd.DataFrame(index=df_generics.index,
