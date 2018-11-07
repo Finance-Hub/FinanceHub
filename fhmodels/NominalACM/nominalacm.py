@@ -27,7 +27,7 @@ class NominalACM(object):
 
         self.n_tenors = excess_returns.shape[1]
 
-        self.tenors = excess_returns.columns  # Is this good practice?
+        self.tenors = excess_returns.columns
 
         self.sample_size = curve.shape[0] - 1
 
@@ -41,7 +41,7 @@ class NominalACM(object):
     def _run_estimation(self):
 
         # Step 0 - get the PCA factor series as an atribute of the object
-        self.PCA_factors = self._get_PCA_factors()
+        self.PCA_factors = self._get_pca_factors()
 
         # Step 1 - Factor VAR
         Mu_hat, Phi_hat, V_hat, Sigma_hat = self._estimate_factor_VAR()
@@ -58,28 +58,28 @@ class NominalACM(object):
         # Step 5 - Affine Recurssions
         # model implied yield
         if self.compute_miy:
-            MIY = self._affine_recursions(Mu_hat, Phi_hat, Sigma_hat, sigma2_hat, lambda_0_hat, lambda_1_hat,
+            miy = self._affine_recursions(Mu_hat, Phi_hat, Sigma_hat, sigma2_hat, lambda_0_hat, lambda_1_hat,
                                           delta_0_hat, delta_1_hat)
 
-            MIY = pd.DataFrame(data=MIY[:, 1:],
+            miy = pd.DataFrame(data=miy[:, 1:],
                                index=self.PCA_factors[1:].index,
                                columns=list(range(1, self.tenors.max() + 1)))
 
-            self.MIY = np.exp(MIY) - 1
+            self.miy = np.exp(miy) - 1
         else:
-            self.MIY = None
+            self.miy = None
 
         # risk neutral yield
-        RNY = self._affine_recursions(Mu_hat, Phi_hat, Sigma_hat, sigma2_hat, 0, 0, delta_0_hat, delta_1_hat)
+        rny = self._affine_recursions(Mu_hat, Phi_hat, Sigma_hat, sigma2_hat, 0, 0, delta_0_hat, delta_1_hat)
 
-        RNY = pd.DataFrame(data=RNY[:, 1:],
+        rny = pd.DataFrame(data=rny[:, 1:],
                            index=self.PCA_factors[1:].index,
                            columns=list(range(1, self.tenors.max() + 1)))
 
-        self.RNY = np.exp(RNY) - 1
-        self.TermPremium = ((1 + self.curve)/(1 + self.RNY) - 1).dropna(how='all')
+        self.rny = np.exp(rny) - 1
+        self.term_premium = ((1 + self.curve) / (1 + self.rny) - 1).dropna(how='all')
 
-    def _get_PCA_factors(self):
+    def _get_pca_factors(self):
 
         pca = PCA(n_components=self.n_factors)
 
@@ -199,5 +199,4 @@ class NominalACM(object):
 TO DO
 * write documentation
 * wtite README.md
-* write example
 """
