@@ -6,13 +6,26 @@ pd.options.mode.chained_assignment = None
 
 
 class NominalACM(object):
+    """
+    This class estimates term premium based on the paper 'pricing term structures with linear regressions'.
+    It takes the curve vertices and excess returns of positions from all of them and return the term premium and
+    risk neutral yields as object attributes.
+    """
 
     base_count_dict = {'daily': 252,
                        'monthly': 12,
                        'yearly': 1}
 
     def __init__(self, curve, excess_returns, freq='daily', interpolation='pchip', n_factors=5, compute_miy=False):
-
+        """
+        All inputs are saved as attributes.
+        :param curve: DataFrame with equally spaced vertices as columns
+        :param excess_returns: DataFrame with the excess returns of the vertices as columns
+        :param freq: 'daily', 'monthly' or 'yearly'. Frequency of observations.
+        :param interpolation: any interpolation method from the SciPy library.
+        :param n_factors: number of principal components in the analysis.
+        :param compute_miy: Boolean. If True, computes the model implied yield.
+        """
         self.curve = curve
 
         self.excess_returns = excess_returns
@@ -35,27 +48,26 @@ class NominalACM(object):
 
         self.compute_miy = compute_miy
 
-        # Runs the estimation and retunrs the Risk Netral curve and term premium series as an atibute of the object
         self._run_estimation()
 
     def _run_estimation(self):
 
-        # Step 0 - get the PCA factor series as an atribute of the object
+        # Step 0 - get the PCA factor series
         self.PCA_factors = self._get_pca_factors()
 
-        # Step 1 - Factor VAR
-        Mu_hat, Phi_hat, V_hat, Sigma_hat = self._estimate_factor_VAR()
+        # Step 1 - VAR for the PCA factors
+        Mu_hat, Phi_hat, V_hat, Sigma_hat = self._estimate_factor_var()
 
         # Step 2 - Excess return equation
-        beta_hat, a_hat, B_star_hat, sigma2_hat, c_hat = self._estimate_excess_return_equation(V_hat=V_hat)
+        beta_hat, a_hat, B_star_hat, sigma2_hat, c_hat = self._estimate_excess_return_equation(v_hat=V_hat)
 
-        # Step 3 - Price of risk parameters estimates
+        # Step 3 - Estimate price of risk parameters
         lambda_0_hat, lambda_1_hat = self._retrieve_lambda(beta_hat, a_hat, B_star_hat, Sigma_hat, sigma2_hat, c_hat)
 
-        # Step 4 - Short Rate Equation
+        # Step 4 - Equation for the Short Rate
         delta_0_hat, delta_1_hat = self._estimate_short_rate_equation()
 
-        # Step 5 - Affine Recurssions
+        # Step 5 - Affine Recursions
         # model implied yield
         if self.compute_miy:
             miy = self._affine_recursions(Mu_hat, Phi_hat, Sigma_hat, sigma2_hat, lambda_0_hat, lambda_1_hat,
@@ -89,7 +101,7 @@ class NominalACM(object):
 
         return df_pca
 
-    def _estimate_factor_VAR(self):
+    def _estimate_factor_var(self):
         Y = self.PCA_factors.iloc[1:]
         Z = self.PCA_factors.iloc[:-1]
         Z['const'] = 1
@@ -110,11 +122,11 @@ class NominalACM(object):
 
         return Mu_hat, Phi_hat, V_hat, Sigma_hat
 
-    def _estimate_excess_return_equation(self, V_hat):
+    def _estimate_excess_return_equation(self, v_hat):
 
         mat_rx = self.excess_returns.iloc[1:].values.T.astype(float)
 
-        Z = np.concatenate((np.ones((1, self.sample_size)), V_hat, np.matrix(self.PCA_factors.iloc[:-1]).T))
+        Z = np.concatenate((np.ones((1, self.sample_size)), v_hat, np.matrix(self.PCA_factors.iloc[:-1]).T))
 
         D_hat = np.dot(mat_rx, np.dot(Z.T, np.linalg.inv(np.dot(Z, Z.T))))
         a_hat = D_hat[:, 0]
@@ -131,12 +143,12 @@ class NominalACM(object):
 
         return beta_hat, a_hat, B_star_hat, sigma2_hat, c_hat
 
-    def _retrieve_lambda(self, beta_hat, a_hat, B_star_hat, Sigma_hat, sigma2_hat, c_hat):
+    def _retrieve_lambda(self, beta_hat, a_hat, b_star_hat, Sigma_hat, sigma2_hat, c_hat):
 
         lambda_0_hat = np.dot(np.linalg.inv(np.dot(beta_hat, beta_hat.T)),
                               np.dot(beta_hat,
                                      a_hat + np.dot(0.5,
-                                                    np.dot(B_star_hat,
+                                                    np.dot(b_star_hat,
                                                            np.reshape(Sigma_hat, (self.n_factors ** 2, 1)))
                                                     + np.dot(sigma2_hat,
                                                              np.ones((self.n_tenors, 1))
@@ -197,6 +209,5 @@ class NominalACM(object):
 
 """
 TO DO
-* write documentation
 * wtite README.md
 """
