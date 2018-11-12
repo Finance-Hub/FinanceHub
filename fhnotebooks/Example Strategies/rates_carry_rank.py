@@ -7,7 +7,9 @@ country_code = {'US': '082',  # United States
                 'CA': '101',  # Canada
                 'GE': '910',  # Germany
                 'UK': '110',  # United Kingdom
-                'JP': '105'}  # Japan
+                'JP': '105',  # Japan
+                'FR': '915',  # France
+                'IT': '905'}  # Italy
 
 tenors_month = [3, 6, 12, 2*12, 3*12, 4*12, 5*12, 6*12, 7*12, 8*12, 9*12, 10*12, 15*12, 20*12, 30*12]
 
