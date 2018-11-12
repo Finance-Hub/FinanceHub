@@ -42,6 +42,8 @@ df_tracker = pd.DataFrame(index=df_generics.index,
                           columns=['contract_rolling_out', 'er_index', 'roll_out_date', 'holdings'])
 
 # initialize
+start_date = df_uc.index[0]
+
 df_tracker.loc[start_date, 'er_index'] = 100
 
 contract_rolling_out = df_uc.loc[start_date, 'JB2 Comdty'] + ' Comdty'
@@ -80,6 +82,6 @@ for d, dm1 in zip(df_tracker.index[1:], df_tracker.index[:-1]):
 df_tracker['er_index'].plot()
 plt.show()
 
-writer = pd.ExcelWriter(r'G:\Gustavo Amarante\Aulas\df_IT.xlsx')
+writer = pd.ExcelWriter(r'G:\Gustavo Amarante\Aulas\df_JP.xlsx')
 df_tracker.to_excel(writer)
 writer.save()
