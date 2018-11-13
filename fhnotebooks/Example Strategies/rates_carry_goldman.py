@@ -215,7 +215,3 @@ print(round((time.time()-start_time)/60, 1), 'minutes to run')
 
 # strat_index['tr_index'].plot()
 # plt.show()
-
-writer = pd.ExcelWriter(r'C:\Users\gamarante\Desktop\my_strat.xlsx')
-strat_index.to_excel(writer)
-writer.save()
