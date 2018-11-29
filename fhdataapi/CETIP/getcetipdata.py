@@ -91,3 +91,8 @@ class CETIP(object):
         df = pd.date_range(initial_date, end_date, freq='D')
         
         return df
+    
+"""
+To Do:
+* Code runs slow since it needs to read one .txt for each day. Think of a strategy to accelerate this process.
+"""
