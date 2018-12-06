@@ -8,6 +8,9 @@ import time
 
 
 class Rstar(object):
+    """
+    Code for computing Rstar
+    """
 
     def __init__(self, logGDP, inflation, NominalRate, RealRate, ar_c=None, by_c=None, run_se=False, niter=500,
                  charts=False, smoothed=True):
