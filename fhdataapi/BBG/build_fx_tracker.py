@@ -36,7 +36,7 @@ forwards = pd.DataFrame(index=bbg_raw_data_df.index,columns=bbg_raw_data_df.colu
 for i in range(len(day_count_dc)):
     #since the trade settle 2 business days afterwards, we take the settlement date for each of the cases and
     value_dates[bbg_raw_data_df.columns[i]] = bbg_raw_data_df.index + timedelta(days=day_count_dc[i]) + BDay(2)
-    if i !=0: #if not spot, get the outright forwards by dividing the points by 1000000
+    if i !=0: #if not spot, get the outright forwards by dividing the points by 10000
         forwards[forwards.columns[i]] = bbg_raw_data_df['spot'] + bbg_raw_data_df.iloc[:,i]/10000
     else:
         forwards[forwards.columns[i]] = bbg_raw_data_df['spot']
@@ -47,7 +47,7 @@ for i in value_dates.columns[1:]:
     day_counts_df[i] = [(a - b).days for a, b in zip(value_dates[i], value_dates['spot'])]
 
 #We are going to build a trading stratey in which we every day trade a fraction of the notional on a 1 month forward
-number_of_trades = 20 #so, we get a strip of 21 forwards
+number_of_trades = 21 #so, we get a strip of forwards
 how_much_pct_of_notional_to_trade_per_day = 1./float(number_of_trades)
 
 pnl = pd.Series(index=range(number_of_trades), data=0.)
@@ -60,6 +60,7 @@ notionals = pd.Series(index=range(number_of_trades), data=0.)
 days_to_mat_new_position = pd.Series(index=value_dates.index[:-number_of_trades],
                                      data=[(a-b).days for a,b in zip(value_dates['1m'].iloc[number_of_trades:],
                                                                      value_dates['1m'].iloc[:-number_of_trades])])
+
 #start the tracker index with 100 notional
 tracker_index = pd.Series(index=value_dates.index[:-number_of_trades])
 index_start_date = tracker_index.index[0]
@@ -81,7 +82,7 @@ for d,d_minus_1 in zip(tracker_index.index[1:],tracker_index.index[:-1]):
 
     # mark to market the forwards that we are holding
     fwd_mtm = pd.Series(index=fwd_strikes.index,
-                        data=np.interp(fwd_day_count,
+                        data=np.interp(list(fwd_day_count.values),
                         list(day_counts_df.loc[d].astype(float).values),
                         list(forwards.loc[d].values)))
 
@@ -96,7 +97,7 @@ for d,d_minus_1 in zip(tracker_index.index[1:],tracker_index.index[:-1]):
     tracker_index[d] = tracker_index[d_minus_1] + todays_pnl #acumulate the pnl in the tracker
 
 
-bbg_carry_index = bbg.fetch_series(securities = 'AUDUSDCR CMPN Curncy',
+bbg_carry_index = bbg.fetch_series(securities = currency + 'USDCR CMPN Curncy',
                                fields='PX_LAST',
                                startdate=start_date,
                                enddate=end_date)
