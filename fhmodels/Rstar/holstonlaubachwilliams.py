@@ -1,3 +1,7 @@
+"""
+Author: Gustavo Amarante
+"""
+
 import numpy as np
 import pandas as pd
 import pykalman
@@ -8,6 +12,10 @@ import time
 
 
 class Rstar(object):
+    """
+    This class replicates the model from 'Measuring the Natural Rate of Interest: International Trends and Determinants'
+    (2016) from Holston, Laubach and Williams
+    """
 
     def __init__(self, logGDP, inflation, NominalRate, RealRate, ar_c=None, by_c=None, run_se=False, niter=500,
                  charts=False, smoothed=True):
