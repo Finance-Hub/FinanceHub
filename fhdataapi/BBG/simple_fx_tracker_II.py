@@ -9,6 +9,8 @@ import numpy as np
 
 bbg = BBG()
 
+#TODO add ['DKK', 'ISK', 'SKK', 'HKD', 'CNY', 'MYR', 'THB', 'ARS', 'COP', 'PEN'] to the list of currencies
+
 currencies = [
     'AUD',
     'BRL',
