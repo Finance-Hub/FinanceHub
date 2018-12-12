@@ -1,3 +1,7 @@
+"""
+Author: Gustavo Amarante
+"""
+
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -55,7 +59,7 @@ class NominalACM(object):
         # Step 0 - get the PCA factor series
         self.PCA_factors = self._get_pca_factors()
 
-        # Step 1 - VAR for the PCA factors
+        # Step 1 - VAR for the PCA equities
         Mu_hat, Phi_hat, V_hat, Sigma_hat = self._estimate_factor_var()
 
         # Step 2 - Excess return equation

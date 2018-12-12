@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 """
-Created on Thu Nov 29 15:58:51 2018
-
-@author: Vitor Eller
+Author: Vitor Eller
 """
 
 import pandas as pd
 from datetime import datetime, timedelta
 from time import strptime
+
 
 class CETIP(object):
     
@@ -62,12 +60,13 @@ class CETIP(object):
                 data = pd.read_csv(url, header=None).iloc[0, 0]
                 
                 if series_id == 'MediaCDI':
-                    """CDI needs to be converted to percentage"""
+                    # CDI needs to be converted to percentage
                     data = data/100
                     
                 df.loc[date, series_id] = data
             
             except:
+                # expected behaviour is skipping holidays and weekends
                 continue
         
         return df

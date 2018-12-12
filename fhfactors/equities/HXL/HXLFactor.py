@@ -1,29 +1,30 @@
 """
-@author: Vitor Eller - @VFermat
+Author: Vitor Eller - @VFermat
 """
 
 import pandas as pd
 from pandas.tseries.offsets import MonthEnd
 
-class HXLFactors(object):
+
+class HXLFactor(object):
     
-    def calculate_factors(self, prices, dividends, assets, ROE, marketcap):
+    def calculate_factors(self, prices, dividends, assets, roe, marketcap):
         
         # Lining up dates to end of month
         prices.columns = prices.columns + MonthEnd(0)
         dividends.columns = dividends.columns + MonthEnd(0)
         assets.columns = assets.columns + MonthEnd(0)
-        ROE.columns = ROE.columns + MonthEnd(0)
+        roe.columns = roe.columns + MonthEnd(0)
         marketcap.columns = marketcap.columns + MonthEnd(0)
-        
-        dividends, assets, ROE = self._padronize_columns(prices.columns, 
+
+        dividends, assets, roe = self._padronize_columns(prices.columns,
                                                          dividends,
                                                          assets,
-                                                         ROE)
+                                                         roe)
         
         self.securities = {
                 'assets': assets,
-                'ROE': ROE,
+                'ROE': roe,
                 'price': prices,
                 'marketcap': marketcap,
                 'dividends': dividends
@@ -31,11 +32,10 @@ class HXLFactors(object):
         
         # Gathering info
         self.securities = self._get_IA_info(self.securities)
-        self.securites = self._get_return(self.securities)
+        self.securities = self._get_return(self.securities)
         self.securities = self._get_benchmarks(self.securities)
 
-    
-    @staticmethod        
+    @staticmethod
     def _get_benchmarks(securities):
         pass
     
@@ -67,8 +67,7 @@ class HXLFactors(object):
         n_securities['lreturn'] = n_securities['return'].shift(-1, axis=1)
         
         return n_securities
-        
-        
+
     @staticmethod
     def _get_IA_info(securities):
         """
@@ -111,20 +110,20 @@ class HXLFactors(object):
             Dataframe containing information on assets
         ROE : DataFrame like
             Dataframe containing information on ROE
-            
+
         Return
         ----------
         ndividends : Dataframe like
             Updated Dataframe containing information on dividends
         nassets : Dataframe like
             Updated Dataframe containing information on assets
-        nROE : Dataframe like
+        n_roe : Dataframe like
             Updated Dataframe containing information on ROE
         """
         
         ndividends = pd.DataFrame(index=dividends.index)
         nassets = pd.DataFrame(index=assets.index)
-        nROE = pd.DataFrame(index=ROE.index)
+        n_roe = pd.DataFrame(index=ROE.index)
         
         for date in pattern:
             
@@ -135,17 +134,14 @@ class HXLFactors(object):
                 
             if date in assets.columns:
                 nassets[date] = assets[date]
-                nROE[date] = ROE[date]
+                n_roe[date] = ROE[date]
             else:
                 nassets[date] = 0
-                nROE[date] = 0
+                n_roe[date] = 0
             
-        return ndividends, nassets, nROE
-            
-                
-    
-    
-    
+        return ndividends, nassets, n_roe
+
+
 """
 TO DO:
     Maneira para que todos os index sejam o ultimo dia do mes.
