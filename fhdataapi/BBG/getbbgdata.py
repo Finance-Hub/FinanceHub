@@ -30,6 +30,9 @@ class BBG(object):
         :param enddate: str, datetime or timestamp
         :param period: 'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'SEMI ANNUAL' OR 'YEARLY'. Periodicity of the series
         :param calendar: 'ACTUAL', 'CALENDAR' or 'FISCAL'
+        :param fx: str with a currency code. Converts the series to the chosen currency
+        :param fperiod: ???
+        :param verbose: prints progress
         :return:  DataFrame or Multi-index DataFrame (if more than one field is passed)
         """
 
