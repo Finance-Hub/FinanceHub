@@ -24,6 +24,8 @@ class BBG(object):
 
         Requests can easily get really big, this method allows for up to 30k data points.
 
+        This replicates the behaviour of the BDH function of the excel API
+
         :param securities: str or list of str
         :param fields: str or list of str
         :param startdate: str, datetime or timestamp
@@ -200,6 +202,8 @@ class BBG(object):
         Grabs a characteristic of a contract, like maturity dates, first notice dates, strikes, contract sizes, etc.
 
         Returns a DataFrame with the tickers on the index and the field on the columns.
+
+        This replicates the behaviour of the BDP Function from the excel API.
 
         OBS: For now, it only allows for a single field. An extension that allows for multiple fields is a good idea.
 
@@ -494,11 +498,6 @@ class BBG(object):
         """
         return str(input_date.year)+str(input_date.month).zfill(2)+str(input_date.day).zfill(2)
 
-
-"""
-To Dos
-* Correct the empty variables problem
-"""
 
 """
 FUTURE DEVELOPMENT
