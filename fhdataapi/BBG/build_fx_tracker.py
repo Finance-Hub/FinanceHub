@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
+#TODO This code is incomplete. It is generating wrong results and needs fixing. DO NOT USE IT!!
+
 writer = pd.ExcelWriter(os.path.join(r'G:\GS' ,'fx_tracer.xlsx'))
 
 bbg = BBG()
