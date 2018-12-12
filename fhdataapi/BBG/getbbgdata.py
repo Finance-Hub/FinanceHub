@@ -368,8 +368,10 @@ class BBG(object):
 
                                 df = df.append(s, ignore_index=True)
 
-                df.columns = ['', ref_date]
-                df = df.set_index(df.columns[0])
+                if not df.empty:
+                    df.columns = ['', ref_date]
+                    df = df.set_index(df.columns[0])
+
                 end_reached = True
 
         return df
@@ -492,8 +494,6 @@ class BBG(object):
 
 """
 To Dos
-* Write README
-* Assert variable types
 * Correct the empty variables problem
 """
 
