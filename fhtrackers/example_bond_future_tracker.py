@@ -81,7 +81,3 @@ for d, dm1 in zip(df_tracker.index[1:], df_tracker.index[:-1]):
 
 df_tracker['er_index'].plot()
 plt.show()
-
-writer = pd.ExcelWriter(r'G:\Gustavo Amarante\Aulas\df_JP.xlsx')
-df_tracker.to_excel(writer)
-writer.save()
