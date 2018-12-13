@@ -9,10 +9,10 @@ from fhdataapi import BBG
 bbg = BBG()
 
 # ===== User Defined Parameters =====
-currency = 'EUR'  # Currency to build the tracker against the USD
+currency = 'AUD'  # Currency to build the tracker against the USD
 n_trades = 20  # Number of trackers to smooth the changes in holdings
-start_date = '2000-01-04'
-end_date = '2016-12-31'
+start_date = '1999-01-04'
+end_date = '2014-04-10'
 
 # Bloomberg tickers for the currency futures
 dict_tickers = {currency + ' Curncy': 'spot',
