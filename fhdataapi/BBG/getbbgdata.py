@@ -502,4 +502,5 @@ class BBG(object):
 """
 FUTURE DEVELOPMENT
 * Since all functions require a session, build a session opening routine.
+* allow for 'securities' to be a dict, with tickers on the keys and names on the values.
 """
