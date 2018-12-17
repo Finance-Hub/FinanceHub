@@ -131,8 +131,3 @@ plt.show()
 df_tracker['ratio'] = df_tracker['index'] / df_tracker[currency + 'USDCR CMPN Curncy']
 df_tracker['ratio'].plot()
 plt.show()
-
-
-"""
-* test JPY
-"""
