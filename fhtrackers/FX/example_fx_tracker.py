@@ -16,10 +16,10 @@ start_time = time.time()
 bbg = BBG()
 
 # ===== User Defined Parameters =====
-currency = 'JPY'  # Currency to build the tracker against the USD
+currency = 'AUD'  # Currency to build the tracker against the USD
 n_trades = 20  # Number of trackers to smooth the changes in holdings
 start_date = '1999-01-04'
-end_date = '2014-04-10'
+end_date = '2017-04-10'
 
 # Bloomberg tickers for the currency futures
 dict_tickers = {currency + ' Curncy': 'spot',
@@ -39,6 +39,7 @@ df_bbg = bbg.fetch_series(securities=list(dict_tickers.keys()),
                           startdate=start_date,
                           enddate=end_date)
 df_bbg = df_bbg.rename(dict_tickers, axis=1)
+df_bbg = df_bbg.fillna(method='ffill')
 
 # DataFrame to hold settlement dates
 df_value_dates = pd.DataFrame(index=df_bbg.index,
@@ -56,7 +57,7 @@ for mat in dict_dc.keys():
     if mat == 'spot':
         df_forwards[mat] = df_bbg['spot']
     else:
-        df_forwards[mat] = (df_bbg['spot'] + df_bbg[mat].multiply(1/100))
+        df_forwards[mat] = (df_bbg['spot'] + df_bbg[mat].multiply(1/10000))
 
 # DataFrame to hold the number of days between the spot date and the settlement date
 df_daycount_dc = pd.DataFrame(index=df_bbg.index)
@@ -80,7 +81,7 @@ df_tracker = pd.DataFrame(index=df_bbg.index,
                           data=100)
 
 for d, dm1 in zip(df_tracker.index[1:], df_tracker.index[:-1]):
-    # print(d)
+    print(d)
 
     # move trades down by 1 position
     change_daycount = (df_value_dates.loc[d, 'spot'] - df_value_dates.loc[dm1, 'spot']).days
