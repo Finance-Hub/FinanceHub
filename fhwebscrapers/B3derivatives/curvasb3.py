@@ -44,10 +44,10 @@ class ScraperB3(object):
         :param contract: B3 code for the contract (see list of supported contracts)
         :param date: should be in american convention mm/dd/yyyy
         :param update_db: If True, updates the FinanceLab AWS database with the scraped data. Requires the connect_dict
-                          property with the access credentials.
+                          property with the access credentials. Does not return a DataFrame as output.
         :param connect_dict: dict keys should be 'flavor', 'database', 'schema', 'user', 'password', 'host', 'port'.
                              These will generate the connection string.
-        :return:
+        :return: DataFrame (if update_db is False) or None
         """
 
         if update_db:
@@ -108,7 +108,9 @@ class ScraperB3(object):
         df = ScraperB3._drop_useless_columns(df)
         df = ScraperB3._append_contract_column(contract, date, df)
 
-        if df.empty:
+        df.index = pd.to_datetime(df.index)
+
+        if df.empty:  # TODO needs a better way to handle errors
             return
 
         if update_db:
@@ -186,3 +188,10 @@ class ScraperB3(object):
                                            flavor=connect_dict['flavor']))
 
         df.to_sql('B3curves', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+
+
+"""
+TO DO
+* modify scrape method to include a date interval. Scrape all dates into a single dataframe before uploading
+* query the primary key of the table to check if there are no repeated values, drop repeated from dataframe and the upload
+"""

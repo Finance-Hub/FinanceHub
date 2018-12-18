@@ -931,3 +931,8 @@ class Rstar(object):
 
         return lame / T
 
+
+"""
+TO DO
+* Raise warnings in the cases where the program should stop
+"""
