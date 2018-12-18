@@ -1,3 +1,9 @@
+"""
+Author: Gustavo Amarante
+
+This script is to show how a bond futures tracker is built
+"""
+
 from fhdataapi import BBG
 import pandas as pd
 from datetime import timedelta

@@ -213,5 +213,6 @@ class NominalACM(object):
 
 """
 TO DO
-* wtite README.md
+* Write README.md
+* Include method to compute excess return. So that df_returns would be optional.
 """
