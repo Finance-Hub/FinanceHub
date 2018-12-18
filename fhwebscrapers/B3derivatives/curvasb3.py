@@ -38,7 +38,7 @@ class ScraperB3(object):
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
     @staticmethod
-    def scrape(contract, date, update_db=False, connect_dict=None):
+    def scrape(contract, initial_date, end_date, update_db=False, connect_dict=None):
         """
 
         :param contract: B3 code for the contract (see list of supported contracts)
@@ -49,6 +49,13 @@ class ScraperB3(object):
                              These will generate the connection string.
         :return: DataFrame (if update_db is False) or None
         """
+
+        pass
+
+
+    @staticmethod
+    def _scrape_single_date(contract, date, update_db=False, connect_dict=None):
+
 
         if update_db:
             assert type(connect_dict) is dict, "If 'update_db' is True, 'connect_dict' should be a dictionary"
