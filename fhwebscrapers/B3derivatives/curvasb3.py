@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError
 
 
 class ScraperB3(object):
@@ -38,7 +39,7 @@ class ScraperB3(object):
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
     @staticmethod
-    def scrape(contract, initial_date, end_date, update_db=False, connect_dict=None):
+    def scrape(contract, start_date, end_date, update_db=False, connect_dict=None):
         """
 
         :param contract: B3 code for the contract (see list of supported contracts)
@@ -50,22 +51,37 @@ class ScraperB3(object):
         :return: DataFrame (if update_db is False) or None
         """
 
-        pass
-
-
-    @staticmethod
-    def _scrape_single_date(contract, date, update_db=False, connect_dict=None):
-
-
         if update_db:
             assert type(connect_dict) is dict, "If 'update_db' is True, 'connect_dict' should be a dictionary"
-        else:
-            connect_dict = None
 
-        if not (type(date) is str):
-            date = date.strftime('%m/%d/%Y')
+        if not (type(start_date) is str):
+            start_date = start_date.strftime('%m/%d/%Y')
         else:
-            date = pd.to_datetime(date).strftime('%m/%d/%Y')
+            start_date = pd.to_datetime(start_date).strftime('%m/%d/%Y')
+
+        if not (type(end_date) is str):
+            end_date = end_date.strftime('%m/%d/%Y')
+        else:
+            end_date = pd.to_datetime(end_date).strftime('%m/%d/%Y')
+
+        df = pd.DataFrame()
+        date_list = pd.date_range(start=start_date, end=end_date)
+
+        for d in date_list:
+
+            print('Scraping', contract, 'for date', d.strftime('%m/%d/%Y'))
+
+            df_date = ScraperB3._scrape_single_date(contract, d.strftime('%m/%d/%Y'))
+            df = pd.concat([df, df_date], join='outer')
+
+        if update_db:
+            ScraperB3._send_df_to_db(df, contract, connect_dict)
+
+        else:
+            return df
+
+    @staticmethod
+    def _scrape_single_date(contract, date):
 
         contract = contract.upper()
         header = ScraperB3._get_header(contract)
@@ -117,11 +133,8 @@ class ScraperB3(object):
 
         df.index = pd.to_datetime(df.index)
 
-        if df.empty:  # TODO needs a better way to handle errors
+        if df.empty:  # TODO needs a better way to handle this error
             return
-
-        if update_db:
-            ScraperB3._send_df_to_db(df, connect_dict)
         else:
             return df
 
@@ -182,7 +195,7 @@ class ScraperB3(object):
         return df
 
     @staticmethod
-    def _send_df_to_db(df, connect_dict):
+    def _send_df_to_db(df, contract, connect_dict):
 
         df.columns = map(str.lower, df.columns)
 
@@ -194,11 +207,30 @@ class ScraperB3(object):
                                            port=connect_dict['port'],
                                            flavor=connect_dict['flavor']))
 
-        df.to_sql('B3curves', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+        min_date = df.index.min()
+        max_date = df.index.max()
+
+        query = 'SELECT time_stamp, maturity_code FROM "B3curvesteste" WHERE '
+        query = query + f"contract='{contract}'"
+        query = query + f"AND time_stamp BETWEEN '{min_date}' AND '{max_date}'"
+
+        df_db = pd.read_sql(sql=query, con=db_connect, index_col='time_stamp')
+        df_db = df_db.set_index([df_db.index, 'maturity_code'])
+
+        df = df.set_index([df.index, 'maturity_code'])
+        df = df.drop(df_db.index)
+        df['maturity_code'] = df.index.get_level_values(1)
+        df = df.set_index(df.index.get_level_values(0))
+
+        try:
+            df.to_sql('B3curvesteste', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+
+        except IntegrityError:
+            print('There are duplicate entries in the DataFrame')
 
 
 """
 TO DO
-* modify scrape method to include a date interval. Scrape all dates into a single dataframe before uploading
-* query the primary key of the table to check if there are no repeated values, drop repeated from dataframe and the upload
+* treat weekends and holidays
+* review documentation
 """
