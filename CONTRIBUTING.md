@@ -43,7 +43,7 @@ workflow productive and less frustrating. Basically, if you do not have
 the time to organize your code, we will not have enough time to read it
 and test it.
 
-## Bug Reports (GitHub issues)
+## Bug Reports
 
 * Bug reports are handled by the GitHub's issues tab of the project.
 * **Debug the code**. You might find the problem yourself and then
