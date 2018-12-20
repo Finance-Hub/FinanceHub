@@ -233,4 +233,5 @@ class ScraperB3(object):
 TO DO
 * treat weekends and holidays
 * review documentation
+* check if the example still works
 """
