@@ -213,7 +213,7 @@ class ScraperB3(object):
         min_date = df.index.min()
         max_date = df.index.max()
 
-        query = 'SELECT time_stamp, maturity_code FROM "B3curvesteste" WHERE '
+        query = 'SELECT time_stamp, maturity_code FROM "B3futures" WHERE '
         query = query + f"contract='{contract}'"
         query = query + f"AND time_stamp BETWEEN '{min_date}' AND '{max_date}'"
 
