@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
+import time
 
 
 class ScraperB3(object):
@@ -197,6 +198,8 @@ class ScraperB3(object):
     @staticmethod
     def _send_df_to_db(df, contract, connect_dict):
 
+        start_time = time.time()
+
         df.columns = map(str.lower, df.columns)
 
         db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{database}"
@@ -223,10 +226,12 @@ class ScraperB3(object):
         df = df.set_index(df.index.get_level_values(0))
 
         try:
-            df.to_sql('B3curvesteste', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+            df.to_sql('B3futures', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
 
         except IntegrityError:
             print('There are duplicate entries in the DataFrame')
+
+        print(round((time.time() - start_time)/60, 2), 'minutes to upload')
 
 
 """
