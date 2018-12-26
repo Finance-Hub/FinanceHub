@@ -2,6 +2,8 @@
 This script uploads data from the B3 website to our AWS SQL database.
 In order for this routine to work you need to fill 'connect_dict' with a username and password with writing privileges
 to the database.
+
+Author: Gustavo Amarante
 """
 
 from fhwebscrapers import ScraperB3
