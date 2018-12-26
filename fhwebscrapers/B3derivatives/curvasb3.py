@@ -39,6 +39,20 @@ class ScraperB3(object):
     # Columns that need to be dropped. They are either HTML junk or redundant information
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
+    # Contract maturity dictionary
+    mat_dict = {'JAN': 'F',
+                'FEV': 'G',
+                'MAR': 'H',
+                'ABR': 'J',
+                'MAI': 'K',
+                'JUN': 'M',
+                'JUL': 'N',
+                'AGO': 'Q',
+                'SET': 'U',
+                'OUT': 'V',
+                'NOV': 'X',
+                'DEZ': 'Z'}
+
     @staticmethod
     def scrape(contract, start_date, end_date, update_db=False, connect_dict=None):
         """
@@ -134,9 +148,14 @@ class ScraperB3(object):
 
         df.index = pd.to_datetime(df.index)
 
-        if df.empty:  # TODO needs a better way to handle this error
+        if df.empty:
             return
+
         else:
+
+            #if pd.to_datetime(date) <= pd.to_datetime('01/01/2006'):
+            df = ScraperB3._change_contract_name(df, date)
+
             return df
 
     @staticmethod
@@ -194,6 +213,26 @@ class ScraperB3(object):
         df = pd.concat([add_col, df], axis=1)
 
         return df
+
+    @staticmethod
+    def _change_contract_name(df, date):
+
+        if len(df['MATURITY_CODE'].iloc[0]) >= 4:
+            my_func = lambda x: ScraperB3._change_old_maturity_code(x, date)
+            df['MATURITY_CODE'] = df['MATURITY_CODE'].apply(my_func)
+
+        return df
+
+    @staticmethod
+    def _change_old_maturity_code(code, date):
+        month_code = ScraperB3.mat_dict[code[:-1]]
+
+        if int(code[-1]) >= int(date[-1]):
+            new_code = month_code + '0' + code[-1]
+        else:
+            new_code = month_code + '1' + code[-1]
+
+        return new_code
 
     @staticmethod
     def _send_df_to_db(df, contract, connect_dict):
