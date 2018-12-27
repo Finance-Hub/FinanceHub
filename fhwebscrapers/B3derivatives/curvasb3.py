@@ -1,6 +1,8 @@
 import pandas as pd
 import requests
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError
+import time
 
 
 class ScraperB3(object):
@@ -37,8 +39,22 @@ class ScraperB3(object):
     # Columns that need to be dropped. They are either HTML junk or redundant information
     col2drop = {'JUNK1', 'CHANGE', 'VARIATION'}
 
+    # Contract maturity dictionary
+    mat_dict = {'JAN': 'F',
+                'FEV': 'G',
+                'MAR': 'H',
+                'ABR': 'J',
+                'MAI': 'K',
+                'JUN': 'M',
+                'JUL': 'N',
+                'AGO': 'Q',
+                'SET': 'U',
+                'OUT': 'V',
+                'NOV': 'X',
+                'DEZ': 'Z'}
+
     @staticmethod
-    def scrape(contract, date, update_db=False, connect_dict=None):
+    def scrape(contract, start_date, end_date, update_db=False, connect_dict=None):
         """
 
         :param contract: B3 code for the contract (see list of supported contracts)
@@ -52,13 +68,35 @@ class ScraperB3(object):
 
         if update_db:
             assert type(connect_dict) is dict, "If 'update_db' is True, 'connect_dict' should be a dictionary"
-        else:
-            connect_dict = None
 
-        if not (type(date) is str):
-            date = date.strftime('%m/%d/%Y')
+        if not (type(start_date) is str):
+            start_date = start_date.strftime('%m/%d/%Y')
         else:
-            date = pd.to_datetime(date).strftime('%m/%d/%Y')
+            start_date = pd.to_datetime(start_date).strftime('%m/%d/%Y')
+
+        if not (type(end_date) is str):
+            end_date = end_date.strftime('%m/%d/%Y')
+        else:
+            end_date = pd.to_datetime(end_date).strftime('%m/%d/%Y')
+
+        df = pd.DataFrame()
+        date_list = pd.date_range(start=start_date, end=end_date)
+
+        for d in date_list:
+
+            print('Scraping', contract, 'for date', d.strftime('%m/%d/%Y'))
+
+            df_date = ScraperB3._scrape_single_date(contract, d.strftime('%m/%d/%Y'))
+            df = pd.concat([df, df_date], join='outer')
+
+        if update_db:
+            ScraperB3._send_df_to_db(df, contract, connect_dict)
+
+        else:
+            return df
+
+    @staticmethod
+    def _scrape_single_date(contract, date):
 
         contract = contract.upper()
         header = ScraperB3._get_header(contract)
@@ -110,12 +148,14 @@ class ScraperB3(object):
 
         df.index = pd.to_datetime(df.index)
 
-        if df.empty:  # TODO needs a better way to handle errors
+        if df.empty:
             return
 
-        if update_db:
-            ScraperB3._send_df_to_db(df, connect_dict)
         else:
+
+            #if pd.to_datetime(date) <= pd.to_datetime('01/01/2006'):
+            df = ScraperB3._change_contract_name(df, date)
+
             return df
 
     @staticmethod
@@ -175,7 +215,29 @@ class ScraperB3(object):
         return df
 
     @staticmethod
-    def _send_df_to_db(df, connect_dict):
+    def _change_contract_name(df, date):
+
+        if len(df['MATURITY_CODE'].iloc[0]) >= 4:
+            my_func = lambda x: ScraperB3._change_old_maturity_code(x, date)
+            df['MATURITY_CODE'] = df['MATURITY_CODE'].apply(my_func)
+
+        return df
+
+    @staticmethod
+    def _change_old_maturity_code(code, date):
+        month_code = ScraperB3.mat_dict[code[:-1]]
+
+        if int(code[-1]) >= int(date[-1]):
+            new_code = month_code + '0' + code[-1]
+        else:
+            new_code = month_code + '1' + code[-1]
+
+        return new_code
+
+    @staticmethod
+    def _send_df_to_db(df, contract, connect_dict):
+
+        start_time = time.time()
 
         df.columns = map(str.lower, df.columns)
 
@@ -187,11 +249,33 @@ class ScraperB3(object):
                                            port=connect_dict['port'],
                                            flavor=connect_dict['flavor']))
 
-        df.to_sql('B3curves', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+        min_date = df.index.min()
+        max_date = df.index.max()
+
+        query = 'SELECT time_stamp, maturity_code FROM "B3futures" WHERE '
+        query = query + f"contract='{contract}'"
+        query = query + f"AND time_stamp BETWEEN '{min_date}' AND '{max_date}'"
+
+        df_db = pd.read_sql(sql=query, con=db_connect, index_col='time_stamp')
+        df_db = df_db.set_index([df_db.index, 'maturity_code'])
+
+        df = df.set_index([df.index, 'maturity_code'])
+        df = df.drop(df_db.index)
+        df['maturity_code'] = df.index.get_level_values(1)
+        df = df.set_index(df.index.get_level_values(0))
+
+        try:
+            df.to_sql('B3futures', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+
+        except IntegrityError:
+            print('There are duplicate entries in the DataFrame')
+
+        print(round((time.time() - start_time)/60, 2), 'minutes to upload')
 
 
 """
 TO DO
-* modify scrape method to include a date interval. Scrape all dates into a single dataframe before uploading
-* query the primary key of the table to check if there are no repeated values, drop repeated from dataframe and the upload
+* treat weekends and holidays
+* review documentation
+* check if the example still works
 """
