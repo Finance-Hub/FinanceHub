@@ -121,6 +121,7 @@ class SwapCurves(object):
     
     @staticmethod
     def _get_term_days(term, convention):
+
         
         conventions = {
                 'D': {
@@ -152,4 +153,8 @@ class SwapCurves(object):
         term_days = times*d
         
         return term_days
-        
+
+
+
+
+
