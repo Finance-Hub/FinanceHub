@@ -11,9 +11,12 @@ df = pd.read_excel('clean_data.xlsx')
 
 df.iloc[4]
 
-import matplotlib.pyplot as plt
+
 from Days import SwapCurve
 
 sc = SwapCurve(df, 'business_days')
 
-sc.plot_day_curve(df.columns[197])
+dates = list(df.columns)[175:179]
+methods = ['nearest']
+
+sc.plot_day_curve(dates, interpolate=True, interpolate_methods=methods)
