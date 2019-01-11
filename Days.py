@@ -39,8 +39,24 @@ class SwapCurve(object):
             curve.plot(legend=date)
             plt.label(True)
             plt.show()
-    
-    @staticmethod
+
+    def plot_historic_rates(self, maturity)
+         try:
+            curve1= self.rates[maturity]
+         except:
+            raise ValueError('Maturity not available, try again.')
+         else:
+
+            curve1.plot(legend=date)
+            plt.label(True)
+            plt.show()
+
+
+
+
+
+
+ @staticmethod
     def _days_in_term(term, rules):
     
         rule= {'D':
@@ -57,9 +73,9 @@ class SwapCurve(object):
         term_time = term[-1]
         multiplication = term[0:-1]
     
-        maturity = rule[term_time][rules]
+        days_until_maturity = rule[term_time][rules]
     
-        term_days = maturity * multiplication
+        term_days = days_until_maturity * multiplication
     
         return term_days
 
