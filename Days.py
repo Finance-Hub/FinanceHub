@@ -146,6 +146,19 @@ class SwapCurve(object):
 
         return info
 
+
+
+
+    def plot_historic_rates(self,maturity)
+            try: historic_rates_curve = self.rates[maturity]
+            except:
+                raise ValueError('Maturity not availabe, try again.')
+            else:
+
+            historic_rates_curve.plot(legend=date)
+                plt.label(True)
+                plt.show()
+
     def plot_day_curve(self, dates, interpolate=False,
                        interpolate_methods=['cubic'], scatter=False):
         """
