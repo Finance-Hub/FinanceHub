@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 
 from scipy.interpolate import interp1d
+from mpl_toolkits.mplot3d import Axes3D
+from datetime import datetime
 
 
 class SwapCurve(object):
@@ -28,6 +30,42 @@ class SwapCurve(object):
         """
         self.convention = convention
         self.rates = rates
+
+    def plot_3d(self, plot_type='surface'):
+
+        x = self.rates.index
+        y = self.rates.columns
+        # Creating 2D Array with swap rates
+        z = []
+        for column in y:
+            base_curve = self.rates[column]
+            curve = self._get_3d_curve(base_curve, x)
+            z.append(curve)
+        z = np.array(z)
+        # Converting x (maturities terms) to days to maturities
+        x = [self._days_in_term(term, self.convention) for term in x]
+        # Converting y (dates) to number. Otherwise, plot will not work
+        inty = [0]
+        for date in y:
+            if date != y[0]:
+                diff = date - y[0]
+                inty.append(diff.days)
+        y = inty
+        # Creating 2D arrays for x and y
+        x, y = np.meshgrid(x, y)
+
+        # Plotting Graphic
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        if plot_type == 'surface':
+            ax.plot_surface(y, x, z)
+        elif plot_type == 'wireframe':
+            ax.plot_wireframe(y, x, z)
+        else:
+            raise ValueError('Invalid Plot Type. Please read documentation for valid plots.')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Days to Maturity')
+        ax.set_zlabel('Swap Rate (%)')
 
     def get_rate(self, base_curves, desired_terms,
                  interpolate_methods=['cubic']):
@@ -172,10 +210,7 @@ class SwapCurve(object):
         # Start plotting
         for curve in curves:
             date = curve.name
-            date = date.split()[0]
-            date = date.split('-')
-            date = date[::-1]
-            date = '/'.join(date)
+            date = date.strftime('%d/%b/%Y')
             if interpolate:
                 if len(interpolate_methods) == 1:
                     terms = curve.index
@@ -227,6 +262,26 @@ class SwapCurve(object):
             plt.legend()
             plt.show()
 
+    def _get_3d_curve(self, base_curve, maturities):
+
+        icurve = base_curve.copy()
+        icurve = icurve.dropna()
+
+        icurve_maturities = icurve.index
+        icurve_dmaturities = [self._days_in_term(term, self.convention) for
+                              term in icurve_maturities]
+        max_maturity = max(icurve_dmaturities)
+        min_maturity = max(icurve_dmaturities)
+        date = base_curve.name
+
+        for maturity in maturities:
+            dmaturity = self._days_in_term(maturity, self.convention)
+            if (dmaturity > min_maturity and dmaturity < max_maturity) and dmaturity not in icurve_dmaturities:
+                rate = self.get_rate(date, dmaturity)['cubic'][dmaturity]
+                base_curve[maturity] = rate
+
+        return base_curve
+
     @staticmethod
     def _interpolate_rates(day_terms, rates, interp_terms, method):
 
@@ -257,12 +312,3 @@ class SwapCurve(object):
         term_days = maturity * multiplication
 
         return term_days
-
-
-"""
-TO DO:
-    - write documentation
-    - 3D Plotting
-    - comment code
-    - structure bbg api code (pull needed data)
-"""
