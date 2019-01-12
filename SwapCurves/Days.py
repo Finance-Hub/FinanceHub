@@ -154,16 +154,32 @@ class SwapCurve(object):
 
         return info
 
+    def get_forward_historic(self, maturity1, maturity2, plot=False,
+                             interpolate_method='cubic'):
 
+        historic = pd.Series()
+        for date in self.rates.columns:
+            rates = self.get_rate(date, [maturity1, maturity2],
+                                  [interpolate_method])
+            rate1 = rates[interpolate_method][maturity1]
+            rate2 = rates[interpolate_method][maturity2]
+            forward = self.forward_rate(date, rate1, maturity1,
+                                        rate2, maturity2, self.convention_year)
+            historic.at[date] = forward
 
+        if plot:
+            historic.plot()
 
-    def plot_historic_rates(self,maturity):
-            try: historic_rates_curve = self.rates[maturity]
+        return historic
+
+    def plot_historic_rates(self, maturity):
+            try:
+                historic_rates_curve = self.rates[maturity]
             except:
                 raise ValueError('Maturity not availabe, try again.')
             else:
 
-                historic_rates_curve.plot(legend=date)
+                historic_rates_curve.plot(legend=maturity)
                 plt.label(True)
                 plt.show()
 
@@ -198,13 +214,6 @@ class SwapCurve(object):
         See Also
         ----------
         plot_term_historic : plot the historic rate for the desired term
-        """
-        """
-        TO DO:
-            - implement algorithm that lets the user pick any date,
-            even if we don't have that specific curve
-            - Change de xlabel to the term, instead of
-            letting it show 'days to maturity'
         """
         # Checking Inputs
         if type(dates) not in (list, np.ndarray):
