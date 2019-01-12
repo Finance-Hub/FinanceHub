@@ -5,6 +5,7 @@ Authors: Vitor Eller (@Vfermat) and Liam Dunphy (@ldunphy98)
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import datetime as dt
 
 from scipy.interpolate import interp1d
 from mpl_toolkits.mplot3d import Axes3D
@@ -350,3 +351,22 @@ class SwapCurve(object):
         term_days = maturity * multiplication
 
         return term_days
+
+    @staticmethod
+    def _forward_rate(base_date, maturity1, maturity2, rate1, rate2, convention):
+
+        maturity1_date = base_date + dt.timedelta(days=maturity1)
+        maturity2_date = base_date + dt.timedelta(days=maturity2)
+
+        business_days1 = np.busday_count(base_date, maturity1_date)
+        business_days2 = np.busday_count(base_date, maturity2_date)
+
+        days_to_years1 = (business_days1/convention)
+        days_to_years2 = (business_days2/convention)
+
+        numerator = (1+rate1)**days_to_years2
+        denominator = (1+rate2)**days_to_years1
+
+        get_forward = ((numerator/denominator)-1)*100
+
+        return get_forward
