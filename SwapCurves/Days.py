@@ -9,6 +9,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 from mpl_toolkits.mplot3d import Axes3D
 from datetime import datetime
+from Interpolation.FlatForward import FlatForward
 
 
 class SwapCurve(object):
@@ -20,6 +21,11 @@ class SwapCurve(object):
             'nearest': 'y-.'
             }
 
+    conventions = {
+            'business_days': 252,
+            'calendar_days': 360
+            }
+
     def __init__(self, rates, convention):
         """
         convention options:
@@ -29,6 +35,7 @@ class SwapCurve(object):
             pandas dataframe
         """
         self.convention = convention
+        self.convention_year = self.conventions[convention]
         self.rates = rates
 
     def plot_3d(self, plot_type='surface'):
@@ -138,7 +145,8 @@ class SwapCurve(object):
                         print('{} is an invalid term.'.format(term))
                         n_desired_terms.remove(term)
                 irates = self._interpolate_rates(dterms, list(curve),
-                                                 n_desired_terms, method)
+                                                 n_desired_terms, method,
+                                                 self.convention_year)
                 rates = {k: v for k, v in zip(n_desired_terms,
                                               irates)}
                 for k in rates.keys():
@@ -232,7 +240,8 @@ class SwapCurve(object):
                     iterms = np.arange(min(dterms), max(dterms), 10)
                     irates = self._interpolate_rates(dterms, list(curve),
                                                      iterms,
-                                                     interpolate_methods[0])
+                                                     interpolate_methods[0],
+                                                     self.convention_year)
                     plt.plot(iterms, irates, label=date)
                     plt.legend()
                     plt.xlabel('Days to Maturity')
@@ -251,7 +260,8 @@ class SwapCurve(object):
                     for method in interpolate_methods:
                         plot_type = self.interpolate_display[method]
                         irates = self._interpolate_rates(dterms, list(curve),
-                                                         iterms, method)
+                                                         iterms, method,
+                                                         self.convention_year)
                         plt.plot(iterms, irates, plot_type, label=method)
                     plt.xlabel('Days to Maturity')
                     plt.ylabel('Swap Rate (%)')
@@ -296,10 +306,16 @@ class SwapCurve(object):
         return base_curve
 
     @staticmethod
-    def _interpolate_rates(day_terms, rates, interp_terms, method):
+    def _interpolate_rates(day_terms, rates, interp_terms,
+                           method, convention_days):
 
-        func = interp1d(day_terms, rates, kind=method)
-        interp_rates = [func(day) for day in interp_terms]
+        if method != 'flatforward':
+            func = interp1d(day_terms, rates, kind=method)
+            interp_rates = [func(day) for day in interp_terms]
+        else:
+            ff = FlatForward()
+            interp_rates = ff.interpolate(rates, day_terms,
+                                          interp_terms, convention_days)
 
         return interp_rates
 
