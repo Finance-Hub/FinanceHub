@@ -21,6 +21,11 @@ with the same style as the ones you see in the repository, this will
 help to ease the understanding for newcomers and motivate contributions
 with the same guidelines.
 
+**You are not writing code for yourself**. Contributing means that you
+are writing code for other people to understand and it has to run on a
+different computer. Keep your code clean and do your best to make it
+efficient.
+
 
 ## Design Decision
 
