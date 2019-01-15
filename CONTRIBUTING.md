@@ -16,7 +16,10 @@ wrap around a general case.
 
 **Learn what you are getting yourself into**. Explore the project.
 Have a look inside the files that already are in the repository. They
-can be used for style reference and even for learning.
+can be used for style reference and even for learning. Build your code
+with the same style as the ones you see in the repository, this will
+help to ease the understanding for newcomers and motivate contributions
+with the same guidelines.
 
 
 ## Design Decision
