@@ -1,10 +1,5 @@
 
 
-#1. As Datas
-#2. As Maturities
-#3. Rate dos dois Maturities
-#4. Quantos dias úteis as maturities tem da data inicial
-#Taxa Forward
 
 import numpy as np
 import datetime
@@ -37,5 +32,3 @@ rate1 = 0.1903
 rate2 = 0.1899
 
 print(forward_rate(base_date, maturity1, maturity2, rate1, rate2, 252))
-
-

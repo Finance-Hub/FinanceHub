@@ -174,15 +174,20 @@ class SwapCurve(object):
         return historic
 
     def plot_historic_rates(self, maturity):
-            try:
-                historic_rates_curve = self.rates[maturity]
-            except:
-                raise ValueError('Maturity not availabe, try again.')
-            else:
+        terms = self.rates.index
+        day_terms = [self._days_in_terms(term, self.convention) for term in terms]
+        if maturity in day_terms:
+            historic_rates_curve = self.rates.loc[maturity]
+            historic_rates_curve.plot(legend=maturity)
+            plt.label(True)
+            plt.show()
+        else:
+            dates = self.rates.columns
 
-                historic_rates_curve.plot(legend=maturity)
-                plt.label(True)
-                plt.show()
+            response = self.get_rate(dates, maturity)
+            table_term = response["cubic"][maturity]
+
+            table_term.plot()
 
     def plot_day_curve(self, dates, interpolate=False,
                        interpolate_methods=['cubic'], scatter=False):
