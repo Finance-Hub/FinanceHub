@@ -7,7 +7,7 @@ Created on Tue Jan  8 10:54:22 2019
 
 import pandas as pd
 
-data = pd.read_excel('preditenors.xlsx')
+data = pd.read_excel('Swaps US Dollar.xlsx')
 
 data.columns
 
@@ -34,5 +34,6 @@ for k in info.keys():
     df = df.transpose()
     
     clean_data = pd.concat([clean_data, df], axis=1)
-    
-clean_data.to_excel('clean_data.xlsx')
+
+clean_data = clean_data.transpose()    
+clean_data.to_excel('us_data.xlsx')

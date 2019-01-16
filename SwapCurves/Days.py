@@ -19,7 +19,8 @@ class SwapCurve(object):
             'linear': 'r-',
             'cubic': 'g--',
             'quadratic': 'b:',
-            'nearest': 'y-.'
+            'nearest': 'y-.',
+            'flatforward': 'r-'
             }
 
     conventions = {
@@ -138,7 +139,7 @@ class SwapCurve(object):
             for method in interpolate_methods:
                 terms = curve.index
                 dterms = [self._days_in_term(t, self.convention) for
-                          t in terms]
+                        t in terms]
                 n_desired_terms = desired_terms.copy()
                 # Checks if desired_terms are valid
                 for term in desired_terms:
@@ -146,30 +147,31 @@ class SwapCurve(object):
                         print('{} is an invalid term.'.format(term))
                         n_desired_terms.remove(term)
                 irates = self._interpolate_rates(dterms, list(curve),
-                                                 n_desired_terms, method,
-                                                 self.convention_year)
+                                                n_desired_terms, method,
+                                                self.convention_year)
                 rates = {k: v for k, v in zip(n_desired_terms,
-                                              irates)}
+                                            irates)}
                 for k in rates.keys():
                     info[method].at[curve.name, k] = rates[k]
 
         return info
 
     def get_forward_historic(self, maturity1, maturity2, plot=False,
-                             interpolate_method='cubic'):
+                            interpolate_method='cubic'):
 
         historic = pd.Series()
-        for date in self.rates.columns:
-            rates = self.get_rate(date, [maturity1, maturity2],
-                                  [interpolate_method])
-            rate1 = rates[interpolate_method][maturity1]
-            rate2 = rates[interpolate_method][maturity2]
-            forward = self.forward_rate(date, rate1, maturity1,
-                                        rate2, maturity2, self.convention_year)
+        for i in range(len(self.rates.columns)):
+            date = self.rates.columns[i]
+            rate1 = self.get_rate([date], [maturity1],
+                                  [interpolate_method])[interpolate_method][maturity1][date]
+            rate2 = self.get_rate([date], [maturity2],
+                                  [interpolate_method])[interpolate_method][maturity2][date]
+            forward = self._forward_rate(date, maturity1, maturity2,
+                                        rate1, rate2, self.convention_year)
             historic.at[date] = forward
-
         if plot:
             historic.plot()
+            plt.show()
 
         return historic
 
@@ -178,8 +180,7 @@ class SwapCurve(object):
         day_terms = [self._days_in_terms(term, self.convention) for term in terms]
         if maturity in day_terms:
             historic_rates_curve = self.rates.loc[maturity]
-            historic_rates_curve.plot(legend=maturity)
-            plt.label(True)
+            historic_rates_curve.plot()
             plt.show()
         else:
             dates = self.rates.columns
