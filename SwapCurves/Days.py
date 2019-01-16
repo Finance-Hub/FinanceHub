@@ -177,7 +177,7 @@ class SwapCurve(object):
 
     def plot_historic_rates(self, maturity):
         terms = self.rates.index
-        day_terms = [self._days_in_terms(term, self.convention) for term in terms]
+        day_terms = [self._days_in_term(term, self.convention) for term in terms]
         if maturity in day_terms:
             historic_rates_curve = self.rates.loc[maturity]
             historic_rates_curve.plot()
