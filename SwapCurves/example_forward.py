@@ -17,3 +17,4 @@ br_forward = br_curve._forward_rate(date, maturity1, maturity2, br_rate1, br_rat
 forward_historic = br_curve.get_forward_historic(maturity1, maturity2, plot=True)
 
 print(br_forward)
+

@@ -11,6 +11,7 @@ from scipy.interpolate import interp1d
 from mpl_toolkits.mplot3d import Axes3D
 from datetime import datetime
 from Interpolation.FlatForward import FlatForward
+from Holidays.AnbimaHolidays import AnbimaHolidays
 
 
 class SwapCurve(object):
@@ -75,6 +76,7 @@ class SwapCurve(object):
         ax.set_xlabel('Date')
         ax.set_ylabel('Days to Maturity')
         ax.set_zlabel('Swap Rate (%)')
+        plt.show()
 
     def get_rate(self, base_curves, desired_terms,
                  interpolate_methods=['cubic']):
@@ -301,6 +303,16 @@ class SwapCurve(object):
             plt.legend()
             plt.show()
 
+    def get_duration(self, maturity, rate, convention):
+
+        rate = rate/100
+
+        numerator = maturity/convention
+
+        duration = - numerator / (1+rate)
+
+        return duration
+
     def _get_3d_curve(self, base_curve, maturities):
 
         icurve = base_curve.copy()
@@ -361,11 +373,13 @@ class SwapCurve(object):
     @staticmethod
     def _forward_rate(base_date, maturity1, maturity2, rate1, rate2, convention):
 
+        holidays = AnbimaHolidays().get_holidays()
+
         maturity1_date = base_date + dt.timedelta(days=maturity1)
         maturity2_date = base_date + dt.timedelta(days=maturity2)
 
-        business_days1 = np.busday_count(base_date, maturity1_date)
-        business_days2 = np.busday_count(base_date, maturity2_date)
+        business_days1 = np.busday_count(base_date, maturity1_date, holidays=holidays)
+        business_days2 = np.busday_count(base_date, maturity2_date, holidays=holidays)
 
         days_to_years1 = (business_days1/convention)
         days_to_years2 = (business_days2/convention)
@@ -376,3 +390,5 @@ class SwapCurve(object):
         get_forward = ((numerator/denominator)-1)*100
 
         return get_forward
+
+
