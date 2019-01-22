@@ -8,7 +8,7 @@ br_curve = SwapCurve(data, 'business_days')
 date = data.columns[45]
 
 maturity1 = 360
-maturity2 = 375
+maturity2 = 720
 
 br_rate1 = br_curve.get_rate([date], [maturity1])['cubic'][maturity1]
 br_rate2 = br_curve.get_rate([date], [maturity2])['cubic'][maturity2]

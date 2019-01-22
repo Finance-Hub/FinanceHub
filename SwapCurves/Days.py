@@ -11,7 +11,10 @@ from scipy.interpolate import interp1d
 from mpl_toolkits.mplot3d import Axes3D
 from datetime import datetime
 from Interpolation.FlatForward import FlatForward
+from Holidays.AnbimaHolidays import AnbimaHolidays
 
+# TODO: Change input so dates will be the rows, and columns will be the maturities
+# TODO: Change code to follow input
 
 class SwapCurve(object):
 
@@ -28,19 +31,42 @@ class SwapCurve(object):
             'calendar_days': 360
             }
 
-    def __init__(self, rates, convention):
+    calendars = {
+        'br_anbima': AnbimaHolidays().get_holidays()
+    }
+
+    def __init__(self, rates, convention='business_days', calendar='br_anbima'):
+        """[summary]
+        
+        Arguments
+        ----------
+            rates : pandas df
+                Rates should be a pandas datafram where the columns are the
+                maturity of the title and the rows should be `datetime` type. For more information,
+                check the `ReadMe.md` document.
+        
+        Keyword Arguments
+        ----------
+            convention : str (default: {'business_days'})
+                Your calendar convention. For options, check the `ReadMe.md` document.
+            calendar : str (default: {'br_anbima'})
+                Which holidays should the code use.
+                For now, only Br - Anbima is implemented.
         """
-        convention options:
-            business_days
-            calendar_days
-        rates options:
-            pandas dataframe
-        """
+
         self.convention = convention
         self.convention_year = self.conventions[convention]
         self.rates = rates
+        self.holidays = self.calendars[calendar]
 
     def plot_3d(self, plot_type='surface'):
+        """Function to plot the surface of the swap curve.
+        
+        Keyword Arguments
+        ----------
+            plot_type : str (default: {'surface'})
+                Which type of plot you want to see. You can choose either `surface` or `wireframe`
+        """
 
         x = self.rates.index
         y = self.rates.columns
@@ -75,6 +101,7 @@ class SwapCurve(object):
         ax.set_xlabel('Date')
         ax.set_ylabel('Days to Maturity')
         ax.set_zlabel('Swap Rate (%)')
+        plt.show()
 
     def get_rate(self, base_curves, desired_terms,
                  interpolate_methods=['cubic']):
@@ -158,6 +185,23 @@ class SwapCurve(object):
 
     def get_forward_historic(self, maturity1, maturity2, plot=False,
                             interpolate_method='cubic'):
+        """Function that returns the historic of the forward rate between two maturities. 
+        Maturities have to be between max and min maturities for that title.
+        
+        Arguments
+        ----------
+            maturity1 : int
+                Lower Maturity.
+            maturity2 : int
+                Higher Maturity
+        
+        Keyword Arguments
+        ----------
+            plot : bool (default: {False})
+                Let the user decide if he wants to plot the historic or not.
+            interpolate_method {str} (default: {'cubic'})
+                Let the user decide which Interpolation Method will be used.
+        """
 
         historic = pd.Series()
         for i in range(len(self.rates.columns)):
@@ -253,7 +297,7 @@ class SwapCurve(object):
                     terms = curve.index
                     dterms = [self._days_in_term(t, self.convention) for
                               t in terms]
-                    iterms = np.arange(min(dterms), max(dterms), 10)
+                    iterms = np.arange(min(dterms), max(dterms), 1)
                     irates = self._interpolate_rates(dterms, list(curve),
                                                      iterms,
                                                      interpolate_methods[0],
@@ -361,6 +405,9 @@ class SwapCurve(object):
     @staticmethod
     def _forward_rate(base_date, maturity1, maturity2, rate1, rate2, convention):
 
+        rate1 = rate1/100
+        rate2 = rate2/100
+
         maturity1_date = base_date + dt.timedelta(days=maturity1)
         maturity2_date = base_date + dt.timedelta(days=maturity2)
 
@@ -370,8 +417,8 @@ class SwapCurve(object):
         days_to_years1 = (business_days1/convention)
         days_to_years2 = (business_days2/convention)
 
-        numerator = (1+rate1)**days_to_years2
-        denominator = (1+rate2)**days_to_years1
+        numerator = (1+rate2)**days_to_years2
+        denominator = (1+rate1)**days_to_years1
 
         get_forward = ((numerator/denominator)-1)*100
 
