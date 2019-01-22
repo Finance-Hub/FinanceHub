@@ -25,10 +25,6 @@ def forward_rate(base_date, maturity1, maturity2, rate1, rate2, convention):
 
 
 
-base_date = datetime.date(2002, 1, 18)
-maturity1 = 14
-maturity2 = 40
-rate1 = 0.1903
-rate2 = 0.1899
+
 
 print(forward_rate(base_date, maturity1, maturity2, rate1, rate2, 252))

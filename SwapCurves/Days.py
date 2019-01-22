@@ -345,6 +345,16 @@ class SwapCurve(object):
             plt.legend()
             plt.show()
 
+    def get_duration(self, maturity, rate, convention):
+
+        rate = rate/100
+
+        numerator = maturity/convention
+
+        duration = - numerator / (1+rate)
+
+        return duration
+
     def _get_3d_curve(self, base_curve, maturities):
 
         icurve = base_curve.copy()
@@ -407,12 +417,13 @@ class SwapCurve(object):
 
         rate1 = rate1/100
         rate2 = rate2/100
+        holidays = AnbimaHolidays().get_holidays()
 
         maturity1_date = base_date + dt.timedelta(days=maturity1)
         maturity2_date = base_date + dt.timedelta(days=maturity2)
 
-        business_days1 = np.busday_count(base_date, maturity1_date)
-        business_days2 = np.busday_count(base_date, maturity2_date)
+        business_days1 = np.busday_count(base_date, maturity1_date, holidays=holidays)
+        business_days2 = np.busday_count(base_date, maturity2_date, holidays=holidays)
 
         days_to_years1 = (business_days1/convention)
         days_to_years2 = (business_days2/convention)
@@ -423,3 +434,5 @@ class SwapCurve(object):
         get_forward = ((numerator/denominator)-1)*100
 
         return get_forward
+
+
