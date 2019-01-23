@@ -41,7 +41,7 @@ class SwapCurve(object):
         Arguments
         ----------
             rates : pandas df
-                Rates should be a pandas datafram where the columns are the
+                Rates should be a pandas dataframe where the columns are the
                 maturity of the title and the rows should be `datetime` type. For more information,
                 check the `ReadMe.md` document.
         
@@ -122,7 +122,7 @@ class SwapCurve(object):
             is True. Default is 'cubic'.
 
             Accepted methods are: `linear`, `cubic`, `quadratic`,
-            and `nearest`.
+            `nearest` and `flatforward`.
 
         Returns
         ----------
