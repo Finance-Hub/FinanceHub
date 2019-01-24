@@ -8,13 +8,11 @@ import pandas as pd
 import datetime as dt
 
 from scipy.interpolate import interp1d
+from math import log, exp
 from mpl_toolkits.mplot3d import Axes3D
 from datetime import datetime
-from Interpolation.FlatForward import FlatForward
 from Holidays.AnbimaHolidays import AnbimaHolidays
 
-# TODO: Change input so dates will be the rows, and columns will be the maturities
-# TODO: Change code to follow input
 
 class SwapCurve(object):
 
@@ -35,16 +33,17 @@ class SwapCurve(object):
         'br_anbima': AnbimaHolidays().get_holidays()
     }
 
-    def __init__(self, rates, convention='business_days', calendar='br_anbima'):
+    def __init__(self, rates, convention='business_days',
+                 calendar='br_anbima'):
         """[summary]
-        
+
         Arguments
         ----------
             rates : pandas df
                 Rates should be a pandas dataframe where the columns are the
-                maturity of the title and the rows should be `datetime` type. For more information,
-                check the `ReadMe.md` document.
-        
+                maturity of the title and the rows should be `datetime` type.
+                For more information, check the `ReadMe.md` document.
+
         Keyword Arguments
         ----------
             convention : str (default: {'business_days'})
@@ -61,7 +60,7 @@ class SwapCurve(object):
 
     def plot_3d(self, plot_type='surface'):
         """Function to plot the surface of the swap curve.
-        
+
         Keyword Arguments
         ----------
             plot_type : str (default: {'surface'})
@@ -166,7 +165,7 @@ class SwapCurve(object):
             for method in interpolate_methods:
                 terms = curve.index
                 dterms = [self._days_in_term(t, self.convention) for
-                        t in terms]
+                          t in terms]
                 n_desired_terms = desired_terms.copy()
                 # Checks if desired_terms are valid
                 for term in desired_terms:
@@ -174,27 +173,27 @@ class SwapCurve(object):
                         print('{} is an invalid term.'.format(term))
                         n_desired_terms.remove(term)
                 irates = self._interpolate_rates(dterms, list(curve),
-                                                n_desired_terms, method,
-                                                self.convention_year)
+                                                 n_desired_terms, method,
+                                                 self.convention_year)
                 rates = {k: v for k, v in zip(n_desired_terms,
-                                            irates)}
+                                              irates)}
                 for k in rates.keys():
                     info[method].at[curve.name, k] = rates[k]
 
         return info
 
     def get_forward_historic(self, maturity1, maturity2, plot=False,
-                            interpolate_method='cubic'):
+                             interpolate_method='cubic'):
         """Function that returns the historic of the forward rate between two maturities. 
         Maturities have to be between max and min maturities for that title.
-        
+
         Arguments
         ----------
             maturity1 : int
                 Lower Maturity.
             maturity2 : int
                 Higher Maturity
-        
+
         Keyword Arguments
         ----------
             plot : bool (default: {False})
@@ -211,7 +210,7 @@ class SwapCurve(object):
             rate2 = self.get_rate([date], [maturity2],
                                   [interpolate_method])[interpolate_method][maturity2][date]
             forward = self._forward_rate(date, maturity1, maturity2,
-                                        rate1, rate2, self.convention_year)
+                                         rate1, rate2, self.convention_year)
             historic.at[date] = forward
         if plot:
             historic.plot()
@@ -219,20 +218,24 @@ class SwapCurve(object):
 
         return historic
 
-    def plot_historic_rates(self, maturity):
+    def get_historic_rates(self, maturity, plot=False):
         terms = self.rates.index
         day_terms = [self._days_in_term(term, self.convention) for term in terms]
         if maturity in day_terms:
             historic_rates_curve = self.rates.loc[maturity]
-            historic_rates_curve.plot()
-            plt.show()
+            if plot:
+                historic_rates_curve.plot()
+                plt.show()
+            return historic_rates_curve
         else:
             dates = self.rates.columns
 
             response = self.get_rate(dates, maturity)
             table_term = response["cubic"][maturity]
-
-            table_term.plot()
+            if plot:
+                table_term.plot()
+                plt.show()
+            return table_term
 
     def plot_day_curve(self, dates, interpolate=False,
                        interpolate_methods=['cubic'], scatter=False):
@@ -282,7 +285,7 @@ class SwapCurve(object):
                 print('{}. {} is an invalid date. It will not be used.'.format(e, date))
             else:
                 curves.append(curve)
-           
+
         # Check if there are curves to be plotted (or all dates where invalid)
         if len(curves) == 0:
             raise ValueError('There are no dates to be plotted.')
@@ -345,15 +348,19 @@ class SwapCurve(object):
             plt.legend()
             plt.show()
 
-    def get_duration(self, maturity, rate, convention):
+    def get_historic_duration(self, maturity, plot=False):
 
-        rate = rate/100
+        durations = pd.Series()
+        term = self._days_in_term(maturity, self.convention)
+        for date in self.columns:
+            rate = self.get_rate([date], [term])["cubic"][term]
+            durations.at[date, term] = rate
 
-        numerator = maturity/convention
+        if plot:
+            durations.plot()
+            plt.show()
 
-        duration = - numerator / (1+rate)
-
-        return duration
+        return durations
 
     def _get_3d_curve(self, base_curve, maturities):
 
@@ -376,6 +383,15 @@ class SwapCurve(object):
         return base_curve
 
     @staticmethod
+    def _get_duration(maturity, rate, convention):
+
+        rate = rate/100
+        numerator = maturity/convention
+        duration = - numerator / (1+rate)
+
+        return duration
+
+    @staticmethod
     def _interpolate_rates(day_terms, rates, interp_terms,
                            method, convention_days):
 
@@ -393,15 +409,23 @@ class SwapCurve(object):
     def _days_in_term(term, rules):
 
         rule = {
-                'D':
-                    {'business_days': 1, 'calendar_days': 1},
-                'W':
-                    {'business_days': 5, 'calendar_days': 7},
-                'M':
-                    {'business_days': 22, 'calendar_days': 30},
-                'Y':
-                    {'business_days': 252, 'calendar_days': 360}
-            }
+                'D': {
+                        'business_days': 1,
+                        'calendar_days': 1
+                        },
+                'W': {
+                        'business_days': 5,
+                        'calendar_days': 7
+                        },
+                'M': {
+                        'business_days': 22,
+                        'calendar_days': 30
+                        },
+                'Y': {
+                        'business_days': 252,
+                        'calendar_days': 360
+                        }
+        }
 
         term_time = term[-1]
         multiplication = int(term[0:-1])
@@ -413,7 +437,8 @@ class SwapCurve(object):
         return term_days
 
     @staticmethod
-    def _forward_rate(base_date, maturity1, maturity2, rate1, rate2, convention):
+    def _forward_rate(base_date, maturity1, maturity2,
+                      rate1, rate2, convention):
 
         rate1 = rate1/100
         rate2 = rate2/100
@@ -422,8 +447,10 @@ class SwapCurve(object):
         maturity1_date = base_date + dt.timedelta(days=maturity1)
         maturity2_date = base_date + dt.timedelta(days=maturity2)
 
-        business_days1 = np.busday_count(base_date, maturity1_date, holidays=holidays)
-        business_days2 = np.busday_count(base_date, maturity2_date, holidays=holidays)
+        business_days1 = np.busday_count(base_date,
+                                         maturity1_date, holidays=holidays)
+        business_days2 = np.busday_count(base_date,
+                                         maturity2_date, holidays=holidays)
 
         days_to_years1 = (business_days1/convention)
         days_to_years2 = (business_days2/convention)
@@ -436,3 +463,59 @@ class SwapCurve(object):
         return get_forward
 
 
+class FlatForward(object):
+    """This class has the abilities of creating a Flat Forward interpolation
+    on a specific set of swap rates.
+    """
+
+    def interpolate(self, rates, maturities,
+                    desired_maturities, convention_days):
+        """Function responsible for activating a FlatForward interpolation method
+        on a specific set of rates.
+
+        Arguments
+        ----------
+            rates : list
+                A List or a Numpy ndarray containing a collection of rates (Real Ones).
+            maturities : list
+                A List or a Numpy ndarray containing a collection of maturities (On DU unities).
+            desired_maturities {list}
+                A List or a Numpy ndarray containing the maturities which you want to
+                calculate the rates (On DU unities).
+            convention_days : int
+                Int which representates the convention of the year (252 for Business Days, 365 for Days, etc.).
+
+
+        Return
+        ----------
+            desired_rates : list
+                A list containing the rates the user wanted. Indexing correspond desired_maturities indexing.
+        """
+
+        discounts = [self._convert_rate(rate, maturity, convention_days) for
+                     rate, maturity in zip(rates, maturities)]
+        interp_func = interp1d(maturities, discounts)
+
+        desired_rates = []
+        for maturity in desired_maturities:
+            discount = interp_func(maturity)
+            rate = self._convert_discount(discount, maturity, convention_days)
+            desired_rates.append(rate)
+
+        return desired_rates
+
+    @staticmethod
+    def _convert_rate(rate, maturity, convention_days):
+
+        rate = rate/100
+        discount = 1/((1+rate)**(maturity/convention_days))
+        discount = log(discount)
+        return discount
+
+    @staticmethod
+    def _convert_discount(discount, maturity, convention_days):
+
+        discount = exp(discount)
+        rate = (1/discount)**(convention_days/maturity) - 1
+        rate = rate*100
+        return rate
