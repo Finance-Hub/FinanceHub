@@ -364,7 +364,7 @@ class AnbimaHolidays(object):
         holidays.append(datetime.datetime(2029, 10, 12))
         holidays.append(datetime.datetime(2029, 11, 2))
         holidays.append(datetime.datetime(2029, 11, 15))
-        holidays.append(datetime.datetime(2029, 15, 25))
+        holidays.append(datetime.datetime(2029, 12, 25))
         holidays.append(datetime.datetime(2030, 1, 1))
         holidays.append(datetime.datetime(2030, 3, 4))
         holidays.append(datetime.datetime(2030, 3, 5))
