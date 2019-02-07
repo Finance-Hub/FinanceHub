@@ -182,7 +182,7 @@ class SwapCurve(object):
 
         return info
 
-    def get_forward_historic(self, maturity1, maturity2, plot=False,
+    def get_historic_forward(self, maturity1, maturity2, plot=False,
                              interpolate_method='cubic'):
         """Function that returns the historic of the forward rate between two maturities. 
         Maturities have to be between max and min maturities for that title.
