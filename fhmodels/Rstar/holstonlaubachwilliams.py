@@ -12,10 +12,6 @@ import time
 
 
 class Rstar(object):
-    """
-    This class replicates the model from 'Measuring the Natural Rate of Interest: International Trends and Determinants'
-    (2016) from Holston, Laubach and Williams
-    """
 
     def __init__(self, logGDP, inflation, NominalRate, RealRate, ar_c=None, by_c=None, run_se=False, niter=500,
                  charts=False, smoothed=True):
@@ -162,7 +158,7 @@ class Rstar(object):
                                   self.inflation[1:T-3].values.reshape((T-4, 1)) +
                                   self.inflation[0:T-4].values.reshape((T-4, 1)) / 3)), axis=1)
 
-        # Starting values for the parameter vector (size 8) of stage 1 (Some of the guesses might be different for brazil)
+        # Starting values for parameter vector (size 8) of stage 1 (Some of the guesses might be different for brazil)
         initial_parameters = np.array([b_is[0, 0], b_is[1, 0], b_ph[0, 0], b_ph[2, 0], 0.85, s_is, s_ph, 0.5])
 
         # Set an upper and lower bound on the parameter vectors
@@ -182,6 +178,9 @@ class Rstar(object):
 
         # Set the initial covariance matrix (see footnote 6 from the paper)
         P_00 = Rstar.CalculateCovariance(initial_parameters.copy(), theta_bounds.copy(), y_data.copy(), x_data.copy(), stage, None, None, xi_00.copy())
+
+        # Increase P_00 precision. Note that this only happens in stage 1
+        P_00 = P_00 + 0.0001 * np.eye(P_00.shape[0])
 
         # Get parameter estimates via maximum likelihood with bounds
         def f(theta):
@@ -930,9 +929,3 @@ class Rstar(object):
                   'Check to see if your EW, MW, and/or QLR value is outside of Table 3.')
 
         return lame / T
-
-
-"""
-TO DO
-* Raise warnings in the cases where the program should stop
-"""
