@@ -80,7 +80,7 @@ of the session, we welcome general discussions.
 | 29-jan-19 <br> **Crowded Trades, Momentum and Carry**    | Rafael Rocha - [Comomentum](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Rafael%20Rocha%20-%20Comomentum.pdf) (Lou and Polk, Journal of Political Economy, R&R)                                                                   | Claudia Bruschi   - [Crowds, Crashes, and the Carry Trade](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Claudia%20Bruschi%20-%20Crowds%2C%20Crashes%20%26%20Carry%20Trade.pdf) (Sokolovski, 2018, Working Paper)                                                                  |
 | 12-feb-19 <br> **Macro Announcements and Returns**       | Marcelo Paixão - [The Pre‐FOMC Announcement Drift](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Marcelo%20Paixao%20-%20Pre%E2%80%90FOMC%20Announcement%20Drift.pdf) (Lucca and Moench, Journal of Finance, 2015)                  | Diogo Duarte - [Monetary Momentum](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Diogo%20Duarte%20-%20Monetary%20Momentum.pdf) (Neuhierl and Weber, Working Paper, 2018)                                                           |
 | 25-feb-19 | Gustavo Amarante - Yield Curve Premia (Brooks and Moskowitz, working paper 2017) | TBD |
-| 11-mar-19 | TBD | TBD |
+| 11-mar-19 | Rafael Porsani - The TIPS‐Treasury Bond Puzzle (Fleckenstein, Longstaff and Lustig, 2013) | TBD |
 | 18-mar-19 | TBD | TBD |
 | 08-apr-19 | TBD | TBD |
 | 22-apr-19 | TBD | TBD |
