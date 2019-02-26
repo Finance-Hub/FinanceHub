@@ -4,6 +4,7 @@
 """
 
 import pandas as pd
+import numpy as np
 
 import datetime
 
@@ -378,7 +379,7 @@ class AnbimaHolidays(object):
         holidays.append(datetime.datetime(2030, 11, 15))
         holidays.append(datetime.datetime(2030, 12, 25))
         holidays.append(datetime.datetime(2031, 1, 1))
-        self.holidays = holidays
+        self.holidays = np.array(holidays).astype('datetime64[D]')
 
     def get_holidays(self):
         """This function returns a set containing ANBIMA's holidays from 2001 to 2070.

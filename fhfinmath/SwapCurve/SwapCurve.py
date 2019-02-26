@@ -228,9 +228,8 @@ class SwapCurve(object):
                 plt.show()
             return historic_rates_curve
         else:
-            dates = self.rates.columns
-
-            response = self.get_rate(dates, maturity)
+            dates = list(self.rates.columns)
+            response = self.get_rate(dates, [maturity])
             table_term = response["cubic"][maturity]
             if plot:
                 table_term.plot()
@@ -351,8 +350,9 @@ class SwapCurve(object):
     def get_historic_duration(self, maturity, plot=False):
 
         durations = pd.Series()
-        term = self._days_in_term(maturity, self.convention)
-        for date in self.columns:
+        # term = self._days_in_term(maturity, self.convention)
+        term = maturity
+        for date in self.rates.columns:
             rate = self.get_rate([date], [term])["cubic"][term]
             durations.at[date, term] = rate
 
@@ -395,7 +395,7 @@ class SwapCurve(object):
     def _interpolate_rates(day_terms, rates, interp_terms,
                            method, convention_days):
 
-        if method != 'flatforward':
+        if method != 'flat_forward':
             func = interp1d(day_terms, rates, kind=method)
             interp_rates = [func(day) for day in interp_terms]
         else:
@@ -445,12 +445,14 @@ class SwapCurve(object):
         holidays = AnbimaHolidays().get_holidays()
 
         maturity1_date = base_date + dt.timedelta(days=maturity1)
+        print(maturity1_date)
+        print(base_date)
         maturity2_date = base_date + dt.timedelta(days=maturity2)
 
-        business_days1 = np.busday_count(base_date,
-                                         maturity1_date, holidays=holidays)
-        business_days2 = np.busday_count(base_date,
-                                         maturity2_date, holidays=holidays)
+        business_days1 = np.busday_count(np.array(base_date).astype('datetime64[D]'),
+                                         np.array(maturity1_date).astype('datetime64[D]'), holidays=holidays)
+        business_days2 = np.busday_count(np.array(base_date).astype('datetime64[D]'),
+                                         np.array(maturity2_date).astype('datetime64[D]'), holidays=holidays)
 
         days_to_years1 = (business_days1/convention)
         days_to_years2 = (business_days2/convention)

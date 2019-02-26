@@ -1,7 +1,7 @@
 import pandas as pd
 from SwapCurve import SwapCurve
 
-data = pd.read_excel('example.xlsx')
+data = pd.read_excel('example.xlsx', index_col=0)
 swap_curve = SwapCurve(data, convention='business_days', calendar='br_anbima')
 
 # Getting rate for an specific date
@@ -9,7 +9,7 @@ swap_curve = SwapCurve(data, convention='business_days', calendar='br_anbima')
 date = [data.columns[45]]
 day_units = 35
 method = 'cubic'
-rate = swap_curve.get_rate(date, [day_units], interpolate_method=[method])[method][day_units]
+rate = swap_curve.get_rate(date, [day_units], interpolate_methods=[method])[method][day_units]
 
 print('Date: {}'.format(date))
 print('Rate: {}'.format(rate))
