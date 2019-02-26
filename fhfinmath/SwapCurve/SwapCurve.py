@@ -352,9 +352,10 @@ class SwapCurve(object):
         durations = pd.Series()
         # term = self._days_in_term(maturity, self.convention)
         term = maturity
-        for date in self.rates.columns:
+        for date in self.rates.columns.values:
             rate = self.get_rate([date], [term])["cubic"][term]
-            durations.at[date, term] = rate
+            duration = self._get_duration(maturity, float(rate), self.convention_year)
+            durations.at[date] = float(duration)
 
         if plot:
             durations.plot()
