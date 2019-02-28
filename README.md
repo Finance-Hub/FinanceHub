@@ -80,12 +80,11 @@ of the session, we welcome general discussions.
 | 29-jan-19 <br> **Crowded Trades, Momentum and Carry**    | Rafael Rocha - [Comomentum](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Rafael%20Rocha%20-%20Comomentum.pdf) (Lou and Polk, Journal of Political Economy, R&R)                                                                   | Claudia Bruschi   - [Crowds, Crashes, and the Carry Trade](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Claudia%20Bruschi%20-%20Crowds%2C%20Crashes%20%26%20Carry%20Trade.pdf) (Sokolovski, 2018, Working Paper)                                                                  |
 | 12-feb-19 <br> **Macro Announcements and Returns**       | Marcelo Paixão - [The Pre‐FOMC Announcement Drift](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Marcelo%20Paixao%20-%20Pre%E2%80%90FOMC%20Announcement%20Drift.pdf) (Lucca and Moench, Journal of Finance, 2015)                  | Diogo Duarte - [Monetary Momentum](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Diogo%20Duarte%20-%20Monetary%20Momentum.pdf) (Neuhierl and Weber, Working Paper, 2018)                                                           |
 | 25-feb-19 <br> **Yield Curve** | Gustavo Amarante - [Yield Curve Premia](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Gustavo%20Amarante%20-%20Yield%20Curve%20Premia.pdf) (Brooks and Moskowitz, working paper 2017) | Gustavo Amarante - [Pricing the Term Structure with Linear Regressions](https://github.com/Finance-Hub/FinanceHub/blob/master/fhseminars/Gustavo%20Amarante%20-%20Pricing%20Term%20Structures%20with%20Linear%20Regressions.pdf) (Adrian, Crump and Moench, 2013) |
-| 11-mar-19 | Rafael Porsani - The TIPS‐Treasury Bond Puzzle (Fleckenstein, Longstaff and Lustig, 2013) | TBD |
-| 18-mar-19 | TBD | TBD |
-| 08-apr-19 | TBD | TBD |
-| 22-apr-19 | TBD | TBD |
-| 06-may-19 | TBD | TBD |
-| 03-jun-19 | TBD | TBD |
+| 11-mar-19 <br> **Fixed Income** | Rafael Porsani - The TIPS‐Treasury Bond Puzzle (Fleckenstein, Longstaff and Lustig, 2013) | Fernando Tassinari - Expected Returns in Treasury Bonds (Anna Cieslak and Pavol Povala,  Review of Financial Studies, 2015)  |
+| 08-apr-19 <br> **Machine Learning** | Shrinking the cross section (Kozak, Nagel and Santosh, 2017) | Empirical Asset Pricing via Machine Learning (Gu, Kelly and Xiu, 2018)|
+| 22-apr-19 <br> **Liquidity**| Slow-Moving Liquidity Provision and Flow-Driven Common Factors in Stock Returns (Li, 2018) | Is Liquidity Risk Priced in Partially Segmented Markets? (Chaieb, Errunza and Langlois , 2017) |
+| 06-may-19 <br> **Financial Intermediaries**| Financial Intermediaries and the Cross-Section of Asset Returns (Adrian, Etula and Muir, The Journal of Finance, 2014) | Financial Amplification of Foreign Exchange Risk Premia (Adrian, Etula and Groen,  European economic review, 2011) |
+| 03-jun-19 <br> **Factors**| Factor risk premiums and invested capital: calculations with stochastic discount factors (Ang, Hogan and Shores, Journal of Asset Management, 2016) | Factor Timing with Cross-Sectional and Time-Series Predictors (Hodges, Hogan, Peterson and Ang, The Journal of Portfolio Management, 2017) |
 
 
 
