@@ -11,7 +11,7 @@ class BBG(object):
     """
 
     @staticmethod
-    def fetch_series(self, securities, fields, startdate, enddate, period="DAILY", calendar="ACTUAL", fx=None,
+    def fetch_series(securities, fields, startdate, enddate, period="DAILY", calendar="ACTUAL", fx=None,
                      fperiod=None, verbose=False):
         """
         Fetches time series for given tickers and fields, from startdate to enddate.
