@@ -1,4 +1,3 @@
-from optparse import OptionParser
 import datetime as dt
 import pandas as pd
 import numpy as np
@@ -11,10 +10,8 @@ class BBG(object):
     a python 3.6 environment.
     """
 
-    def __init__(self):
-        self.options = BBG._parse_cmd_line()
-
-    def fetch_series(self, securities, fields, startdate, enddate, period="DAILY", calendar="ACTUAL", fx=None,
+    @staticmethod
+    def fetch_series(securities, fields, startdate, enddate, period="DAILY", calendar="ACTUAL", fx=None,
                      fperiod=None, verbose=False):
         """
         Fetches time series for given tickers and fields, from startdate to enddate.
@@ -47,10 +44,7 @@ class BBG(object):
         if startdate > enddate:
             ValueError("Start date is later than end date")
 
-        session_options = blpapi.SessionOptions()
-        session_options.setServerHost(self.options.host)
-        session_options.setServerPort(self.options.port)
-        session = blpapi.Session(session_options)
+        session = blpapi.Session()
 
         if not session.start():
             raise ConnectionError("Failed to start session")
@@ -451,24 +445,6 @@ class BBG(object):
         return df
 
     @staticmethod
-    def _parse_cmd_line():
-        """
-        creates session options for the bloomberg API session
-        """
-
-        parser = OptionParser(description="Retrive reference data.")
-
-        parser.add_option("-a", "--ip", dest="host", help="server name or IP (default: %default)",
-                          metavar="ipAdress", default="localhost")
-
-        parser.add_option("-p", dest="port", type="int", help="server port (default: %default)",
-                          metavar="tcpPort", default=8194)
-
-        (options, args) = parser.parse_args()
-
-        return options
-
-    @staticmethod
     def _assert_date_type(input_date):
         """
         Assures the date is in datetime format
@@ -501,6 +477,5 @@ class BBG(object):
 
 """
 FUTURE DEVELOPMENT
-* Since all functions require a session, build a session opening routine.
 * allow for 'securities' to be a dict, with tickers on the keys and names on the values.
 """
