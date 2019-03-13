@@ -84,7 +84,7 @@ of the session, we welcome general discussions.
 | 08-apr-19 <br> **Machine Learning** | Marcelo Paixão - Shrinking the cross section (Kozak, Nagel and Santosh, 2017) | Fernando Tassinari - Empirical Asset Pricing via Machine Learning (Gu, Kelly and Xiu, 2018)|
 | 22-apr-19 <br> **Financial Intermediaries**| Claudia Bruschi - Financial Intermediaries and the Cross-Section of Asset Returns (Adrian, Etula and Muir, The Journal of Finance, 2014) | Bruno Lund - Financial Amplification of Foreign Exchange Risk Premia (Adrian, Etula and Groen,  European economic review, 2011) |
 | 06-may-19 <br> **Liquidity**| Marcio Prado - Slow-Moving Liquidity Provision and Flow-Driven Common Factors in Stock Returns (Li, 2018) | Is Liquidity Risk Priced in Partially Segmented Markets? (Chaieb, Errunza and Langlois , 2017) |
-| 03-jun-19 <br> **Factors**| Gustavo Soares - Factor risk premiums and invested capital: calculations with stochastic discount factors (Ang, Hogan and Shores, Journal of Asset Management, 2016) | Rafael Gondo - Factor Timing with Cross-Sectional and Time-Series Predictors (Hodges, Hogan, Peterson and Ang, The Journal of Portfolio Management, 2017) |
+| 03-jun-19 <br> **Factors**| Gustavo Soares - Factor risk premiums and invested capital: calculations with stochastic discount factors (Ang, Hogan and Shores, Journal of Asset Management, 2016) | Raphael Gondo - Factor Timing with Cross-Sectional and Time-Series Predictors (Hodges, Hogan, Peterson and Ang, The Journal of Portfolio Management, 2017) |
 
 
 
