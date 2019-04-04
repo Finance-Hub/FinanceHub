@@ -29,3 +29,7 @@ print(futures_list)
 # grabs the first notice date for each contract
 df_fn = bbg.fetch_contract_parameter(securities=futures_list, field='FUT_NOTICE_FIRST')
 print(df_fn)
+
+# fetches fields with bulk data
+df_bulk = bbg.fetch_bulk_data(index_name='AAPL US Equity', field='PG_REVENUE', ref_date=start_date)
+print(df_bulk)
