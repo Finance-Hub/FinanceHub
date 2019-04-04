@@ -1,13 +1,18 @@
+"""
+Authors: Gustavo Amarante, Gustavo Soares, Wilson Felicio
+"""
+
 import datetime as dt
 import pandas as pd
 import numpy as np
-import blpapi  # See our installation guide to learn how to install this library properly
+import blpapi
 
 
 class BBG(object):
     """
-    This class is a wrapper around the Bloomberg API. To work, it requires an active bloomberg terminal and
-    a python 3.6 environment.
+    This class is a wrapper around the Bloomberg API. To work, it requires an active bloomberg terminal, a python 3.6
+    environment and the installation of the bloomberg API. Check out the guides on our github repository to learn how
+    to install the API.
     """
 
     @staticmethod
@@ -474,8 +479,79 @@ class BBG(object):
         """
         return str(input_date.year)+str(input_date.month).zfill(2)+str(input_date.day).zfill(2)
 
+    @staticmethod
+    def fetch_bulk_data(index_name, field, ref_date, pg_override=None):
+        """
+        Fetches fields that have bulk data
+        :param index_name: str
+        :param field: str, field name
+        :param ref_date: str, datetime or timestamp
+        :param pg_override: str, bloomberg override option
+        :return: DataFrame
+        """
 
-"""
-FUTURE DEVELOPMENT
-* allow for 'securities' to be a dict, with tickers on the keys and names on the values.
-"""
+        ref_date = BBG._assert_date_type(ref_date)
+
+        session = blpapi.Session()
+
+        if not session.start():
+            raise ConnectionError("Failed to start session.")
+
+        if not session.openService("//blp/refdata"):
+            raise ConnectionError("Failed to open //blp/refdat")
+
+        service = session.getService("//blp/refdata")
+        request = service.createRequest("ReferenceDataRequest")
+
+        request.append("securities", index_name)
+        request.append("fields", field)
+
+        overrides = request.getElement("overrides")
+        override1 = overrides.appendElement()
+        override1.setElement("fieldId", "END_DATE_OVERRIDE")
+        override1.setElement("value", ref_date.strftime('%Y%m%d'))
+
+        if not (pg_override is None):
+            overrides_bdh = request.getElement("overrides")
+            override1_bdh = overrides_bdh.appendElement()
+            override1_bdh.setElement("fieldId", "PRODUCT_GEO_OVERRIDE")
+            override1_bdh.setElement("value", pg_override)
+
+        session.sendRequest(request)  # there is no need to save the response as a variable in this case
+
+
+        end_reached = False
+        df = pd.DataFrame()
+        while not end_reached:
+
+            ev = session.nextEvent()
+
+            if ev.eventType() == blpapi.Event.RESPONSE:
+
+                for msg in ev:
+
+                    security_data = msg.getElement('securityData')
+                    security_data_list = [security_data.getValueAsElement(i) for i in range(security_data.numValues())]
+
+                    for sec in security_data_list:
+
+                        field_data = sec.getElement('fieldData')
+                        field_data_list = [field_data.getElement(i) for i in range(field_data.numElements())]
+
+                        for fld in field_data_list:
+
+                            for v in [fld.getValueAsElement(i) for i in range(fld.numValues())]:
+
+                                s = pd.Series()
+
+                                for d in [v.getElement(i) for i in range(v.numElements())]:
+                                    s[str(d.name())] = d.getValue()
+
+                                df = df.append(s, ignore_index=True)
+
+                if not df.empty:
+                    df = df.set_index(df.columns[0])
+
+                end_reached = True
+
+        return df
