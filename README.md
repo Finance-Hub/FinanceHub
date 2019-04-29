@@ -47,9 +47,8 @@ python and help build up the community and push the project forward.
 * **Research**: Investment professionals from BWGI and Itaú Asset
 Management and academics from Insper are the initial members of this
 community and activaly discuss research.  To promote this branch we are
-organizing academic [seminars](#seminars) on the relevant topics and curating a
-repository of academic research papers on the [Mendeley](https://www.mendeley.com/)
-plataform.
+organizing academic [seminars](https://github.com/Finance-Hub/FinanceHubMaterials/tree/master/Seminars) on the relevant 
+topics and curating a repository of academic research papers on the [Mendeley](https://www.mendeley.com/) plataform.
 
 # Seminars
 
@@ -93,20 +92,8 @@ of the session, we welcome general discussions.
 # Set Up
 
 Here we speak **python**. This is the fastest growing programming
-language. To get started:
+language. To get started follow our [installation guide](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Guides/Installation%20Guide.pdf).
 
-- Download the [**Anaconda**](https://www.anaconda.com/download/) distribution
-system and install the python 3.7 version. This system allows you to
-install all the python libraries you need, including the jupyter notebook
-environment, where you can open our lecture files.
-
-- Install [**Git**](https://git-scm.com/downloads). This is a **Version Control
-System** (VCS) that allows everyone to keep their own version of their code.
-(Don't worry about how to use Git. You just need it installed on your computer)
-
-- Our favorite **python editor** is [**PyCharm**](https://www.jetbrains.com/pycharm/download/).
-This is the software that brings everything together and allows you to
-connect directly to our GitHub repository.
 
 ---
 
