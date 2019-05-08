@@ -1,5 +1,5 @@
 """
-Authors: Gustavo Amarante, Gustavo Soares, Wilson Felicio
+Authors: Daniel Dantas, Gustavo Amarante, Gustavo Soares, Wilson Felicio
 """
 
 import datetime as dt
@@ -125,7 +125,7 @@ class BBG(object):
 
                                 for fld_i in fields:
                                     if fld.hasElement(fld_i):
-                                        results[sec_name]\
+                                        results[sec_name] \
                                             .setdefault(fld_i, []).append([fld.getElement("date").getValue(),
                                                                            fld.getElement(fld_i).getValue()])
                         else:
@@ -152,7 +152,7 @@ class BBG(object):
             # single ticker and single field
             # returns a dataframe with a single column
             results = np.array(results)
-            df[securities] = pd.Series(index=results[:, 0], data=results[:, 1])
+            df[securities] = pd.Series(index=pd.to_datetime(results[:, 0]), data=results[:, 1])
 
         elif (type(securities) is list) and not (type(fields) is list):
             # multiple tickers and single field
@@ -164,7 +164,8 @@ class BBG(object):
                 if len(aux) == 0:
                     df[tick] = np.nan
                 else:
-                    df = pd.concat([df, pd.Series(index=aux[:, 0], data=aux[:, 1], name=tick)], axis=1, join='outer', sort=True)
+                    df = pd.concat([df, pd.Series(index=pd.to_datetime(aux[:, 0]), data=aux[:, 1], name=tick)],
+                                   axis=1, join='outer', sort=True)
 
         elif not (type(securities) is list) and (type(fields) is list):
             # single ticker and multiple fields
@@ -172,7 +173,7 @@ class BBG(object):
 
             for fld in results.keys():
                 aux = np.array(results[fld])
-                df[fld] = pd.Series(index=aux[:, 0], data=aux[:, 1])
+                df[fld] = pd.Series(index=pd.to_datetime(aux[:, 0]), data=aux[:, 1])
 
         else:
             # multiple tickers and multiple fields
@@ -183,13 +184,12 @@ class BBG(object):
                 for fld in results[tick].keys():
                     aux = np.array(results[tick][fld])
                     df_aux = pd.DataFrame(data={'FIELD': fld,
-                                                'TRADE_DATE': aux[:, 0],
+                                                'TRADE_DATE': pd.to_datetime(aux[:, 0]),
                                                 'TICKER': tick,
                                                 'VALUE': aux[:, 1]})
                     df = df.append(df_aux)
 
             df['VALUE'] = df['VALUE'].astype(float, errors='ignore')
-            df['TRADE_DATE'] = df['TRADE_DATE'].astype(pd.Timestamp)
 
             df = pd.pivot_table(data=df, index=['FIELD', 'TRADE_DATE'], columns='TICKER', values='VALUE')
 
@@ -242,12 +242,13 @@ class BBG(object):
                 for msg in ev:
 
                     for i in range(msg.getElement("securityData").numValues()):
-
-                        sec = str(msg.getElement("securityData").getValue(i).getElement("security").getValue())  # here we get the security
+                        sec = str(msg.getElement("securityData").getValue(i).getElement(
+                            "security").getValue())  # here we get the security
                         name.append(sec)
 
-                        value = msg.getElement("securityData").getValue(i).getElement("fieldData").getElement(field).getValue()
-                        val.append(value)  # here we get the field we have selected
+                        value = msg.getElement("securityData").getValue(i).getElement("fieldData").getElement(
+                            field).getValue()
+                        val.append(value)  # here we get the field value we have selected
 
             if ev.eventType() == blpapi.Event.RESPONSE:
                 end_reached = True
@@ -477,12 +478,12 @@ class BBG(object):
         :param input_date:
         :return:
         """
-        return str(input_date.year)+str(input_date.month).zfill(2)+str(input_date.day).zfill(2)
+        return str(input_date.year) + str(input_date.month).zfill(2) + str(input_date.day).zfill(2)
 
     @staticmethod
     def fetch_bulk_data(index_name, field, ref_date, pg_override=None):
         """
-        Fetches fields that have bulk data
+        Allows to grab fields with bulk data
         :param index_name: str
         :param field: str, field name
         :param ref_date: str, datetime or timestamp
@@ -518,7 +519,6 @@ class BBG(object):
             override1_bdh.setElement("value", pg_override)
 
         session.sendRequest(request)  # there is no need to save the response as a variable in this case
-
 
         end_reached = False
         df = pd.DataFrame()
