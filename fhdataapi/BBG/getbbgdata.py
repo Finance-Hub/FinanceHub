@@ -189,7 +189,7 @@ class BBG(object):
                     df = df.append(df_aux)
 
             df['VALUE'] = df['VALUE'].astype(float, errors='ignore')
-            df['TRADE_DATE'] = df['TRADE_DATE'].astype(pd.Timestamp)
+            df['TRADE_DATE'] = pd.to_datetime(df['TRADE_DATE'])
 
             df = pd.pivot_table(data=df, index=['FIELD', 'TRADE_DATE'], columns='TICKER', values='VALUE')
 
