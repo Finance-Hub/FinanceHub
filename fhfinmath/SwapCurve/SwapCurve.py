@@ -11,7 +11,7 @@ from scipy.interpolate import interp1d
 from math import log, exp
 from mpl_toolkits.mplot3d import Axes3D
 from datetime import datetime
-from Holidays.AnbimaHolidays import AnbimaHolidays
+from fhfinmath.SwapCurve.Holidays.AnbimaHolidays import AnbimaHolidays
 
 
 class SwapCurve(object):
