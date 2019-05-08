@@ -1,5 +1,5 @@
 import pandas as pd
-from SwapCurve import SwapCurve
+from fhfinmath import SwapCurve
 
 data = pd.read_excel('example.xlsx', index_col=0)
 swap_curve = SwapCurve(data, convention='business_days', calendar='br_anbima')

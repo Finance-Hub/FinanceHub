@@ -1,4 +1,4 @@
 __all__ = ['SwapCurve']
 
-from SwapCurve.SwapCurve import SwapCurve
+from fhfinmath.SwapCurve.SwapCurve import SwapCurve
 
