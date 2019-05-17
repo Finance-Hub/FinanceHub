@@ -1,4 +1,4 @@
-__all__ = ['SwapCurve']
+__all__ = ['SwapCurve', 'momentum']
 
-from SwapCurve.SwapCurve import SwapCurve
-
+from fhfinmath.SwapCurve.SwapCurve import SwapCurve
+from fhfinmath.tsmomentum import momentum
