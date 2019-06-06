@@ -1,5 +1,5 @@
 """
-Implements Hierarchical Risk Parity Routine
+Implements Hierarchical Risk Parity Routines
 Author: Gustavo Amarante
 """
 
@@ -24,6 +24,7 @@ class HRP(object):
                       cluster n+1. A cluster with an index less than n corresponds to one of the original observations.
                       The distance between clusters link[i, 0] and link[i, 1] is given by link[i, 2]. The fourth value
                       link[i, 3] represents the number of original observations in the newly formed cluster.
+            - 'weights': final weights for each asset
 
         :param data: pandas DataFrame where each column is a series of returns
         :param method: any method available in scipy.cluster.hierarchy.linkage
