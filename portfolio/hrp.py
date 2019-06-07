@@ -102,6 +102,16 @@ class HRP(object):
 
     def plot_corr_matrix(self, save_path=None, show_chart=True, cmap='vlag', linewidths=1, figsize=(6, 6),
                          row_colors=None, col_colors=None):
+        """
+        Plots the correlation matrix using clustermap from the seaborn library
+        :param save_path: local directory to save file
+        :param show_chart: If True, shows the chart
+        :param cmap: matplotlib colormap
+        :param linewidths: dendrogram line width
+        :param figsize: tuple with figsize dimensions
+        :param row_colors: color names for labels on the lines
+        :param col_colors: color names for labels on the columns
+        """
 
         sns.clustermap(self.corr, method=self.method, metric=self.metric, cmap=cmap,
                        row_colors=row_colors, col_colors=col_colors,
@@ -120,6 +130,11 @@ class HRP(object):
         plt.close()
 
     def plot_dendrogram(self, show_chart=True, save_path=None):
+        """
+        Plots the dendrogram using scipy's own method.
+        :param show_chart: If True, shows the chart
+        :param save_path: local directory to save file
+        """
 
         plt.figure()
         dn = sch.dendrogram(self.link)
