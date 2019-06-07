@@ -1,20 +1,23 @@
 """
-Implements Hierarchical Risk Parity Routines
 Author: Gustavo Amarante
 """
 
-import scipy.cluster.hierarchy as sch
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+import scipy.cluster.hierarchy as sch
 
 
 class HRP(object):
+    """
+    Implements Hierarchical Risk Parity
+    """
 
     def __init__(self, data, method='single', metric='euclidean'):
         """
-        Combines the assets in 'data' using HRP and returns a sequence of returns.
+        Combines the assets in 'data' using HRP
         returns an object with the following atributes:
             - 'cov': covariance matrix of the returns
             - 'corr': correlation matrix of the returns
@@ -69,7 +72,7 @@ class HRP(object):
         return sort_ix.tolist()
 
     def _get_recursive_bisection(self, cov, sort_ix):
-        w = pd.Series(1, index=sort_ix)
+        w = pd.Series(1, index=sort_ix, name='HRP')
         c_items = [sort_ix]  # initialize all items in one cluster
         # c_items = sort_ix
 
@@ -148,3 +151,70 @@ class HRP(object):
 
         if show_chart:
             plt.show()
+
+
+class MinVar(object):
+    """
+    Implements Minimal Variance Portfolio
+    """
+
+    def __init__(self, data):
+        """
+        Combines the assets in 'data' by finding the minimal variance portfolio
+        returns an object with the following atributes:
+            - 'cov': covariance matrix of the returns
+            - 'weights': final weights for each asset
+
+        :param data: pandas DataFrame where each column is a series of returns
+        """
+
+        assert isinstance(data, pd.DataFrame), "input 'data' must be a pandas DataFrame"
+
+        self.cov = data.cov()
+
+        eq_cons = {'type': 'eq',
+                   'fun': lambda w: w.sum() - 1}
+
+        w0 = np.zeros(self.cov.shape[0])
+
+        res = minimize(self._port_var, w0, method='SLSQP', constraints=eq_cons,
+                       options={'ftol': 1e-9, 'disp': False})
+
+        if not res.success:
+            raise ArithmeticError('Convergence Failed')
+
+        self.weights = pd.Series(data=res.x, index=self.cov.columns, name='Min Var')
+
+    def _port_var(self, w):
+        return w.dot(self.cov).dot(w)
+
+
+class IVP(object):
+    """
+    Implements Inverse Variance Portfolio
+    """
+
+    def __init__(self, data, use_variance=True):
+        """
+        Combines the assets in 'data' by their inverse variances
+        returns an object with the following atributes:
+            - 'cov': covariance matrix of the returns
+            - 'weights': final weights for each asset
+
+        :param data: pandas DataFrame where each column is a series of returns
+        :param use_variance: if True, uses the inverse variance. If False, uses the inverse standard deviation
+        """
+
+        assert isinstance(data, pd.DataFrame), "input 'data' must be a pandas DataFrame"
+        assert isinstance(use_variance, bool), "input 'use_variance' must be boolean"
+
+        self.cov = data.cov()
+        w = np.diag(self.cov)
+
+        if not use_variance:
+            w = np.sqrt(w)
+
+        w = 1 / w
+        w = w / w.sum()
+
+        self.weights = pd.Series(data=w, index=self.cov.columns, name='IVP')

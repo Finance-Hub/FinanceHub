@@ -1,6 +1,8 @@
-# Author: Fernando Tassinari Moraes
-# BAB Factor Builder Routine
-# Paper: Frazziniand Pedersen (2014) - "Betting Against Beta"
+"""
+Author: Fernando Tassinari Moraes
+BAB Factor Builder Routine
+Paper: Frazziniand Pedersen (2014) - "Betting Against Beta"
+"""
 
 import pandas as pd
 import numpy as np

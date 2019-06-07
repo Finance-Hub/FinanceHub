@@ -1,4 +1,4 @@
-from portfolio import HRP
+from portfolio import HRP, MinVar, IVP
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,10 +25,9 @@ df_simul, corr_true = generate_mnorm(5, 1000)
 
 hrp = HRP(data=df_simul)
 print(hrp.link)
-print(corr_true)
 
 # labels = list(df_simul.columns)
-# plt.pcolor(hrp.corr)
+# plt.matshow(hrp.corr)
 # plt.colorbar()
 # plt.yticks(np.arange(.5, hrp.corr.shape[0]+.5), labels)
 # plt.xticks(np.arange(.5, hrp.corr.shape[0]+.5), labels)
@@ -36,7 +35,7 @@ print(corr_true)
 
 
 # labels = hrp.sort_ix
-# plt.pcolor(hrp.sorted_corr)
+# plt.matshow(hrp.sorted_corr)
 # plt.colorbar()
 # plt.yticks(np.arange(.5,hrp.sorted_corr.shape[0]+.5), labels)
 # plt.xticks(np.arange(.5,hrp.sorted_corr.shape[0]+.5), labels)
@@ -44,3 +43,10 @@ print(corr_true)
 
 hrp.plot_corr_matrix()
 hrp.plot_dendrogram()
+
+min_var = MinVar(df_simul)
+ivp = IVP(df_simul)
+
+df_weights = pd.concat([hrp.weights, min_var.weights, ivp.weights], axis=1, sort=True)
+df_weights.plot(kind='bar')
+plt.show()

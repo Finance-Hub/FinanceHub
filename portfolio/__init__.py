@@ -1,3 +1,4 @@
-from portfolio.hrp import HRP
+from portfolio.port_construction import HRP, MinVar, IVP
 
-__all__ = ['HRP']
+
+__all__ = ['HRP', 'MinVar', 'IVP']
