@@ -1,11 +1,10 @@
-'''
-A classe que calcula metrica de time series momentum
-'''
-
-#Developed by Eduardo Minatel Tinos and Eduardo Ribeiro da Silva
+"""
+Author: Eduardo Minatel Tinos and Eduardo Ribeiro da Silva
+"""
 
 import pandas as pd
 from pandas.tseries.offsets import BDay
+
 
 def momentum(df,h=252):
     '''
