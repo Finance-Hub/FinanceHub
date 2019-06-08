@@ -93,7 +93,6 @@ of the session, we welcome general discussions.
 Here we speak **python**. This is the fastest growing programming
 language. To get started follow our [installation guide](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Guides/Installation%20Guide.pdf).
 
-
 ---
 
 # Websites We Like
