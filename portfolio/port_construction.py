@@ -18,7 +18,7 @@ class HRP(object):
     def __init__(self, data, method='single', metric='euclidean'):
         """
         Combines the assets in 'data' using HRP
-        returns an object with the following atributes:
+        returns an object with the following attributes:
             - 'cov': covariance matrix of the returns
             - 'corr': correlation matrix of the returns
             - 'sort_ix': list of sorted column names according to cluster
@@ -218,3 +218,4 @@ class IVP(object):
         w = w / w.sum()
 
         self.weights = pd.Series(data=w, index=self.cov.columns, name='IVP')
+
