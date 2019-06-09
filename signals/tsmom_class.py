@@ -8,7 +8,6 @@ from pandas.tseries.offsets import BDay
 
 def momentum(df,h=252):
     '''
-
     Computes the momentum signal for all the series in a dataframe
     :param df: pandas dataframe or series
     :param h: lookback period in business days
@@ -23,7 +22,6 @@ def momentum(df,h=252):
 
 def macd(df, hl_rap=12, hl_len=26):
     '''
-
     Computes the macd signal for all the series in a dataframe
     :param df: pandas dataframe or series
     :param hl_rap: lookback period in business days for the fast exponential moving average
@@ -39,9 +37,9 @@ def macd(df, hl_rap=12, hl_len=26):
 
     return df_macd
 
+
 def relative_position(df, h):
     '''
-
     :param df: pandas dataframe or series
     :param h: lookback period in business days
     :return: pandas dataframe with the relative position signals
@@ -55,15 +53,15 @@ def relative_position(df, h):
     
     return df_rp
 
-def relative_strength_index(df,h=14):
-    '''
 
+def relative_strength_index(df, h=14):
+    '''
     :param df: pandas dataframe or series
     :param h: lookback period in business days
     :return: pandas dataframe with the momentum signals
     '''
 
-    #Calculates daily price change from t to t+1
+    # Calculates daily price change from t to t+1
     df_delta = df.diff().dropna()
     
     up, down = df_delta.copy(), df_delta.copy()
@@ -72,7 +70,6 @@ def relative_strength_index(df,h=14):
 
     roll_up1 = up.rolling(h).sum()
     roll_down1 = down.rolling(h).sum().abs()
-    
 
     df_rs = roll_up1 / roll_down1
     df_rsi = 100 - 100 / (1 + df_rs)

@@ -1,4 +1,4 @@
-__all__ = ['SwapCurve', 'momentum', 'macd']
+__all__ = ['SwapCurve']
 
 from finmath.SwapCurve.SwapCurve import SwapCurve
-from finmath.tsmomentum import momentum, macd
+
