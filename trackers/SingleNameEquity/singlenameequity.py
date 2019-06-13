@@ -2,29 +2,41 @@ import pandas as pd
 from bloomberg import BBG
 
 
-class SingleNameStock(object):
+class SingleNameEquity(object):
+    """
+    Class for creating total return indeces for single name equities. Assumes 1 stock held at oldest ex-dividend date
+    and computes the total return indedx by reinvesting dividends on the same stock on every ex-dividend date.
+    """
 
     def __init__(self, ticker, price_field='PX_LAST'):
         """
-        'Declared Date', 'Amount', 'Frequency', 'Type', 'Ex-Dividend Date',
-        'Payable Date', 'Record Date'
+        Returns an object with the following atributes:
+            - ticker: str with bloomberg ticker for the stock
+            - dividends: DataFrame with dividend information. Its columns are 'Declared Date', 'Amount', 'Frequency',
+                         'Type', 'Ex-Dividend Date', 'Payable Date', 'Record Date'
+            - price: Series with the stock price
+            - tr_index: Series with the total return index
+            - quantity: amount of stocks held
+            - ts_df: DataFrame with columns 'Price', 'Dividend', 'Quantity' and 'Total Return Index'
+        :param ticker: str, Bloomberg ticker of the stock
+        :param price_field: Price field to be used as settlement price
         """
 
-        self.bbg = BBG()
+        bbg = BBG()
         self.ticker = ticker
         today = pd.to_datetime('today')
-        self.dividends = self._get_dividends(today)
+        self.dividends = self._get_dividends(today, bbg)
         start_date = self.dividends['Ex-Dividend Date'].min()
-        self.price = self.bbg.fetch_series(securities=ticker, fields=price_field, startdate=start_date, enddate=today)
+        self.price = bbg.fetch_series(securities=ticker, fields=price_field, startdate=start_date, enddate=today)
         df = self._get_total_return_index()
         self.price = df[self.ticker].rename('Price')
+        df['Price'] = self.price
         self.tr_index = df['Total Return Index'].rename('TR Index')
         self.quantity = df['Quantity'].rename('Quantity')
+        self.ts_df = df[['Price', 'Dividend', 'Quantity', 'Total Return Index']]
 
-        # TODO opcao para um unico dataframe com todas as opcoes
-
-    def _get_dividends(self, today):
-        df = self.bbg.fetch_dividends(self.ticker, today)
+    def _get_dividends(self, today, bbg):
+        df = bbg.fetch_dividends(self.ticker, today)
 
         rename_dict = {'Declared Date': 'Declared Date',
                        'Dividend Amount': 'Amount',
