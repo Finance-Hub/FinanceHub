@@ -27,6 +27,7 @@ class SingleNameEquity(object):
         """
 
         # TODO Handle case where there are no dividend payments
+        # TODO Debug case for AAPL US Equity
 
         bbg = BBG()
         self.ticker = ticker
