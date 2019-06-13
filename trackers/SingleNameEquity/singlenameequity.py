@@ -1,3 +1,7 @@
+"""
+Author: Gustavo Amarante
+"""
+
 import pandas as pd
 from bloomberg import BBG
 
@@ -21,6 +25,8 @@ class SingleNameEquity(object):
         :param ticker: str, Bloomberg ticker of the stock
         :param price_field: Price field to be used as settlement price
         """
+
+        # TODO Handle case where there are no dividend payments
 
         bbg = BBG()
         self.ticker = ticker
