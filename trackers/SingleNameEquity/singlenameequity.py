@@ -28,6 +28,8 @@ class SingleNameEquity(object):
 
         # TODO Handle case where there are no dividend payments
         # TODO Debug case for AAPL US Equity
+        # TODO allow user to choose currency
+        # TODO allow for user to input data
 
         bbg = BBG()
         self.ticker = ticker
