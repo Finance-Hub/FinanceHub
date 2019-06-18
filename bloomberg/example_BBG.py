@@ -33,3 +33,6 @@ print(df_fn)
 # fetches fields with bulk data
 df_bulk = bbg.fetch_bulk_data(index_name='AAPL US Equity', field='PG_REVENUE', ref_date=start_date)
 print(df_bulk)
+
+# fetches historical dividends
+df_div = bbg.fetch_dividends('AAPL US Equity', end_date)
