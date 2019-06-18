@@ -39,7 +39,7 @@ of that data. The objective of this branch is to build tools for
 research which will reduce the cost of data acquisition as well as model
 set up.
 
-* **Education**: We have lectures on [python programming](https://github.com/Finance-Hub/FinanceHub/tree/master/fhnotebooks/Introduction%20to%20Python) for finance and
+* **Education**: We have lectures on [python programming](https://github.com/Finance-Hub/FinanceHubMaterials/tree/master/Python%20Lectures) for finance and
 financial theory. All of the material is available in our repository in
 the format of slides and jupyter notebooks, so that everyone can learn
 python and help build up the community and push the project forward.
@@ -85,6 +85,7 @@ of the session, we welcome general discussions.
 | 06-may-19 <br> **Liquidity**                             | Marcio Prado - Slow-Moving Liquidity Provision and Flow-Driven Common Factors in Stock Returns (Li, 2018) | Guilherme Paiva - [Brokers and Order Flow Leakage: Evidence from Fire Sales](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Seminars/Guilherme%20Paiva%20-%20Brokers%20and%20Order%20Flow%20Leakage.pdf) (Barbon, Maggio & Landier, 2017) |
 | 20-may-19 <br> **Factors**                               | Gustavo Soares - [Factor risk premiums and invested capital: calculations with stochastic discount factors](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Seminars/Gustavo%20Sosares%20-%20Factor%20risk%20premiums%20and%20invested%20capital.pdf) (Ang, Hogan and Shores, Journal of Asset Management, 2016) | Raphael Gondo - [Factor Timing with Cross-Sectional and Time-Series Predictors](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Seminars/Raphael%20Gondo%20-%20Factor%20Timing%20with%20Cross.pdf) (Hodges, Hogan, Peterson and Ang, The Journal of Portfolio Management, 2017) |
 | 03-jun-19 <br> **Portfolio Construction**                | Gustavo Soares -  [Dynamic trading with predictable returns and transaction costs](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Seminars/Gustavo%20Soares%20-%20Dynamic%20Trading.pdf) (Gârleanu & Pedersen, 2013) | Fernando Tassinari - [Strategic Rebalancing](https://github.com/Finance-Hub/FinanceHubMaterials/blob/master/Seminars/Fernando%20Tassinari%20-%20Strategic%20Rebalancing.pdf) (Granger, Harvey, Rattray & Van Hemert, 2019) |
+| 24-jun-19 <br> **Interest Rate Slope**                   | Claudia Bruschi - Monetary Policy Communication, Policy Slope, and the Stock Market (Neuhier & Weber, 2019) | Pedro Castro - Currency Returns and Interest Rate Slopes (Castro & Ribeiro, 2019) |
 
 ---
 
