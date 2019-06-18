@@ -6,6 +6,7 @@ import datetime as dt
 import pandas as pd
 import numpy as np
 import blpapi
+from blpapi.exception import IndexOutOfRangeException
 
 
 class BBG(object):
@@ -607,7 +608,10 @@ class BBG(object):
                                 s = pd.Series()
 
                                 for d in [v.getElement(i) for i in range(v.numElements())]:
-                                    s[str(d.name())] = d.getValue()
+                                    try:
+                                        s[str(d.name())] = d.getValue()
+                                    except IndexOutOfRangeException:
+                                        continue
 
                                 df = df.append(s, ignore_index=True)
 

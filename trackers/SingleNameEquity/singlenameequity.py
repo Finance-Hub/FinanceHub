@@ -4,12 +4,14 @@ Author: Gustavo Amarante
 
 import pandas as pd
 from bloomberg import BBG
+from pandas._libs.tslibs.nattype import NaTType
 
 
 class SingleNameEquity(object):
     """
-    Class for creating total return indeces for single name equities. Assumes 1 stock held at oldest ex-dividend date
-    and computes the total return indedx by reinvesting dividends on the same stock on every ex-dividend date.
+    Class for creating total return indeces for single name equities using data from bloomberg. Assumes 1 stock held at
+    oldest ex-dividend date and computes the total return indedx by reinvesting dividends on the same stock on every
+    ex-dividend date.
     """
 
     def __init__(self, ticker, price_field='PX_LAST'):
@@ -26,16 +28,20 @@ class SingleNameEquity(object):
         :param price_field: Price field to be used as settlement price
         """
 
-        # TODO Handle case where there are no dividend payments
-        # TODO Debug case for AAPL US Equity
         # TODO allow user to choose currency
-        # TODO allow for user to input data
 
         bbg = BBG()
         self.ticker = ticker
         today = pd.to_datetime('today')
         self.dividends = self._get_dividends(today, bbg)
-        start_date = self.dividends['Ex-Dividend Date'].min()
+        start_date_div = self.dividends['Ex-Dividend Date'].min()
+        start_date_prc = pd.to_datetime(bbg.fetch_contract_parameter(self.ticker, 'CALENDAR_START_DATE').values[0][0])
+
+        if isinstance(start_date_div, NaTType):
+            start_date = start_date_prc
+        else:
+            start_date = min(start_date_div, start_date_prc)
+
         self.price = bbg.fetch_series(securities=ticker, fields=price_field, startdate=start_date, enddate=today)
         df = self._get_total_return_index()
         self.price = df[self.ticker].rename('Price')
@@ -58,7 +64,10 @@ class SingleNameEquity(object):
         df = df.rename(rename_dict, axis=1)
 
         for col in ['Declared Date', 'Ex-Dividend Date', 'Payable Date', 'Record Date']:
-            df[col] = pd.to_datetime(df[col])
+            try:
+                df[col] = pd.to_datetime(df[col])
+            except KeyError:
+                continue
 
         index2drop = df[df['Type'] == 'Quote Lot Change'].index
         df = df.drop(index2drop)
