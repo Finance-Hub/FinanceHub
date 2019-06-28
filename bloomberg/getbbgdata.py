@@ -212,6 +212,8 @@ class BBG(object):
         :return: DataFrame
         """
 
+        # TODO allow for a list of fields
+
         session = blpapi.Session()
         session.start()
 
