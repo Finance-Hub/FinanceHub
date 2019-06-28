@@ -19,12 +19,12 @@ connect_dict = {'flavor': 'postgres+psycopg2',
                 'host': '[HOST ADDRESS]',
                 'port': '[PORT NUMBER]'}
 
-month_start = pd.date_range(start='01/01/2009',
-                            end='31/12/2009',
+month_start = pd.date_range(start='01/01/2019',
+                            end='31/12/2019',
                             freq='MS')
 
-month_end = pd.date_range(start='01/01/2009',
-                          end='31/12/2009',
+month_end = pd.date_range(start='01/01/2019',
+                          end='31/12/2019',
                           freq='M')
 
 for dt_ini, dt_end in zip(month_start, month_end):
