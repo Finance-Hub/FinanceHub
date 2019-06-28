@@ -48,4 +48,3 @@ for s in stocks:
         sne.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append')
     except IntegrityError:
         pass
-
