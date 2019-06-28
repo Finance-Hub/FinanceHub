@@ -1,6 +1,6 @@
 # Welcome to the FinanceHub
 
-The FinanceHub is a **community** of investment professionals, academics
+FinanceHub is a **community** of investment professionals, academics
 and students in Brazil capable of fostering the research and technology
 that will help the brazilian asset management industry cope with its new
 challenges.
