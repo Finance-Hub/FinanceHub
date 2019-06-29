@@ -1,0 +1,236 @@
+# Financas Quantitativas
+# Contribuição ao Finance Hub: Rentabilidade dos bancos
+# Autores: Ivan Zemella e Renan Pereira
+
+# Importa bibliotecas
+import json, requests
+import pandas as pd
+import numpy as np
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt 
+
+# Declara variavel
+continuar = True
+ 
+# Declara coleção
+colecao  = {}
+
+contador=0
+
+# Captura qual o semestre
+escolha = input('Deseja inserir períodos manualmente? S/N  ')
+
+if (escolha == 'N'):
+    
+    list1 = ['201506','201512','201606','201612','201706','201712','201806','201812']
+
+    for contador in range(0, len(list1)):
+
+        # Continua executando o código enquanto o continuar for igual a True
+
+        # Captura qual o semestre
+        trimestre = list1[contador]
+
+        print('Capturando os bancos para o trimestre...',trimestre)
+
+        colecao[trimestre] = {}
+
+        # Captura os dados no site do banco central
+        resposta_bancos = requests.get(
+            "https://www3.bcb.gov.br/ifdata/rest/arquivos?nomeArquivo=" + trimestre + "/cadastro" + trimestre + "_1005.json&{}")
+
+        # Converte a resposta json para um array    
+        corpo_bancos = json.loads(resposta_bancos.content)
+
+        i = 0
+
+        # Varre os dados pegando o nome dos bancos
+        while (i < len(corpo_bancos)):
+            # Pega o identificador do banco, que está no campo c0
+            indice_banco = int(corpo_bancos[i]['c0'])
+
+            # Adiciona os dados do banco dentro da coleçao
+            colecao[trimestre][indice_banco] = {"trimestre": trimestre,"banco": corpo_bancos[i]['c2'], "patrimonio_liquido": 0, "lucro_liquido": 0}
+
+            i += 1 
+
+        print('Capturando os valores para o trimestre...',trimestre)
+
+        # Captura os dados no site do banco central
+        resposta_valores = requests.get(
+            "https://www3.bcb.gov.br/ifdata/rest/arquivos?nomeArquivo=" + trimestre + "/dados" + trimestre + "_1.json&{}")
+
+        # Converte a resposta json para um array
+        corpo_valores = json.loads(resposta_valores.content)
+
+        # Acessa o nivel do array onde estão os valores
+        corpo_valores = corpo_valores['values']
+
+        i = 0
+
+        while (i < len(corpo_valores)):
+            # Encontra o id do banco dentro do valores
+            indice_banco = int(corpo_valores[i]['e'])
+
+            # Valida se esse id já existe
+            if (indice_banco in colecao[trimestre]):
+
+                x = 0
+
+                while (x < len(corpo_valores[i]['v'])):
+
+                    # Pega o identificador do campo
+                    indicador = int(corpo_valores[i]['v'][x]['i'])
+
+                    if (indicador == 78186):
+                        colecao[trimestre][indice_banco]['patrimonio_liquido'] = corpo_valores[i]['v'][x]['v']
+
+                    if (indicador == 78187):
+                        colecao[trimestre][indice_banco]['lucro_liquido'] = corpo_valores[i]['v'][x]['v']
+
+                    x += 1
+
+                if (colecao[trimestre][indice_banco]['lucro_liquido'] != 0 and colecao[trimestre][indice_banco][
+                    'patrimonio_liquido'] != 0):
+
+                    # Calcula o roe
+                    colecao[trimestre][indice_banco]['roe'] = colecao[trimestre][indice_banco]['lucro_liquido'] / \
+                                                              colecao[trimestre][indice_banco]['patrimonio_liquido']
+
+            i += 1
+
+            contador += 1
+            
+        # Verifica se o usuário que continuar baixando trimestres
+        deseja_continuar = 'S'
+
+        if(deseja_continuar == 'N'):
+            continuar = False
+
+
+    resultado = {}
+    i = 0
+
+    for key,value in colecao.items():
+        for k,item in value.items():
+            resultado[i] = item
+            i += 1
+
+else:
+
+    # Continua executando o código enquanto o continuar for igual a True
+    while(continuar):
+
+        # Captura qual o semestre
+        trimestre = input('Qual o trimestre?  ')
+
+        print('Capturando os bancos para o trimestre...',trimestre)
+
+        colecao[trimestre] = {}
+
+        # Captura os dados no site do banco central
+        resposta_bancos = requests.get(
+            "https://www3.bcb.gov.br/ifdata/rest/arquivos?nomeArquivo=" + trimestre + "/cadastro" + trimestre + "_1005.json&{}")
+
+        # Converte a resposta json para um array    
+        corpo_bancos = json.loads(resposta_bancos.content)
+
+        i = 0
+
+        # Varre os dados pegando o nome dos bancos
+        while (i < len(corpo_bancos)):
+            # Pega o identificador do banco, que está no campo c0
+            indice_banco = int(corpo_bancos[i]['c0'])
+
+            # Adiciona os dados do banco dentro da coleçao
+            colecao[trimestre][indice_banco] = {"trimestre": trimestre,"banco": corpo_bancos[i]['c2'], "patrimonio_liquido": 0, "lucro_liquido": 0}
+
+            i += 1 
+
+        print('Capturando os valores para o trimestre...',trimestre)
+
+        # Captura os dados no site do banco central
+        resposta_valores = requests.get(
+            "https://www3.bcb.gov.br/ifdata/rest/arquivos?nomeArquivo=" + trimestre + "/dados" + trimestre + "_1.json&{}")
+
+        # Converte a resposta json para um array
+        corpo_valores = json.loads(resposta_valores.content)
+
+        # Acessa o nivel do array onde estão os valores
+        corpo_valores = corpo_valores['values']
+
+        i = 0
+        while (i < len(corpo_valores)):
+            # Encontra o id do banco dentro do valores
+            indice_banco = int(corpo_valores[i]['e'])
+
+            # Valida se esse id já existe
+            if (indice_banco in colecao[trimestre]):
+
+                x = 0
+
+                while (x < len(corpo_valores[i]['v'])):
+
+                    # Pega o identificador do campo
+                    indicador = int(corpo_valores[i]['v'][x]['i'])
+
+                    if (indicador == 78186):
+                        colecao[trimestre][indice_banco]['patrimonio_liquido'] = corpo_valores[i]['v'][x]['v']
+
+                    if (indicador == 78187):
+                        colecao[trimestre][indice_banco]['lucro_liquido'] = corpo_valores[i]['v'][x]['v']
+
+                    x += 1
+
+                if (colecao[trimestre][indice_banco]['lucro_liquido'] != 0 and colecao[trimestre][indice_banco][
+                    'patrimonio_liquido'] != 0):
+
+                    # Calcula o roe
+                    colecao[trimestre][indice_banco]['roe'] = colecao[trimestre][indice_banco]['lucro_liquido'] / \
+                                                              colecao[trimestre][indice_banco]['patrimonio_liquido']
+
+            i += 1
+
+        # Verifica se o usuário que continuar baixando trimestres
+        deseja_continuar = input('Deseja continuar? [S/N]       ')
+
+        if(deseja_continuar == 'N'):
+            continuar = False
+
+    resultado = {}
+    i = 0
+
+    for key,value in colecao.items():
+        for k,item in value.items():
+            resultado[i] = item
+            i += 1
+
+    print("--------Encerrado--------")   
+
+
+#Converte os dados em formato dicionário para pandas dataframe
+df = pd.DataFrame.from_dict(resultado,orient='index')
+df.tail() # demonstração da tabela gerada
+
+# Define as séries que serão utilizdas nos gráficos em dataframes por bancos
+df_bradesco=df[df['banco'].str.contains('BRADESCO')][['banco', 'trimestre', 'roe']]
+df_itau=df[df['banco'].str.contains('ITAU')][['banco', 'trimestre', 'roe']]
+df_santander=df[df['banco'].str.contains('SANTANDER')][['banco', 'trimestre', 'roe']]
+df_bancobrasil=df[df['banco'].str.match(r'^BB$')][['banco', 'trimestre', 'roe']]
+
+fig, ax = plt.subplots(figsize=(15, 8))
+
+plt.plot( 'trimestre', 'roe', label='BRADESCO',data=df_bradesco, marker='o', markerfacecolor='tomato', markersize=12, color='tomato', linewidth=4)
+plt.plot( 'trimestre', 'roe', label='ITAU',data=df_itau, marker='o', markerfacecolor='Navy', markersize=12, color='Navy', linewidth=4)
+plt.plot( 'trimestre', 'roe', label='SANTANDER',data=df_santander, marker='o', markerfacecolor='red', markersize=12, color='red', linewidth=4)
+plt.plot( 'trimestre', 'roe', label='BANCO DO BRASIL',data=df_bancobrasil, marker='o', markerfacecolor='gold', markersize=12, color='gold', linewidth=4)
+
+plt.legend()
+
+plt.show()
+
+# Gera tabela e exporta para o Excel
+df_bancos=df[df['banco'].str.contains(r'^BB$|BRADESCO|ITAU|SANTANDER')][['banco', 'trimestre', 'roe']]
+df_bancos.to_excel(r"df_Top4.xlsx")
+df.to_excel(r"df_bancos.xlsx")
