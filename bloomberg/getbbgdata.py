@@ -6,6 +6,7 @@ import datetime as dt
 import pandas as pd
 import numpy as np
 import blpapi
+from blpapi.exception import IndexOutOfRangeException
 
 
 class BBG(object):
@@ -210,6 +211,8 @@ class BBG(object):
         :param field: str
         :return: DataFrame
         """
+
+        # TODO allow for a list of fields
 
         session = blpapi.Session()
         session.start()
@@ -553,5 +556,70 @@ class BBG(object):
                     df = df.set_index(df.columns[0])
 
                 end_reached = True
+
+        return df
+
+    @staticmethod
+    def fetch_dividends(stock_ticker, ref_date):
+
+        ref_date = BBG._assert_date_type(ref_date)
+
+        session = blpapi.Session()
+
+        if not session.start():
+            raise ConnectionError("Failed to start session.")
+
+        if not session.openService("//blp/refdata"):
+            raise ConnectionError("Failed to open //blp/refdat")
+
+        service = session.getService("//blp/refdata")
+        request = service.createRequest("ReferenceDataRequest")
+
+        request.append("securities", stock_ticker)
+        request.append("fields", "DVD_HIST_ALL")
+
+        overrides = request.getElement("overrides")
+        override1 = overrides.appendElement()
+        override1.setElement("fieldId", "END_DATE_OVERRIDE")
+        override1.setElement("value", ref_date.strftime('%Y%m%d'))
+
+        session.sendRequest(request)  # there is no need to save the response as a variable in this case
+
+        end_reached = False
+        df = pd.DataFrame()
+        while not end_reached:
+
+            ev = session.nextEvent()
+
+            if ev.eventType() == blpapi.Event.RESPONSE:
+
+                for msg in ev:
+
+                    security_data = msg.getElement('securityData')
+                    security_data_list = [security_data.getValueAsElement(i) for i in range(security_data.numValues())]
+
+                    for sec in security_data_list:
+
+                        field_data = sec.getElement('fieldData')
+                        field_data_list = [field_data.getElement(i) for i in range(field_data.numElements())]
+
+                        for fld in field_data_list:
+
+                            for v in [fld.getValueAsElement(i) for i in range(fld.numValues())]:
+
+                                s = pd.Series()
+
+                                for d in [v.getElement(i) for i in range(v.numElements())]:
+                                    try:
+                                        s[str(d.name())] = d.getValue()
+                                    except IndexOutOfRangeException:
+                                        continue
+
+                                df = df.append(s, ignore_index=True)
+
+                end_reached = True
+
+                if not ('Ex-Date' in df.columns):
+                    raise FileNotFoundError('Ticker returned a dataframe without ex-dividend date')
 
         return df
