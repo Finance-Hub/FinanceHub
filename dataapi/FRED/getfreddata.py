@@ -12,7 +12,7 @@ class FRED(object):
 
     def fetch(self, series_id, initial_date=None, end_date=None):
         """
-        Grabs series from the FRED website
+        Grabs series from the FRED website and returns a pandas dataframe
 
         :param series_id: string with series ID, list of strings of the series ID or dict with series ID as keys
         :param initial_date: string in the format 'yyyy-mm-dd' (optional)
