@@ -1,7 +1,7 @@
 from trackers import SingleNameEquity
 import matplotlib.pyplot as plt
 
-sne = SingleNameEquity('ITUB4 BZ Equity')
+sne = SingleNameEquity('GE US Equity')
 
 sne.df_ts[['Dividend']].plot()
 plt.show()
