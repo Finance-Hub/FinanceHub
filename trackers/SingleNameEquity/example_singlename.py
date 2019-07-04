@@ -14,3 +14,6 @@ plt.show()
 
 sne.df_ts[['Price', 'Total Return Index']].pct_change(1).plot()
 plt.show()
+
+sne.df_ts[['Price', 'Total Return Index']].pct_change(1).plot.scatter(0, 1, s=1)
+plt.show()
