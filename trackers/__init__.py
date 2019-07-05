@@ -1,4 +1,4 @@
-from trackers.BondFutures.bondfuturetracker import BuildBondFutureTracker
+from trackers.BondFutures.bondfuturetracker import BondFutureTracker
 from trackers.SingleNameEquity.singlenameequity import SingleNameEquity
 
-__all__ = ['BuildBondFutureTracker', 'SingleNameEquity']
+__all__ = ['BondFutureTracker', 'SingleNameEquity']

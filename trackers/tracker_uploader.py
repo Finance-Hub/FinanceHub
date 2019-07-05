@@ -1,7 +1,8 @@
+import pandas as pd
 from time import time
 from sqlalchemy import create_engine
-from trackers import SingleNameEquity
 from sqlalchemy.exc import IntegrityError
+from trackers import SingleNameEquity, BondFutureTracker
 
 # ===== DATABASE CONNECTION =====
 connect_dict = {'flavor': 'postgres+psycopg2',
@@ -21,7 +22,10 @@ db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{data
                                    port=connect_dict['port'],
                                    flavor=connect_dict['flavor']))
 
+
+# ===============================
 # ===== EQUITY SINGLE NAMES =====
+# ===============================
 stocks = ['PETR4 BZ Equity',
           'BBDC4 BZ Equity',
           'VIVT4 BZ Equity',
@@ -42,7 +46,8 @@ stocks = ['PETR4 BZ Equity',
           'KO US Equity',
           'XOM US Equity',
           'GE US Equity',
-          'C US Equity']
+          'C US Equity',
+          'BAC US Equity']
 
 for ss in stocks:
     print(ss)
@@ -67,6 +72,39 @@ for ss in stocks:
     # upload new tracker - pandas method
     try:
         sne.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append', method='multi')
+    except IntegrityError:
+        pass
+
+    print(round((time() - start)), 'seconds to upload')
+
+# ========================
+# ===== BOND FUTURES =====
+# ========================
+countries = ['US', 'DE', 'FR', 'IT', 'JP', 'AU', 'GB', 'CA']
+
+for country in countries:
+    print(country)
+    start = time()
+
+    bf = BondFutureTracker(country=country, start_date='1980-01-01', end_date=pd.to_datetime('today'))
+
+    # uploads the metadata
+    try:
+        bf.df_metadata.to_sql('trackers_description', con=db_connect, index=False, if_exists='append')
+    except IntegrityError:
+        pass
+
+    # erase the old tracker
+    sql_query = f"DELETE FROM trackers WHERE fh_ticker IN ('{bf.fh_ticker}')"
+    conn = db_connect.raw_connection()
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    conn.commit()
+    cursor.close()
+
+    # upload new tracker - pandas method
+    try:
+        bf.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append', method='multi')
     except IntegrityError:
         pass
 
