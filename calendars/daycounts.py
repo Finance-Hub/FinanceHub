@@ -1,3 +1,7 @@
+"""
+Author: Thiago Barros
+"""
+
 from .holidays import Holidays
 from pandas import to_datetime, Timestamp, DatetimeIndex, date_range, \
     DateOffset
