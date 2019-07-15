@@ -3,12 +3,11 @@ import matplotlib.pyplot as plt
 from bloomberg import BBG
 import pandas as pd
 
-currency = 'NOK'
+currency = 'BRL'
 
 # Calculate your own FX tracker
 fx_tracker_object = FXForwardTrackers(currency)
 fx_tracker_df = fx_tracker_object.ts_df
-start_date = fx_tracker_df.index[0].date()
 
 # Get Bloomberg's FX tracker
 bbg = BBG()
@@ -20,9 +19,9 @@ bbg_carry_raw.columns = ['bbg_tracker']
 
 
 bbg_carry_index = pd.Series(index=fx_tracker_df.index)
-bbg_carry_index.iloc[0] = fx_tracker_df.iloc[0, 3]
+bbg_carry_index.iloc[0] = fx_tracker_df.iloc[0, 0]
 for d in bbg_carry_index.index[1:]:
-    ret = fx_tracker_df.loc[d,'er_index'] / fx_tracker_df.loc[:d].iloc[-2,3]
+    ret = fx_tracker_df.loc[d,'er_index'] / fx_tracker_df.loc[:d].iloc[-2, 0]
     bbg_carry_index.loc[d] = bbg_carry_index.loc[:d].iloc[-2] * ret
 
 fig, ax = plt.subplots()
