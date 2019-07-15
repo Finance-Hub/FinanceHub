@@ -2,7 +2,7 @@ import pandas as pd
 from time import time
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from trackers import SingleNameEquity, BondFutureTracker
+from trackers import SingleNameEquity, BondFutureTracker, FXForwardTrackers
 
 # ===== DATABASE CONNECTION =====
 connect_dict = {'flavor': 'postgres+psycopg2',
@@ -105,6 +105,41 @@ for country in countries:
     # upload new tracker - pandas method
     try:
         bf.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append', method='multi')
+    except IntegrityError:
+        pass
+
+    print(round((time() - start)), 'seconds to upload')
+
+
+# ==============
+# ===== FX =====
+# ==============
+currencies = ['AUD', 'BRL', 'CAD', 'CHF', 'CLP', 'CZK', 'EUR', 'GBP', 'HUF', 'JPY', 'KRW',
+              'MXN', 'NOK', 'NZD', 'PHP', 'PLN', 'SEK', 'SGD', 'TRY', 'TWD', 'ZAR']
+
+for curr in currencies:
+    print(curr)
+    start = time()
+
+    fx = FXForwardTrackers(curr)
+
+    # uploads the metadata
+    try:
+        fx.df_metadata.to_sql('trackers_description', con=db_connect, index=False, if_exists='append')
+    except IntegrityError:
+        pass
+
+    # erase the old tracker
+    sql_query = f"DELETE FROM trackers WHERE fh_ticker IN ('{fx.fh_ticker}')"
+    conn = db_connect.raw_connection()
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    conn.commit()
+    cursor.close()
+
+    # upload new tracker - pandas method
+    try:
+        fx.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append', method='multi')
     except IntegrityError:
         pass
 
