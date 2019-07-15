@@ -6,8 +6,8 @@ import pandas as pd
 currency = 'BRL'
 
 # Calculate your own FX tracker
-fx_tracker_object = FXForwardTrackers(currency)
-fx_tracker_df = fx_tracker_object.ts_df
+fx = FXForwardTrackers(currency)
+fx_tracker_df = fx.df_tracker
 
 # Get Bloomberg's FX tracker
 bbg = BBG()

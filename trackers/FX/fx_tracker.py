@@ -113,11 +113,7 @@ class FXForwardTrackers(object):
         raw_fwd = self._get_1m_fwd_rate()
         self.country = self.iso_country_dict[self.ccy_symbol]
         self.fh_ticker = 'fx ' + self.country.lower() + ' ' + self.ccy_symbol.lower()
-        self.asset_class = 'FX'
-        self.type = 'forward'
-        self.currency = 'USD'
-        self.maturity = 1/12  # in years
-
+        self.df_metadata = self._get_metadata()
 
         # calculate forward outrights
         fwd_outrights = self.spot_rate + raw_fwd / self.point_divisor_dict[self.ccy_symbol]
@@ -131,7 +127,8 @@ class FXForwardTrackers(object):
             bbg_raw_spot_data = self.spot_rate
             fwd_outrights = self.fwd_rate_bbg_data
 
-        self.ts_df = self._calculate_tr_index(bbg_raw_spot_data, fwd_outrights)
+        self.df_tracker = self._calculate_tr_index(bbg_raw_spot_data, fwd_outrights)
+        self.df_tracker = self._get_tracker_melted()
 
     @staticmethod
     def _calculate_tr_index(spot_rate, fwd_rate):
@@ -185,3 +182,21 @@ class FXForwardTrackers(object):
         bbg_raw_fwd_data.columns = [self.ccy_symbol]
         bbg_raw_fwd_data = bbg_raw_fwd_data.fillna(method='ffill').dropna()
         return bbg_raw_fwd_data
+
+    def _get_metadata(self):
+        df = pd.DataFrame(index=[0],
+                          data={'fh_ticker': self.fh_ticker,
+                                'asset_class': 'FX',
+                                'type': 'currency forward',
+                                'exchange_symbol': self.ccy_symbol,
+                                'currency': 'USD',
+                                'country': self.country,
+                                'maturity': 1/12})
+        return df
+
+    def _get_tracker_melted(self):
+        df = self.df_tracker[['er_index']].rename({'er_index': self.fh_ticker}, axis=1)
+        df['time_stamp'] = df.index.to_series()
+        df = df.melt(id_vars='time_stamp', var_name='fh_ticker', value_name='value')
+        df = df.dropna()
+        return df
