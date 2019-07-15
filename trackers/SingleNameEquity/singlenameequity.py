@@ -74,7 +74,7 @@ class SingleNameEquity(object):
         df = self.df_ts[['Total Return Index']].rename({'Total Return Index': self.fh_ticker}, axis=1)
         df['time_stamp'] = df.index.to_series()
         df = df.melt(id_vars='time_stamp', var_name='fh_ticker', value_name='value')
-
+        df = df.dropna()
 
         return df
 
