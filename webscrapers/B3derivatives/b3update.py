@@ -9,23 +9,13 @@ import time
 
 start_time = time.time()
 
-
-
-# connect_dict = {'flavor': 'postgres+psycopg2',
-#                 'database': '[DATABASE NAME]',
-#                 'schema': '[DATABASE SCHEMA]',
-#                 'user': '[USERNAME]',
-#                 'password': '[PASSWORD]',
-#                 'host': '[HOST ADDRESS]',
-#                 'port': '[PORT NUMBER]'}
-
 connect_dict = {'flavor': 'postgres+psycopg2',
-                'database': 'labfinan',
-                'schema': 'public',
-                'user': 'gustavo.amarante',
-                'password': 'pY-L4bF!nan!ns3r',
-                'host': 'labfinancas-01.c2q6rckdd916.us-east-1.rds.amazonaws.com',
-                'port': '5432'}
+                'database': '[DATABASE NAME]',
+                'schema': '[DATABASE SCHEMA]',
+                'user': '[USERNAME]',
+                'password': '[PASSWORD]',
+                'host': '[HOST ADDRESS]',
+                'port': '[PORT NUMBER]'}
 
 b3 = ScraperB3Derivatives(connect_dict)
 
