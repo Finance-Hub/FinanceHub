@@ -57,21 +57,26 @@ class ScraperB3Derivatives(object):
                 'NOV': 'X',
                 'DEZ': 'Z'}
 
-    @staticmethod
-    def scrape(contract, start_date, end_date, update_db=False, connect_dict=None):
+    def __init__(self, connect_dict=None):
+        self.connect_dict = connect_dict
+
+        if connect_dict is None:
+            self.db_connect = None
+        else:
+            self.db_connect = self._get_dbconnection()
+
+    def scrape(self, contract, start_date, end_date, update_db=False):
         """
 
         :param contract: B3 code for the contract (see list of supported contracts)
         :param date: should be in american convention mm/dd/yyyy
         :param update_db: If True, updates the FinanceLab AWS database with the scraped data. Requires the connect_dict
                           property with the access credentials. Does not return a DataFrame as output.
-        :param connect_dict: dict keys should be 'flavor', 'database', 'schema', 'user', 'password', 'host', 'port'.
-                             These will generate the connection string.
         :return: DataFrame (if update_db is False) or None
         """
 
         if update_db:
-            assert type(connect_dict) is dict, "If 'update_db' is True, 'connect_dict' should be a dictionary"
+            assert type(self.connect_dict) is dict, "If 'update_db' is True, 'connect_dict' should be a dictionary"
 
         if not (type(start_date) is str):
             start_date = start_date.strftime('%m/%d/%Y')
@@ -90,49 +95,48 @@ class ScraperB3Derivatives(object):
 
             print('Scraping', contract, 'for date', d.strftime('%m/%d/%Y'))
 
-            df_date = ScraperB3Derivatives._scrape_single_date(contract, d.strftime('%m/%d/%Y'))
+            df_date = self._scrape_single_date(contract, d.strftime('%m/%d/%Y'))
             df = pd.concat([df, df_date], join='outer')
 
         if update_db:
-            ScraperB3Derivatives._send_df_to_db(df, contract, connect_dict)
+            self._send_df_to_db(df, contract)
 
         else:
             return df
 
-    @staticmethod
-    def _scrape_single_date(contract, date):
+    def _scrape_single_date(self, contract, date):
 
         contract = contract.upper()
-        header = ScraperB3Derivatives._get_header(contract)
+        header = self._get_header(contract)
 
         df = pd.DataFrame(columns=header)
 
-        resp_str = requests.get(ScraperB3Derivatives.url, params={'Data': date, 'Mercadoria': contract}).text
+        resp_str = requests.get(self.url, params={'Data': date, 'Mercadoria': contract}).text
 
-        lkeyc = len(ScraperB3Derivatives.key_string_center)
-        lsepc = len(ScraperB3Derivatives.sep_string_center)
-        lsepr = len(ScraperB3Derivatives.sep_string_right)
+        lkeyc = len(self.key_string_center)
+        lsepc = len(self.sep_string_center)
+        lsepr = len(self.sep_string_right)
 
         isrunning = True
 
         while isrunning:
-            if resp_str.find(ScraperB3Derivatives.key_string_center) > -1:
-                start_str = resp_str.find(ScraperB3Derivatives.key_string_center)
-                end_str = start_str + lkeyc + resp_str[start_str + lkeyc:].find(ScraperB3Derivatives.merc_identifier)
+            if resp_str.find(self.key_string_center) > -1:
+                start_str = resp_str.find(self.key_string_center)
+                end_str = start_str + lkeyc + resp_str[start_str + lkeyc:].find(self.merc_identifier)
                 core = resp_str[start_str:end_str]
-                core_v = core.split(ScraperB3Derivatives.item_sep)
+                core_v = core.split(self.item_sep)
                 resp_str = resp_str[end_str:]
                 row_df = pd.DataFrame(index=[date], columns=header)
 
                 i = 0
                 for x in core_v[:-5]:
-                    if x.find(ScraperB3Derivatives.sep_string_center) > -1:
-                        start_str = x.find(ScraperB3Derivatives.sep_string_center) + lsepc
-                        end_str = x.find(ScraperB3Derivatives.str_sep)
+                    if x.find(self.sep_string_center) > -1:
+                        start_str = x.find(self.sep_string_center) + lsepc
+                        end_str = x.find(self.str_sep)
 
-                    elif x.find(ScraperB3Derivatives.sep_string_right) > -1:
-                        start_str = x.find(ScraperB3Derivatives.sep_string_right) + lsepr
-                        end_str = x.find(ScraperB3Derivatives.str_sep)
+                    elif x.find(self.sep_string_right) > -1:
+                        start_str = x.find(self.sep_string_right) + lsepr
+                        end_str = x.find(self.str_sep)
 
                     to_add = x[start_str:end_str].replace(' ', '')
 
@@ -146,9 +150,9 @@ class ScraperB3Derivatives(object):
             else:
                 isrunning = False
 
-        df = ScraperB3Derivatives._parse_str2num(df)
-        df = ScraperB3Derivatives._drop_useless_columns(df)
-        df = ScraperB3Derivatives._append_contract_column(contract, date, df)
+        df = self._parse_str2num(df)
+        df = self._drop_useless_columns(df)
+        df = self._append_contract_column(contract, date, df)
 
         df.index = pd.to_datetime(df.index)
 
@@ -157,8 +161,7 @@ class ScraperB3Derivatives(object):
 
         else:
 
-            #if pd.to_datetime(date) <= pd.to_datetime('01/01/2006'):
-            df = ScraperB3Derivatives._change_contract_name(df, date)
+            df = self._change_contract_name(df, date)
 
             return df
 
@@ -186,11 +189,10 @@ class ScraperB3Derivatives(object):
 
         return header
 
-    @staticmethod
-    def _parse_str2num(df):
+    def _parse_str2num(self, df):
 
         cols_in_df = set(df.columns)
-        cols_to_parse = cols_in_df & ScraperB3Derivatives.col2num
+        cols_to_parse = cols_in_df & self.col2num
 
         for col in cols_to_parse:
             df[col] = df[col].str.replace('[^0-9.]', '')  # argument is a RegEx
@@ -198,11 +200,10 @@ class ScraperB3Derivatives(object):
 
         return df
 
-    @staticmethod
-    def _drop_useless_columns(df):
+    def _drop_useless_columns(self, df):
 
         cols_in_df = set(df.columns)
-        cols_to_drop = cols_in_df & ScraperB3Derivatives.col2drop
+        cols_to_drop = cols_in_df & self.col2drop
 
         for col in cols_to_drop:
             df = df.drop(col, axis=1)
@@ -218,18 +219,16 @@ class ScraperB3Derivatives(object):
 
         return df
 
-    @staticmethod
-    def _change_contract_name(df, date):
+    def _change_contract_name(self, df, date):
 
         if len(df['MATURITY_CODE'].iloc[0]) >= 4:
-            my_func = lambda x: ScraperB3Derivatives._change_old_maturity_code(x, date)
+            my_func = lambda x: self._change_old_maturity_code(x, date)
             df['MATURITY_CODE'] = df['MATURITY_CODE'].apply(my_func)
 
         return df
 
-    @staticmethod
-    def _change_old_maturity_code(code, date):
-        month_code = ScraperB3Derivatives.mat_dict[code[:-1]]
+    def _change_old_maturity_code(self, code, date):
+        month_code = self.mat_dict[code[:-1]]
 
         if int(code[-1]) >= int(date[-1]):
             new_code = month_code + '0' + code[-1]
@@ -238,20 +237,11 @@ class ScraperB3Derivatives(object):
 
         return new_code
 
-    @staticmethod
-    def _send_df_to_db(df, contract, connect_dict):
+    def _send_df_to_db(self, df, contract):
 
         start_time = time.time()
 
         df.columns = map(str.lower, df.columns)
-
-        db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{database}"
-                                   .format(host=connect_dict['host'],
-                                           database=connect_dict['database'],
-                                           username=connect_dict['user'],
-                                           password=connect_dict['password'],
-                                           port=connect_dict['port'],
-                                           flavor=connect_dict['flavor']))
 
         min_date = df.index.min()
         max_date = df.index.max()
@@ -260,7 +250,7 @@ class ScraperB3Derivatives(object):
         query = query + f"contract='{contract}'"
         query = query + f"AND time_stamp BETWEEN '{min_date}' AND '{max_date}'"
 
-        df_db = pd.read_sql(sql=query, con=db_connect, index_col='time_stamp')
+        df_db = pd.read_sql(sql=query, con=self.db_connect, index_col='time_stamp')
         df_db = df_db.set_index([df_db.index, 'maturity_code'])
 
         df = df.set_index([df.index, 'maturity_code'])
@@ -269,9 +259,36 @@ class ScraperB3Derivatives(object):
         df = df.set_index(df.index.get_level_values(0))
 
         try:
-            df.to_sql('B3futures', con=db_connect, index=True, index_label='time_stamp', if_exists='append')
+            df.to_sql('B3futures', con=self.db_connect, index=True, index_label='time_stamp',
+                      if_exists='append', method='multi')
 
         except IntegrityError:
             print('There are duplicate entries in the DataFrame')
 
         print(round((time.time() - start_time)/60, 2), 'minutes to upload')
+
+    def contract_date_range(self):
+        """
+        Grabs earliest and latest available date for each contract
+        :return: pandas dataframe with available contracts on the index
+        """
+
+        query = 'select contract, min(time_stamp), max(time_stamp) from "B3futures" group by contract'
+
+        df = pd.read_sql(sql=query, con=self.db_connect, index_col='contract')
+        rename_dict = {'min': 'min date', 'max': 'max date'}
+        df = df.rename(rename_dict, axis=1)
+
+        return df
+
+    def _get_dbconnection(self):
+
+        db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{database}"
+                                   .format(host=self.connect_dict['host'],
+                                           database=self.connect_dict['database'],
+                                           username=self.connect_dict['user'],
+                                           password=self.connect_dict['password'],
+                                           port=self.connect_dict['port'],
+                                           flavor=self.connect_dict['flavor']))
+
+        return db_connect

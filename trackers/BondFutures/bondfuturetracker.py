@@ -1,6 +1,5 @@
 """
-This class is a work in progress
-Author: Gustavo Amarante
+Author: Gustavo Amarante, Gustavo Soares
 """
 
 import math
@@ -9,19 +8,19 @@ from bloomberg import BBG
 from pandas.tseries.offsets import BDay
 
 
-class BuildBondFutureTracker(object):
+class BondFutureTracker(object):
 
     futures_ticker_dict = {'US': 'TY',
-                           'GE': 'RX',
+                           'DE': 'RX',
                            'FR': 'OAT',
                            'IT': 'IK',
                            'JP': 'JB',
                            'AU': 'XM',
-                           'UK': 'G ',
+                           'GB': 'G ',
                            'CA': 'CN'}
 
-    fx_dict = {'GE': 'EURUSD Curncy',
-               'UK': 'GBPUSD Curncy',
+    fx_dict = {'DE': 'EURUSD Curncy',
+               'GB': 'GBPUSD Curncy',
                'CA': 'CADUSD Curncy',
                'JP': 'JPYUSD Curncy',
                'AU': 'AUDUSD Curncy',
@@ -31,6 +30,7 @@ class BuildBondFutureTracker(object):
 
     def __init__(self, country, start_date, end_date):
 
+        assert country in list(self.futures_ticker_dict.keys()), 'Country not yet supported'
         self.bbg = BBG()
         self.country = country
         self.start_date = self._assert_date_type(start_date)
@@ -41,9 +41,19 @@ class BuildBondFutureTracker(object):
         self.contract_list = self._get_contracts_list()
         self.df_fn = self._get_first_notice_dates()
         self.df_prices = self._get_all_prices()
-        df_tracker = self._build_tracker()
-        self.tr_index = df_tracker[['er_index']]
-        self.df_roll_info = df_tracker[['contract_rolling_out', 'roll_out_date', 'holdings']].dropna(how='any')
+        self.df_tracker = self._build_tracker()
+        self.tr_index = self.df_tracker[['er_index']]
+        self.fh_ticker = 'fibf ' + self.country.lower() + ' 10y'
+        self.df_roll_info = self.df_tracker[['contract_rolling_out', 'roll_out_date', 'holdings']].dropna(how='any')
+        self.df_metadata = self._get_metadata()
+        self.df_tracker = self._get_tracker_melted()
+
+    def _get_tracker_melted(self):
+        df = self.df_tracker[['er_index']].rename({'er_index': self.fh_ticker}, axis=1)
+        df['time_stamp'] = df.index.to_series()
+        df = df.melt(id_vars='time_stamp', var_name='fh_ticker', value_name='value')
+        df = df.dropna()
+        return df
 
     def _get_generic_future_series(self):
 
@@ -97,7 +107,7 @@ class BuildBondFutureTracker(object):
                                   columns=['contract_rolling_out', 'er_index', 'roll_out_date', 'holdings'])
 
         # set the values for the initial date
-        dt_ini = self.df_uc.index[0]
+        dt_ini = self.df_uc.dropna(how='all').index[0]
         df_tracker.loc[dt_ini, 'er_index'] = 100
         contract_rolling_out = self.df_uc.loc[dt_ini, self.futures_ticker_dict[self.country] + '2 Comdty'] + ' Comdty'
         df_tracker.loc[dt_ini, 'contract_rolling_out'] = contract_rolling_out
@@ -119,7 +129,7 @@ class BuildBondFutureTracker(object):
 
             df_tracker.loc[d, 'er_index'] = df_tracker.loc[dm1, 'er_index'] + pnl
 
-            if d >= roll_out_date.date():
+            if d >= roll_out_date:
                 contract_rolling_out = (self.df_uc.loc[d, self.futures_ticker_dict[self.country] + '2 Comdty'] + ' Comdty')
                 df_tracker.loc[d, 'contract_rolling_out'] = contract_rolling_out
 
@@ -140,6 +150,18 @@ class BuildBondFutureTracker(object):
             date = pd.to_datetime(date)
 
         return date
+
+    def _get_metadata(self):
+        df = pd.DataFrame(index=[0],
+                          data={'fh_ticker': self.fh_ticker,
+                                'asset_class': 'fixed income',
+                                'type': 'bond future',
+                                'exchange_symbol': self.futures_ticker_dict[self.country],
+                                'currency': 'USD',
+                                'country': self.country,
+                                'maturity': 10})
+
+        return df
 
 
 """
