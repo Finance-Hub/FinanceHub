@@ -15,28 +15,135 @@ class CommFutureTracker(object):
     A default front-month roll schedule is assumed but it can be provided by the user
     At the start date, we assume we trade 100 units of the commodity in the contract defined by the roll schedule
     We MtM the position over the month and then roll it into the next contracts as defined by the roll schedule
+    Commodities belonging to the Bloomberg Commodity Index (BCOM) and the S&P GSCI Commodity Index are covered
+    The S&P GSCI Commodity Index is the default roll schedule but BCOM and used-defined are also supported
+
+    ROLL SCHEDULE synthax:
+    The roll schedule is a list of size 12, each element correponding to a month of the year in their natural order
+    The list should contain a month code refering to the maturity of the contract to be held in that month according
+    to the table below:
+
+    Month	    Month Code
+    January	    F
+    February	G
+    March	    H
+    April	    J
+    May	        K
+    June	    M
+    July	    N
+    August	    Q
+    September	U
+    October	    V
+    November	X
+    December	Z
+
+    when the letter is followed by a + sign, it means that the maturity of the contract is in the following year
+
+    Example: The roll schedule [N, N, N, N, N, Z, Z, Z, H+, H+, H+, H+] does the following:
+             Holds the contracting maturinig in July of the same year for the first five months of the year,
+             then rolls that position into the December contract maturinig in the same year
+             and holds that position for the next three months,
+             then rolls that position into the March contract maturing the following year
+             and holds that position until the end of the year
+             rolls that position into the March contract maturing next year,
+             then rolls that position into the July contract in January
     """
 
-    # Currently available commodities
-    # TODO add other commodities to this dictionary
-    roll_schedule_dict = {
-        'CL': ['H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+', 'H+'],
+    # TODO: Generalize this class to incorporate the case covered by the BondFutureTracker
+    # TODO: Generalize this class to cover FX futures
+    # TODO: Generalize this class to cover Index futures
+
+    # These are the roll schedules followed by the commodities in the Bloomberg Commodity Index
+    # See https://data.bloomberglp.com/indices/sites/2/2018/02/BCOM-Methodology-January-2018_FINAL-2.pdf
+    bcom_roll_schedules = {
+        'C': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'S': ['H', 'H', 'K', 'K', 'N', 'N', 'X', 'X', 'X', 'X', 'F+', 'F+'],
+        'SM': ['H', 'H', 'K', 'K', 'N', 'N', 'Z', 'Z', 'Z', 'Z', 'F+', 'F+'],
+        'BO': ['H', 'H', 'K', 'K', 'N', 'N', 'Z', 'Z', 'Z', 'Z', 'F+', 'F+'],
+        'W': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'KW': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'CC': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'CT': ['H', 'H', 'K', 'K', 'N', 'N', 'Z', 'Z', 'Z', 'Z', 'Z', 'H+'],
+        'KC': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'LC': ['G', 'J', 'J', 'M', 'M', 'Q', 'Q', 'V', 'V', 'Z', 'Z', 'G+'],
+        'LH': ['G', 'J', 'J', 'M', 'M', 'N', 'Q', 'V', 'V', 'Z', 'Z', 'G+'],
+        'SB': ['H', 'H', 'K', 'K', 'N', 'N', 'V', 'V', 'V', 'H+', 'H+', 'H+'],
+        'CL': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'CO': ['H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+', 'H+'],
+        'HO': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'QS': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'XB': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'NG': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'HG': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'LN': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LX': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LA': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'GC': ['G', 'J', 'J', 'M', 'M', 'Q', 'Q', 'Z', 'Z', 'Z', 'Z', 'G+'],
+        'SI': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+    }
+
+    # These are the roll schedules followed by the commodities in the S&P GSCI Commodity Index
+    # See https://www.spindices.com/documents/methodologies/methodology-sp-gsci.pdf
+    gsci_roll_schedules = {
+        'C': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'S': ['H', 'H', 'K', 'K', 'N', 'N', 'X', 'X', 'X', 'X', 'F+', 'F+'],
+        'W': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'KW': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'SB': ['H', 'H', 'K', 'K', 'N', 'N', 'V', 'V', 'V', 'H+', 'H+', 'H+'],
+        'CC': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'CT': ['H', 'H', 'K', 'K', 'N', 'N', 'Z', 'Z', 'Z', 'Z', 'Z', 'H+'],
+        'KC': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'OJ': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'FC': ['H', 'H', 'K', 'K', 'Q', 'Q', 'Q', 'V', 'V', 'F+', 'F+', 'F+'],
+        'LC': ['G', 'J', 'J', 'M', 'M', 'Q', 'Q', 'V', 'V', 'Z', 'Z', 'G+'],
+        'LH': ['G', 'J', 'J', 'M', 'M', 'N', 'Q', 'V', 'V', 'Z', 'Z', 'G+'],
+        'CL': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'CO': ['H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+', 'H+'],
+        'HO': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'QS': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'XB': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'NG': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LX': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LL': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LN': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LT': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LP': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'LA': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'X', 'X', 'F+', 'F+'],
+        'GC': ['G', 'J', 'J', 'M', 'M', 'Q', 'Q', 'Z', 'Z', 'Z', 'Z', 'G+'],
+        'SI': ['H', 'H', 'K', 'K', 'N', 'N', 'U', 'U', 'Z', 'Z', 'Z', 'H+'],
+        'PL': ['J', 'J', 'J', 'N', 'N', 'N', 'V', 'V', 'V', 'F+', 'F+', 'F+'],
     }
 
     def __init__(self, comm_bbg_code, start_date = '2004-01-05', end_date = 'today',
                  roll_schedule = None, roll_start_bday = 5, roll_window_size = 5):
+        """
+        Returns an object with the many attributes including a data frame
+            - tickers: list with 2 strs with Bloomberg ticker for the spot rates and 1M forward rates
+            - spot_rate: Series with the spot rate data
+            - fwd: Series with the 1M fwd rate data
+            - er_index: Series with the excess return index
+            - ts_df: DataFrame with columns 'Spot', 'Fwd', and 'Excess Return Index'
+        :param ccy_symbol: str, Currency symbol from Bloomberg
+        :param start_date: str, when the tracker should start
+        :param end_date: str, when the tracker should end
+        """
 
-        if comm_bbg_code in self.roll_schedule_dict.keys():
-            self.roll_schedule = self.roll_schedule_dict[comm_bbg_code]
-        elif roll_schedule:
-            self.roll_schedule = roll_schedule
-        else:
-            raise KeyError('Commodity not yet supported, please include roll schedule for %s' % comm_bbg_code)
+        try:
+            if roll_schedule == 'BCOM':
+                self.roll_schedule = self.bcom_roll_schedules[comm_bbg_code]
+            else:
+                self.roll_schedule = self.gsci_roll_schedules[comm_bbg_code]
+                print('Assuming S&P GSCI roll schedule for %s' % comm_bbg_code)
+        except:
+            if type(roll_schedule) == list:
+                self.roll_schedule = roll_schedule
+            else:
+                raise KeyError('Commodity not yet supported, please include roll schedule for %s' % comm_bbg_code)
 
         self.comm_bbg_code = comm_bbg_code
         self.roll_start_bday = roll_start_bday
         self.roll_window_size = roll_window_size
-        self.start_date = (pd.to_datetime(start_date) + BDay(1)).date()  # for the data
+        self.start_date = (pd.to_datetime(start_date) + BDay(1)).date()
         self.end_date = pd.to_datetime(end_date).date()
 
         self._grab_bbg_data()
@@ -123,6 +230,8 @@ class CommFutureTracker(object):
         elif roll_type == 'backward_from_month_end':
             roll_start_date = days_in_the_month[self.roll_start_bday]
             roll_end_date = days_in_the_month[-1]
+        else:
+            raise KeyError('Roll type not supported')
 
         if d < roll_start_date:
             weight_out = 1
