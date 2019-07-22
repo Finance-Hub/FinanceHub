@@ -132,7 +132,6 @@ class FXForwardTrackers(object):
 
     @staticmethod
     def _calculate_tr_index(spot_rate, fwd_rate):
-
         ts_df = pd.concat([spot_rate, fwd_rate], axis=1, sort=True).fillna(method='ffill').dropna()
         ts_df.columns = ['spot', 'fwd_1m']
         er_index = pd.Series(index=ts_df.index)
