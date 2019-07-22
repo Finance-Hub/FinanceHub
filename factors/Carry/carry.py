@@ -19,7 +19,6 @@ from tqdm import tqdm  # this will just make thing a bit prettier
 
 
 #users may change that
-strDir = "C:\\Users\\pontu\\Downloads\\python_tests\\carrydb\\"
 #shrink correlation parameters
 cov_window = 63 #cov length, working days
 shrinkage_parameter = 0.5 #calculated correlation will be reduced by half with this default
@@ -37,15 +36,15 @@ iSmoothOp = 22	#rolling window, wd
 # import data
 strFile = "G10_rates_carry_data.xlsx"
 #spot rates (i guess there´s no need of loading this anymore...)
-df_zcc = pd.read_excel(strDir + strFile, sheet_name='spot_rates', header = 3, index_col=1)
+df_zcc = pd.read_excel(r"G10_rates_carry_data.xlsx", sheet_name='spot_rates', header = 3, index_col=1)
 df_zcc = df_zcc.iloc[:,1:]
 
 #carry signal
-df_carry = pd.read_excel(strDir + strFile, sheet_name='carry_signal', header = 3, index_col=1)
+df_carry = pd.read_excel(r"G10_rates_carry_data.xlsx", sheet_name='carry_signal', header = 3, index_col=1)
 df_carry = df_carry.iloc[:,1:]
 
 #tracker
-df_trackers = pd.read_excel(strDir + strFile, sheet_name='swap_trackers', header = 3, index_col=1)
+df_trackers = pd.read_excel(r"G10_rates_carry_data.xlsx", sheet_name='swap_trackers', header = 3, index_col=1)
 df_trackers = df_trackers.iloc[:3996,1:]
 
 #no carry, no tracker
