@@ -11,26 +11,29 @@ class BancoCentral:
 	
 	url_valores = "https://www3.bcb.gov.br/ifdata/rest/arquivos?nomeArquivo=__trimestre__/dados__trimestre___1.json&{}"
 	
-	indicador_patrimonio_liquido = 78186
+	indicador_patrimonio_liquido = ""
 	
-	indicador_lucro_liquido = 78187
+	indicador_lucro_liquido = ""
 	
 	colecao = {}
 	
-	trimestres = ['201503','201506','201509','201512','201603','201606','201609','201612','201703','201706','201709','201712','201803','201806','201809','201812', '201903']
-
-
-	def obterTrimestre(self,trimestre):
+	
+	
+	def obterTrimestre(self,trimestre,indicador_patrimonio_liquido,indicador_lucro_liquido):
+		self.indicador_patrimonio_liquido = indicador_patrimonio_liquido
+		self.indicador_lucro_liquido = indicador_lucro_liquido
+		
 		self.obterBancos(trimestre)
 		self.obterValores(trimestre)
 		
 	
 	def obterBancos(self,trimestre):
 		
-		print('Capturing the banks for the quarter ...',trimestre)
+		print('Capturando os bancos para o trimestre...',trimestre)	
 		
 		self.colecao[trimestre] = {}
-
+		
+		
 		resposta = requests.get(self.url_bancos.replace('__trimestre__',trimestre))
 		
 		dados = self.converterJson(resposta)
@@ -48,8 +51,9 @@ class BancoCentral:
 		
 	def obterValores(self,trimestre):
 		
-		print('Capturing the values for the quarter ...',trimestre)
-
+		print('Capturando os valores para o trimestre...',trimestre)
+		
+		# JSON - ACHO QUE É AQUI QUE VC PODE APLICAR O PANDA_JSON
 		resposta = requests.get(self.url_valores.replace('__trimestre__',trimestre))
 		
 		dados = self.converterJson(resposta)
@@ -71,7 +75,7 @@ class BancoCentral:
 
 				while (x < len(dados[i]['v'])):
 
-					# Get the field identifier
+					# Pega o identificador do campo
 					indicador = int(dados[i]['v'][x]['i'])
 
 					if (indicador == self.indicador_patrimonio_liquido):
@@ -81,6 +85,9 @@ class BancoCentral:
 						colecao[trimestre][indice_banco]['lucro_liquido'] = dados[i]['v'][x]['v']
 
 					x += 1
+
+				if (colecao[trimestre][indice_banco]['lucro_liquido'] != 0 and colecao[trimestre][indice_banco]['patrimonio_liquido'] != 0):
+						colecao[trimestre][indice_banco]['roe'] = self.calcularRoe(colecao[trimestre][indice_banco]['lucro_liquido'],colecao[trimestre][indice_banco]['patrimonio_liquido'])
 
 			i += 1
 			
@@ -102,3 +109,9 @@ class BancoCentral:
 				i += 1
 					
 		return resultado		
+		
+		
+		
+
+
+	
