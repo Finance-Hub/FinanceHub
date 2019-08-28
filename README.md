@@ -88,6 +88,7 @@ of the session, we welcome general discussions.
 | 24-jun-19 <br> **Interest Rate Slope**                   | Claudia Bruschi - Monetary Policy Communication, Policy Slope, and the Stock Market (Neuhier & Weber, 2019) | Pedro Castro - Currency Returns and Interest Rate Slopes (Castro & Ribeiro, 2019) |
 | 12-aug-19 <br> **ML and the Factor Zoo**                 | Alexandre Rubesam - Searching the Factor Zoo (Hwang & Rubesam, 2019) | Alexandre Rubesam - Empirical Asset Pricing via Machine Learning (Gu et al., 2019) |
 | 19-aug-19 <br> **Paycheck Frequency & Households’ Decisions** | Filipe Correia - Does Paycheck Frequency Matter for Households’ Decisions? Evidence from Financial Account Data (Baugh et al, 2019) | - |
+| 09-sep-19 <br> **Risk Parity** | Gustavo Amarante - Risk Parity Is Not Short Volatility (Not That There's Anything Wrong with Short Volatility) (Hood et al., 2019) | Luis Abrahão - Least-squares approach to risk parity in portfolio selection (Bai et al., 2016) |
 
 ---
 
