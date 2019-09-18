@@ -89,7 +89,7 @@ of the session, we welcome general discussions.
 | 12-aug-19 <br> **ML and the Factor Zoo**                 | Alexandre Rubesam - Searching the Factor Zoo (Hwang & Rubesam, 2019) | Alexandre Rubesam - Empirical Asset Pricing via Machine Learning (Gu et al., 2019) |
 | 19-aug-19 <br> **Paycheck Frequency & Households’ Decisions** | Filipe Correia - Does Paycheck Frequency Matter for Households’ Decisions? Evidence from Financial Account Data (Baugh et al, 2019) | - |
 | 09-sep-19 <br> **Risk Parity** | Gustavo Amarante - Risk Parity Is Not Short Volatility (Not That There's Anything Wrong with Short Volatility) (Hood et al., 2019) | Luis Abrahão - Least-squares approach to risk parity in portfolio selection (Bai et al., 2016) |
-| 09-sep-19 <br> **Sovereign Funding Markets** | Gustavo Soares - Default Risk and the Pricing of U.S. Sovereign Bonds (Dittmar et al., 2019) | Lucas Pires - Mind the (Convergence) Gap: Forward Rates Strike Back! (Berardi et al., 2019) |
+| 23-sep-19 <br> **Sovereign Funding Markets** | Gustavo Soares - Default Risk and the Pricing of U.S. Sovereign Bonds (Dittmar et al., 2019) | Lucas Pires - Mind the (Convergence) Gap: Forward Rates Strike Back! (Berardi et al., 2019) |
 
 
 ---
