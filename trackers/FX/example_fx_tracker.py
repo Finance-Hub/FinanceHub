@@ -1,12 +1,14 @@
-from trackers import FXForwardTrackers
+from trackers import FXForwardTrackers, FXCarryTrackers
 import matplotlib.pyplot as plt
 from bloomberg import BBG
 import pandas as pd
 
-currency = 'BRL'
+currency = 'EUR'
 
 # Calculate your own FX tracker
-fx = FXForwardTrackers(currency)
+# fx = FXForwardTrackers(currency)
+fx = FXCarryTrackers(currency)
+
 fx_tracker_df = fx.df_tracker.set_index('time_stamp')[['value']]
 
 # Get Bloomberg's FX tracker

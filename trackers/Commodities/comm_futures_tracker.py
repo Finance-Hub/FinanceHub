@@ -129,15 +129,14 @@ class CommFutureTracker(object):
         """
 
         try:
-            if roll_schedule == 'BCOM':
+            if type(roll_schedule) == list:
+                self.roll_schedule = roll_schedule
+            elif roll_schedule == 'BCOM':
                 self.roll_schedule = self.bcom_roll_schedules[comm_bbg_code]
             else:
                 self.roll_schedule = self.gsci_roll_schedules[comm_bbg_code]
                 print('Assuming S&P GSCI roll schedule for %s' % comm_bbg_code)
         except:
-            if type(roll_schedule) == list:
-                self.roll_schedule = roll_schedule
-            else:
                 raise KeyError('Commodity not yet supported, please include roll schedule for %s' % comm_bbg_code)
 
         self.comm_bbg_code = comm_bbg_code
