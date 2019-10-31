@@ -12,9 +12,9 @@ comm_df = pd.pivot(comm.df_tracker, index='time_stamp', columns='fh_ticker', val
 # Get Bloomberg Commodity index (the 'BCOM' + comm_bbg_code + ' Index' will not work for every BCOM commodity)
 bbg = BBG()
 bbg_comm_raw = bbg.fetch_series(securities='BCOM' + comm_bbg_code.upper() + ' Index',
-                                 fields='PX_LAST',
-                                 startdate=comm_df.index[0].date(),
-                                 enddate=comm_df.index[-1].date())
+                                fields='PX_LAST',
+                                startdate=comm_df.index[0].date(),
+                                enddate=comm_df.index[-1].date())
 bbg_comm_raw.columns = ['bcom_tracker']
 
 bcom_index = pd.Series(index=comm_df.index)
