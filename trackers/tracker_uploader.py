@@ -2,7 +2,7 @@ import pandas as pd
 from time import time
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from trackers import SingleNameEquity, BondFutureTracker, FXForwardTrackers
+from trackers import SingleNameEquity, BondFutureTracker, FXForwardTrackers, CommFutureTracker
 
 # ===== DATABASE CONNECTION =====
 connect_dict = {'flavor': 'postgres+psycopg2',
@@ -140,6 +140,44 @@ for curr in currencies:
     # upload new tracker - pandas method
     try:
         fx.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append', method='multi')
+    except IntegrityError:
+        pass
+
+    print(round((time() - start)), 'seconds to upload')
+
+
+# =======================
+# ===== COMMODITIES =====
+# =======================
+comm_list = ['C ', 'S ', 'SM', 'BO', 'W ', 'KW', 'CC', 'CT', 'KC', 'LC', 'LH', 'SB', 'CL',
+             'CO', 'HO', 'QS', 'XB', 'NG', 'HG', 'LN', 'LX', 'LA', 'GC', 'SI']
+
+for comm in comm_list:
+    print('Commodity', comm)
+    start = time()
+
+    try:
+        cft = CommFutureTracker(comm)
+    except AssertionError:
+        cft = CommFutureTracker(comm, roll_schedule='BCOM')
+
+    # uploads the metadata
+    try:
+        cft.df_metadata.to_sql('trackers_description', con=db_connect, index=False, if_exists='append')
+    except IntegrityError:
+        pass
+
+    # erase the old tracker
+    sql_query = f"DELETE FROM trackers WHERE fh_ticker IN ('{cft.fh_ticker}')"
+    conn = db_connect.raw_connection()
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    conn.commit()
+    cursor.close()
+
+    # upload new tracker - pandas method
+    try:
+        cft.df_tracker.to_sql('trackers', con=db_connect, index=False, if_exists='append', method='multi')
     except IntegrityError:
         pass
 
