@@ -34,8 +34,6 @@ class TrackerFeeder(object):
         elif type(fh_ticker) is dict:
             sql_query = sql_query + "fh_ticker IN ('" + "', '".join(list(fh_ticker.keys())) + "')"
 
-        # TODO filter asset_class, type, exchange_symbol, currency, country, sector, group
-
         df = pd.read_sql(sql=sql_query, con=self.conn)
         df = df.pivot(index='time_stamp', columns='fh_ticker', values='value')
 
@@ -108,3 +106,15 @@ class TrackerFeeder(object):
             param_dict[col] = df[col].unique().tolist()
 
         return param_dict
+
+    def fetch_everything(self):
+        sql_query = 'SELECT time_stamp, fh_ticker, value FROM "trackers"'
+
+        df = pd.read_sql(sql=sql_query, con=self.conn)
+        df = df.pivot(index='time_stamp', columns='fh_ticker', values='value')
+
+        df.index = pd.to_datetime(df.index)
+        df = df.dropna(how='all')
+        df = df.sort_index()
+
+        return df

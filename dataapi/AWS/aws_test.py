@@ -38,3 +38,8 @@ print(df)
 # grab metadata possibilities
 param_dict = tf.filter_parameters()
 print(param_dict)
+
+# grab all trackers
+df = tf.fetch_everything()
+df.plot()
+plt.show()
