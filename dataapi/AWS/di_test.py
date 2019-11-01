@@ -20,5 +20,5 @@ db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{data
 
 
 di = DI1(db_connect=db_connect)
-print(di.build_df())
+print(di.time_menu())
 

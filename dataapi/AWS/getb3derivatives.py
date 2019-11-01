@@ -1,3 +1,7 @@
+"""
+Author: Gustavo Amarante
+"""
+
 import pandas as pd
 from datetime import date
 from calendars import DayCounts
