@@ -32,3 +32,6 @@ write investment algorithms.
 
 * **[QuantResearch](http://www.quantresearch.org)**: Marcos Lopéz de Prado personal
 website. There you can find the python codes used in his papers.
+
+* **[Real Python](https://realpython.com/)**: Our recommended python online course. It is organized
+around very specific topics, allowing you to jump directly to the functionality you want to learn.
