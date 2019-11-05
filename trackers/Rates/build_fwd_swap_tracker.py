@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-from fhdataapi import BBG
+from bloomberg import BBG
 import numpy as np
 from dateutil.relativedelta import relativedelta
 from scipy import interpolate

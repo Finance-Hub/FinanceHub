@@ -126,9 +126,9 @@ class FwdIRSTrackers(object):
             ticker = self.currency_bbg_code_dict[self.ccy] + 'SW' + str(self.tenor) + ' Curncy'
 
         bbg_raw_spot_data = self.bbg.fetch_series(securities=ticker,
-                                                      fields='PX_LAST',
-                                                      startdate=self.start_date,
-                                                      enddate=self.end_date)
+                                                  fields='PX_LAST',
+                                                  startdate=self.start_date,
+                                                  enddate=self.end_date)
 
         bbg_raw_spot_data.columns = [self.ccy + str(self.tenor) + 'Y']
         bbg_raw_spot_data.index= pd.to_datetime(bbg_raw_spot_data.index)
