@@ -19,32 +19,21 @@ class FwdIRSTrackers(object):
     """
 
     # TODO: Include more currencies
-    currency_bbg_code_dict = {
-        'AUD': 'AD',
-        'CAD': 'CD',
-        'CHF': 'SF',
-        'EUR': 'EU',
-        'GBP': 'BP',
-        'JPY': 'JY',
-        'NZD': 'ND',
-        'SEK': 'SK',
-        'USD': 'US',
-    }
+    currency_bbg_code_dict = {'AUD': 'AD', 'CAD': 'CD', 'CHF': 'SF', 'EUR': 'EU', 'GBP': 'BP',
+                              'JPY': 'JY', 'NZD': 'ND', 'SEK': 'SK', 'USD': 'US'}
 
     # TODO: Check these are correct
-    currency_calendar_dict = {
-        'USD': DayCounts('30E/360 ISDA', calendar='us_trading'),
-        'AUD': DayCounts('ACT/365', calendar='us_trading'),
-        'CAD': DayCounts('ACT/365', calendar='us_trading'),
-        'CHF': DayCounts('30A/360', calendar='us_trading'),
-        'EUR': DayCounts('30U/360', calendar='us_trading'),
-        'GBP': DayCounts('ACT/365', calendar='us_trading'),
-        'JPY': DayCounts('ACT/365F', calendar='us_trading'),
-        'NZD': DayCounts('ACT/365', calendar='us_trading'),
-        'SEK': DayCounts('30A/360', calendar='us_trading'),
-    }
+    currency_calendar_dict = {'USD': DayCounts('30E/360 ISDA', calendar='us_trading'),
+                              'AUD': DayCounts('ACT/365', calendar='us_trading'),
+                              'CAD': DayCounts('ACT/365', calendar='us_trading'),
+                              'CHF': DayCounts('30A/360', calendar='us_trading'),
+                              'EUR': DayCounts('30U/360', calendar='us_trading'),
+                              'GBP': DayCounts('ACT/365', calendar='us_trading'),
+                              'JPY': DayCounts('ACT/365F', calendar='us_trading'),
+                              'NZD': DayCounts('ACT/365', calendar='us_trading'),
+                              'SEK': DayCounts('30A/360', calendar='us_trading')}
 
-    def __init__(self, ccy = 'USD', tenor = 10, start_date = '2004-01-05', end_date = 'today'):
+    def __init__(self, ccy='USD', tenor=10, start_date='2004-01-05', end_date='today'):
         """
         Returns an object with the following attributes:
             - spot_swap_rates: Series with the rate for the spot starting swaps
@@ -67,15 +56,30 @@ class FwdIRSTrackers(object):
         self.fwd_swap_rates = self._get_1m_fwd_swap_rates()
         self.df_tracker = self._calculate_tr_index()
 
+        self.country = self.bbg.fetch_contract_parameter(self.ticker_spot, 'COUNTRY_ISO').iloc[0, 0].upper()
+        self.exchange_symbol = self.bbg.fetch_contract_parameter(self.ticker_fwd, 'TICKER').iloc[0, 0]
+        self.fh_ticker = 'irs ' + self.country.lower() + ' ' + self.ccy.lower()
+
+        self.df_metadata = pd.DataFrame(data={'fh_ticker': self.fh_ticker,
+                                              'asset_class': 'fixed income',
+                                              'type': 'swap',
+                                              'currency': self.ccy.upper(),
+                                              'country': self.country.upper(),
+                                              'maturity': self.tenor,
+                                              'roll_method': '1 month'},
+                                        index=[self.ticker_spot])
+
+        self.df_tracker = self._get_tracker_melted()
+
     def _calculate_tr_index(self):
-        spot_rate_series = self.spot_swap_rates.iloc[:,0].dropna()
-        fwd_rate_series = self.fwd_swap_rates.iloc[:,0].dropna()
+        spot_rate_series = self.spot_swap_rates.iloc[:, 0].dropna()
+        fwd_rate_series = self.fwd_swap_rates.iloc[:, 0].dropna()
 
         ts_df = pd.concat([spot_rate_series.to_frame('spot'), fwd_rate_series.to_frame('fwd_1m')],
-                                           axis=1, sort=True).fillna(method='ffill').dropna()
+                          axis=1, sort=True).fillna(method='ffill').dropna()
 
         er_index = pd.Series(index=ts_df.index)
-        er_index.iloc[0] = 100.
+        er_index.iloc[0] = 100
 
         start_date = er_index.index[0]
         fwd_swap_rate = ts_df.loc[start_date, 'fwd_1m'] / 100
@@ -130,6 +134,8 @@ class FwdIRSTrackers(object):
                                                   startdate=self.start_date,
                                                   enddate=self.end_date)
 
+        self.ticker_spot = ticker
+
         bbg_raw_spot_data.columns = [self.ccy + str(self.tenor) + 'Y']
         bbg_raw_spot_data.index= pd.to_datetime(bbg_raw_spot_data.index)
 
@@ -151,14 +157,21 @@ class FwdIRSTrackers(object):
             ticker = self.currency_bbg_code_dict[self.ccy] + 'FS0A' + str(self.tenor).zfill(2) + ' Curncy'
 
         bbg_fwd_data = self.bbg.fetch_series(securities=ticker,
-                                                      fields='PX_LAST',
-                                                      startdate=self.start_date,
-                                                      enddate=self.end_date)
+                                             fields='PX_LAST',
+                                             startdate=self.start_date,
+                                             enddate=self.end_date)
+
+        self.ticker_fwd = ticker
 
         bbg_fwd_data.columns = [self.ccy + str(self.tenor) + 'Y']
         bbg_fwd_data.index= pd.to_datetime(bbg_fwd_data.index)
 
         return bbg_fwd_data.dropna(how='all')
 
+    def _get_tracker_melted(self):
+        df = self.df_tracker[['er_index']].rename({'er_index': self.ticker_spot}, axis=1)
+        df['time_stamp'] = df.index.to_series()
+        df = df.melt(id_vars='time_stamp', var_name='fh_ticker', value_name='value')
+        df = df.dropna()
 
-
+        return df

@@ -6,46 +6,26 @@ import numpy as np
 from dateutil.relativedelta import relativedelta
 from scipy import interpolate
 
-bloomberg_semi_annual_swap_tickers = [
-    'USSW1 Curncy',
-    'USSW2 Curncy',
-    'USSW3 Curncy',
-    'USSW4 Curncy',
-    'USSW5 Curncy',
-    'USSW6 Curncy',
-    'USSW7 Curncy',
-    'USSW8 Curncy',
-    'USSW9 Curncy',
-    'USSW10 Curncy',
-    'USSW15 Curncy',
-    'USSW20 Curncy',
-    'USSW25 Curncy',
-    'USSW30 Curncy'
-]
+bloomberg_semi_annual_swap_tickers = ['USSW1 Curncy', 'USSW2 Curncy', 'USSW3 Curncy',
+                                      'USSW4 Curncy', 'USSW5 Curncy', 'USSW6 Curncy',
+                                      'USSW7 Curncy', 'USSW8 Curncy', 'USSW9 Curncy',
+                                      'USSW10 Curncy', 'USSW15 Curncy', 'USSW20 Curncy',
+                                      'USSW25 Curncy', 'USSW30 Curncy']
 
-bloomberg_1M_fwd_starting_tickers = [
-    'USFS0A1 Curncy',
-    'USFS0A2 Curncy',
-    'USFS0A3 Curncy',
-    'USFS0A4 Curncy',
-    'USFS0A5 Curncy',
-    'USFS0A6 Curncy',
-    'USFS0A7 Curncy',
-    'USFS0A8 Curncy',
-    'USFS0A9 Curncy',
-    'USFS0A10 Curncy',
-    'USFS0A15 Curncy',
-    'USFS0A20 Curncy',
-    'USFS0A25 Curncy',
-    'USFS0A30 Curncy'
-]
+bloomberg_1M_fwd_starting_tickers = ['USFS0A1 Curncy', 'USFS0A2 Curncy', 'USFS0A3 Curncy',
+                                     'USFS0A4 Curncy', 'USFS0A5 Curncy', 'USFS0A6 Curncy',
+                                     'USFS0A7 Curncy', 'USFS0A8 Curncy', 'USFS0A9 Curncy',
+                                     'USFS0A10 Curncy', 'USFS0A15 Curncy', 'USFS0A20 Curncy',
+                                     'USFS0A25 Curncy', 'USFS0A30 Curncy']
 
-def get_interpolated_rate(x,curve):
+
+def get_interpolated_rate(x, curve):
     tck = interpolate.splrep(curve.index, curve.values)
-    if x> min(curve.index):
+    if x > min(curve.index):
         return float(interpolate.splev(x,tck))
     else:
         return curve[min(curve.index)]
+
 
 start_date = pd.to_datetime('2003-01-02').date()
 end_date = pd.to_datetime('today').date()
