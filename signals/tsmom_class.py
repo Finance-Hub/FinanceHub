@@ -45,7 +45,6 @@ def relative_position(df, h):
     :return: pandas dataframe with the relative position signals
     """
 
-    
     df_min = df.rolling(h).min()
     df_max = df.rolling(h).max()
     
