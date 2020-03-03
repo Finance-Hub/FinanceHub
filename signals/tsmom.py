@@ -1,5 +1,5 @@
 """
-Author: Eduardo Minatel Tinos and Eduardo Ribeiro da Silva
+Authors: Eduardo Minatel Tinos, Eduardo Ribeiro da Silva
 """
 
 import pandas as pd
