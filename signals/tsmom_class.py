@@ -6,13 +6,13 @@ import pandas as pd
 from pandas.tseries.offsets import BDay
 
 
-def momentum(df,h=252):
-    '''
+def momentum(df, h=252):
+    """
     Computes the momentum signal for all the series in a dataframe
     :param df: pandas dataframe or series
     :param h: lookback period in business days
     :return: pandas dataframe with the momentum signals
-    '''
+    """
 
     df.index = pd.to_datetime(df.index)
     df_mom = df.pct_change(freq=BDay(h))
@@ -21,13 +21,13 @@ def momentum(df,h=252):
 
 
 def macd(df, hl_rap=12, hl_len=26):
-    '''
+    """
     Computes the macd signal for all the series in a dataframe
     :param df: pandas dataframe or series
     :param hl_rap: lookback period in business days for the fast exponential moving average
     :param hl_len: lookback period in business days for the slow exponential moving average
     :return: pandas dataframe with the macd signals
-    '''
+    """
 
     assert hl_rap < hl_len, 'hl_rap should be lower than hl_len'
 
@@ -39,11 +39,11 @@ def macd(df, hl_rap=12, hl_len=26):
 
 
 def relative_position(df, h):
-    '''
+    """
     :param df: pandas dataframe or series
     :param h: lookback period in business days
     :return: pandas dataframe with the relative position signals
-    '''
+    """
 
     
     df_min = df.rolling(h).min()
@@ -55,11 +55,11 @@ def relative_position(df, h):
 
 
 def relative_strength_index(df, h=14):
-    '''
+    """
     :param df: pandas dataframe or series
     :param h: lookback period in business days
     :return: pandas dataframe with the momentum signals
-    '''
+    """
 
     # Calculates daily price change from t to t+1
     df_delta = df.diff().dropna()
