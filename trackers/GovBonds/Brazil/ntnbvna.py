@@ -68,5 +68,35 @@ df['VNA'] = 1000*(df['ultimo index']/1614.62)*((1+df['proj IPCA'])**df['time fra
 
 # drop non business days
 df = df[df['dia util']]
+df_vna = df['VNA']
+
+# ==== Price ====
+df = pd.concat([df['VNA'], df_diario['Yield B50']], axis=1).dropna(how='all')
+df['Yield B50'] = df['Yield B50'].fillna(method='ffill')
+df = df.dropna(how='any')
+df['Cupom'] = 0
+
+dcf_dates = pd.date_range(start='2012-08-15', end='2050-08-15', freq='12SMS')
+dcf_dates = dc.busdateroll(dcf_dates, 'following')
+df_dcf = pd.DataFrame(index=dcf_dates)
+
+for d in tqdm(df.index, 'Pricing'):
+
+    vna_d = df.loc[d, 'VNA']
+    rate_d = df.loc[d, 'Yield B50']/100
+
+    df_dcf['DU'] = dc.days(d, df_dcf.index)
+
+    df_dcf['Fluxo'] = ((1.06**0.5) - 1) * vna_d
+    df_dcf.loc['2050-08-15', 'Fluxo'] = df_dcf.loc['2012-08-15', 'Fluxo'] + vna_d
+
+    df_dcf['Fluxo Descontado'] = df_dcf['Fluxo']/((1+rate_d)**(df_dcf['DU']/252))
+    df.loc[d, 'PU'] = df_dcf['Fluxo Descontado'].sum()
+
+    if d in dcf_dates:
+        df.loc[d, 'Cupom'] = ((1.06**0.5) - 1) * vna_d
+
+df['Quantidade'] = 1 + (df['Cupom'].shift(1, fill_value=0)/df['PU']).expanding().sum()
+df['Notional'] = df['Quantidade']*df['PU']
 
 df.to_clipboard()
