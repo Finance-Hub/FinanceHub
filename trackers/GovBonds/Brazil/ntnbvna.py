@@ -5,10 +5,13 @@ from calendars import DayCounts
 dc = DayCounts('BUS/252', calendar='anbima')
 
 # BW path
-file_path = r'C:\Users\gamarante\Dropbox\Aulas\Insper - Financas Quantitativas\VNA Raw.xlsx'
+# file_path = r'C:\Users\gamarante\Dropbox\Aulas\Insper - Financas Quantitativas\VNA Raw.xlsx'
 
 # macbook path
 # file_path = r'/Users/gusamarante/Dropbox/Aulas/Insper - Financas Quantitativas/VNA Raw.xlsx'
+
+# mac path
+file_path = r'/Users/gustavoamarante/Dropbox/Aulas/Insper - Financas Quantitativas/VNA Raw.xlsx'
 
 df_mensal = pd.read_excel(file_path, 'Mensal', index_col=0)
 df_diario = pd.read_excel(file_path, 'Diario', index_col=0, na_values=['#N/A N/A'])
@@ -33,7 +36,7 @@ for d in tqdm(df.index, 'Filling "ultima virada"'):
             df.loc[d, 'ultima virada'] = pd.datetime(d.year, d.month-1, 15)
 
 df['DU desde virada'] = dc.days(df['ultima virada'], df.index)
-df['DU entre viradas'] = dc.days(df['ultima virada'], df['ultima virada']+pd.DateOffset(months=1))
+df['DU entre viradas'] = dc.days(df['ultima virada'], df['ultima virada'] + pd.DateOffset(months=1))
 df['time fraction'] = df['DU desde virada'] / df['DU entre viradas']
 
 df['proj anbima'] = df_diario['Anbima+0']/100
@@ -41,7 +44,7 @@ df['proj anbima'] = df['proj anbima'].fillna(method='ffill')
 
 df.loc[df.index[0], 'saiu IPCA'] = df_release.index.isin([df.index[0]]).any()
 
-for d, dm1 in tqdm(zip(df.index[1:], df.index[:-1])):
+for d, dm1 in tqdm(zip(df.index[1:], df.index[:-1]), 'Filling "saiu IPCA"'):
     if d.day <= 15 and df.loc[dm1, 'saiu IPCA']:
         df.loc[d, 'saiu IPCA'] = True
     else:
@@ -49,7 +52,7 @@ for d, dm1 in tqdm(zip(df.index[1:], df.index[:-1])):
 
 # fill 'ultimo IPCA' column
 df_aux = df.index.to_frame()
-df_aux.index.name=None
+df_aux.index.name = None
 df_aux = pd.merge_asof(df_aux, df_release)
 df_aux = df_aux.set_index('Date')
 df['ultimo IPCA'] = df_aux['IPCA']/100
@@ -97,6 +100,6 @@ for d in tqdm(df.index, 'Pricing'):
         df.loc[d, 'Cupom'] = ((1.06**0.5) - 1) * vna_d
 
 df['Quantidade'] = 1 + (df['Cupom'].shift(1, fill_value=0)/df['PU']).expanding().sum()
-df['Notional'] = df['Quantidade']*df['PU']
+df['Notional'] = df['Quantidade'] * df['PU']
 
 df.to_clipboard()
