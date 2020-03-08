@@ -1,7 +1,7 @@
 from dataapi import TrackerFeeder, DBConnect
 import matplotlib.pyplot as plt
 
-dbc = DBConnect(username='fhreadonly', password='finquant')
+dbc = DBConnect(username='[USERNAME]', password='[PASWORD]')
 
 # ===== Examples =====
 tf = TrackerFeeder(db_connect=dbc)
