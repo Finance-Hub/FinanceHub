@@ -41,7 +41,7 @@ df['time fraction'] = df['DU desde virada'] / df['DU entre viradas']
 df['proj anbima'] = df_diario['Anbima+0']/100
 df['proj anbima'] = df['proj anbima'].fillna(method='ffill')
 
-df.loc[df.index[0], 'saiu IPCA'] = df_release.index.isin([df.index[0]]).any()
+df.loc[df.index[0], 'saiu IPCA'] = df_release['Date'].isin([df.index[0]]).any()
 
 for d, dm1 in tqdm(zip(df.index[1:], df.index[:-1]), 'Filling "saiu IPCA"'):
     if d.day <= 15 and df.loc[dm1, 'saiu IPCA']:
