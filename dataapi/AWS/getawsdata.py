@@ -11,7 +11,7 @@ class TrackerFeeder(object):
         Feeder construction
         :param db_connect: sql connection engine from sqlalchemy
         """
-        self.conn = db_connect
+        self.dbc = db_connect
 
     def fetch(self, fh_ticker):
         """
@@ -34,7 +34,7 @@ class TrackerFeeder(object):
         elif type(fh_ticker) is dict:
             sql_query = sql_query + "fh_ticker IN ('" + "', '".join(list(fh_ticker.keys())) + "')"
 
-        df = pd.read_sql(sql=sql_query, con=self.conn)
+        df = pd.read_sql(sql=sql_query, con=self.dbc.connection)
         df = df.pivot(index='time_stamp', columns='fh_ticker', values='value')
 
         if type(fh_ticker) is dict:
@@ -53,7 +53,7 @@ class TrackerFeeder(object):
         :return: pandas Dataframe
         """
         sql_query = 'SELECT * FROM "trackers_description"'
-        df = pd.read_sql(sql=sql_query, con=self.conn)
+        df = pd.read_sql(sql=sql_query, con=self.dbc.connection)
         return df
 
     def filter_fetch(self, filter_dict, ret='series'):
@@ -82,7 +82,7 @@ class TrackerFeeder(object):
             desc_query = desc_query + ' and '
 
         desc_query = desc_query[:-5]
-        df = pd.read_sql(sql=desc_query, con=self.conn)
+        df = pd.read_sql(sql=desc_query, con=self.dbc.connection)
 
         tickers = df.values.flatten().tolist()
 
@@ -110,7 +110,7 @@ class TrackerFeeder(object):
     def fetch_everything(self):
         sql_query = 'SELECT time_stamp, fh_ticker, value FROM "trackers"'
 
-        df = pd.read_sql(sql=sql_query, con=self.conn)
+        df = pd.read_sql(sql=sql_query, con=self.dbc.connection)
         df = df.pivot(index='time_stamp', columns='fh_ticker', values='value')
 
         df.index = pd.to_datetime(df.index)
