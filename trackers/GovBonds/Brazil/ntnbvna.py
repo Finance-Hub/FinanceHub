@@ -25,7 +25,6 @@ df.index.name = 'Date'
 
 df['dia util'] = dc.isbus(df.index)
 
-# TODO com certeza existe um meio mais eficiente de fazer isso
 for d in tqdm(df.index, 'Filling "ultima virada"'):
     if d.day >= 15:
         df.loc[d, 'ultima virada'] = pd.datetime(d.year, d.month, 15)
