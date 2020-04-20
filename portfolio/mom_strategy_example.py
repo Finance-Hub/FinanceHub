@@ -1,6 +1,6 @@
 from bloomberg import BBG
 import matplotlib.pyplot as plt
-from portfolio.backtesting_functions import FHSignalBasedWeights
+from portfolio.backtesting import FHSignalBasedWeights
 import pandas as pd
 import numpy as np
 
