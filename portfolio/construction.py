@@ -194,7 +194,7 @@ class IVP(object):
     Implements Inverse Variance Portfolio
     """
 
-    def __init__(self, data, use_variance=True):
+    def __init__(self, data, use_std=False):
         """
         Combines the assets in 'data' by their inverse variances
         returns an object with the following atributes:
@@ -202,16 +202,16 @@ class IVP(object):
             - 'weights': final weights for each asset
 
         :param data: pandas DataFrame where each column is a series of returns
-        :param use_variance: if True, uses the inverse variance. If False, uses the inverse standard deviation
+        :param use_std: if True, uses the inverse standard deviation. If False, uses the inverse variance.
         """
 
         assert isinstance(data, pd.DataFrame), "input 'data' must be a pandas DataFrame"
-        assert isinstance(use_variance, bool), "input 'use_variance' must be boolean"
+        assert isinstance(use_std, bool), "input 'use_variance' must be boolean"
 
         self.cov = data.cov()
         w = np.diag(self.cov)
 
-        if not use_variance:
+        if use_std:
             w = np.sqrt(w)
 
         w = 1 / w
