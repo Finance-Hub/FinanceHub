@@ -46,6 +46,7 @@ class HRP(object):
         self.sort_ix = self.corr.index[self.sort_ix].tolist()  # recover labels
         self.sorted_corr = self.corr.loc[self.sort_ix, self.sort_ix]  # reorder correlation matrix
         self.weights = self._get_recursive_bisection(self.cov, self.sort_ix)
+        # TODO self.cluster_nember = sch.fcluster(self.link, t=5, criterion='maxclust')
 
     @staticmethod
     def _tree_clustering(corr, method, metric):
@@ -129,15 +130,19 @@ class HRP(object):
 
         plt.close()
 
-    def plot_dendrogram(self, show_chart=True, save_path=None):
+    def plot_dendrogram(self, show_chart=True, save_path=None, figsize=(8, 8),
+                        threshold=None):
         """
         Plots the dendrogram using scipy's own method.
-        :param show_chart: If True, shows the chart
-        :param save_path: local directory to save file
+        :param show_chart: If True, shows the chart.
+        :param save_path: local directory to save file.
+        :param figsize: tuple with figsize dimensions.
+        :param threshold: height of the dendrogram to color the nodes. If None, the colors of the nodes follow scipy's
+                           standard behaviour, which cuts the dendrogram on 70% of its height (0.7*max(self.link[:,2]).
         """
 
-        plt.figure()
-        dn = sch.dendrogram(self.link)
+        plt.figure(figsize=figsize)
+        dn = sch.dendrogram(self.link, orientation='left', labels=self.sort_ix, color_threshold=threshold)
 
         plt.tight_layout()
 
@@ -148,6 +153,8 @@ class HRP(object):
 
         if show_chart:
             plt.show()
+
+        plt.close()
 
 
 class MinVar(object):
