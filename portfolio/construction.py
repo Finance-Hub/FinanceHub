@@ -17,7 +17,7 @@ class HRP(object):
 
     def __init__(self, data, method='single', metric='euclidean'):
         """
-        Combines the assets in 'data' using HRP
+        Combines the assets in `data` using HRP
         returns an object with the following attributes:
             - 'cov': covariance matrix of the returns
             - 'corr': correlation matrix of the returns
@@ -103,22 +103,19 @@ class HRP(object):
         ivp /= ivp.sum()
         return ivp
 
-    def plot_corr_matrix(self, save_path=None, show_chart=True, cmap='vlag', linewidths=1, figsize=(6, 6),
-                         row_colors=None, col_colors=None):
+    def plot_corr_matrix(self, save_path=None, show_chart=True, cmap='vlag', linewidth=0, figsize=(10, 10)):
         """
-        Plots the correlation matrix using clustermap from the seaborn library
-        :param save_path: local directory to save file
-        :param show_chart: If True, shows the chart
-        :param cmap: matplotlib colormap
-        :param linewidths: dendrogram line width
-        :param figsize: tuple with figsize dimensions
-        :param row_colors: color names for labels on the lines
-        :param col_colors: color names for labels on the columns
+        Plots the correlation matrix
+        :param save_path: local directory to save file. If provided, saves a png of the image to the address.
+        :param show_chart: If True, shows the chart.
+        :param cmap: matplotlib colormap.
+        :param linewidth: witdth of the grid lines of the correlation matrix.
+        :param figsize: tuple with figsize dimensions.
         """
 
         sns.clustermap(self.corr, method=self.method, metric=self.metric, cmap=cmap,
-                       row_colors=row_colors, col_colors=col_colors,
-                       figsize=figsize, linewidths=linewidths)
+                       figsize=figsize, linewidths=linewidth,
+                       col_linkage=self.link, row_linkage=self.link)
 
         plt.tight_layout()
 
@@ -218,4 +215,3 @@ class IVP(object):
         w = w / w.sum()
 
         self.weights = pd.Series(data=w, index=self.cov.columns, name='IVP')
-
