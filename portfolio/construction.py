@@ -222,3 +222,48 @@ class IVP(object):
         w = w / w.sum()
 
         self.weights = pd.Series(data=w, index=self.cov.columns, name='IVP')
+
+
+class ERC(object):
+    """
+    Implements Equal Risk Contribution portfolio
+    """
+
+    def __init__(self, data, vol_target=0.10):
+        """
+        Combines the assets in 'data' so that all of them have equal contributions to the overall risk of the portfolio.
+        Returns an object with the following atributes:
+            - 'cov': covariance matrix of the returns
+            - 'weights': final weights for each asset
+
+        :param data: pandas DataFrame where each column is a series of returns
+        """
+        self.cov = data.cov()
+        self.vol_target = vol_target
+        self.n_assets = self.cov.shape[0]
+
+        cons = ({'type': 'ineq',
+                 'fun': lambda w: vol_target - self._port_vol(w)},  # <= 0
+                {'type': 'eq',
+                 'fun': lambda w: 1 - w.sum()})
+        w0 = np.zeros(self.n_assets)
+        res = minimize(self._dist_to_target, w0, method='SLSQP', constraints=cons)
+        self.weights = pd.Series(index=self.cov.columns, data=res.x, name='ERC')
+
+    def _port_vol(self, w):
+        return np.sqrt(w.dot(self.cov).dot(w))
+
+    def _risk_contribution(self, w):
+        return w * ((w @ self.cov) / (self._port_vol(w)**2))
+
+    def _dist_to_target(self, w):
+        return np.abs(self._risk_contribution(w) - np.ones(self.n_assets)/self.n_assets).sum()
+
+
+"""
+# TODO
+- ERC
+- ERC based on signal
+- Signal Rank
+- Mean-Variance on signal
+"""
