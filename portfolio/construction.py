@@ -262,7 +262,6 @@ class ERC(object):
 
 """
 # TODO
-- ERC
 - ERC based on signal
 - Signal Rank
 - Mean-Variance on signal
