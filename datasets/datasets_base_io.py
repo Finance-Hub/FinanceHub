@@ -12,8 +12,7 @@ def datasets_path_name() -> str:
     -------
     str : string with datasets path name
     """
-    current_directory = os.getcwd()
-    return current_directory + r'\data'
+    return os.path.dirname(__file__) + r'\data'
 
 def load_data(data_file_name: str) -> pd.DataFrame:
     """
