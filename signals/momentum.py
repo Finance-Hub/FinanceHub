@@ -1,24 +1,34 @@
 """
-Authors: Eduardo Minatel Tinos, Eduardo Ribeiro da Silva
+Authors: Gustavo Soares, Eduardo Minatel Tinos, Eduardo Ribeiro da Silva
 """
 
 import pandas as pd
+import numpy as np
 from pandas.tseries.offsets import BDay
 
 
-def momentum(df, h=252):
+def classic_mom(df, h=252, logs=False, s=1, k=1, m=0):
     """
     Computes the momentum signal for all the series in a dataframe
     :param df: pandas dataframe or series
-    :param h: lookback period in business days
+    :param h: lookback period
+    :param s: front-end smoothing rolling window size
+    :param k: back-end smoothing rolling window size
+    :param m: number of periods to drop to account for short-term
+    reversal effects
     :return: pandas dataframe with the momentum signals
     """
 
     df.index = pd.to_datetime(df.index)
-    df_mom = df.pct_change(freq=BDay(h))
+    p1 = df.rolling(s).mean()
+    p0 = df.shift(h).rolling(k).mean()
 
-    return df_mom
+    if logs:
+        df_mom = np.log(p1.divide(p0))
+    else:
+        df_mom = p1.divide(p0) - 1
 
+    return df_mom.shift(m)
 
 def macd(df, hl_rap=12, hl_len=26):
     """
@@ -37,7 +47,6 @@ def macd(df, hl_rap=12, hl_len=26):
 
     return df_macd
 
-
 def relative_position(df, h):
     """
     :param df: pandas dataframe or series
@@ -51,7 +60,6 @@ def relative_position(df, h):
     df_rp = (df-df_min)/(df_max-df_min)
     
     return df_rp
-
 
 def relative_strength_index(df, h=14):
     """
@@ -74,3 +82,4 @@ def relative_strength_index(df, h=14):
     df_rsi = 100 - 100 / (1 + df_rs)
 
     return df_rsi
+
