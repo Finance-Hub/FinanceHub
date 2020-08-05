@@ -4,7 +4,6 @@ Authors: Gustavo Soares, Eduardo Minatel Tinos, Eduardo Ribeiro da Silva
 
 import pandas as pd
 import numpy as np
-from pandas.tseries.offsets import BDay
 
 
 def classic_mom(df, h=252, logs=False, s=1, k=1, m=0):
@@ -12,6 +11,7 @@ def classic_mom(df, h=252, logs=False, s=1, k=1, m=0):
     Computes the momentum signal for all the series in a dataframe
     :param df: pandas dataframe or series
     :param h: lookback period
+    :param logs: boolean indicating if log (True) or standard (False) returns
     :param s: front-end smoothing rolling window size
     :param k: back-end smoothing rolling window size
     :param m: number of periods to drop to account for short-term
