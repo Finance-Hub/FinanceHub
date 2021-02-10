@@ -10,6 +10,7 @@ from calendars.custom_date_types import Date, TODAY
 
 dc = DayCounts('bus/252', calendar='cdr_anbima')
 
+
 class LTN(object):
 
     def __init__(self,
