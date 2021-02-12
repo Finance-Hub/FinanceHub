@@ -56,6 +56,11 @@ class LTN(object):
                                            dc.following(self.expiry)],
                                     data=[-self.price, self.principal])
 
+        self.macaulay = self.ytm
+        self.mod_duration = self.macaulay / (1. + self.rate)
+        self.dv01 = (self.mod_duration / 100.) * self.price
+        self.convexity = self.ytm * (1. + self.ytm) / (1. + self.rate) ** 2
+
     @staticmethod
     def price_from_rate(principal: float = 1e6,
                         rate: Optional[float] = None,
@@ -117,6 +122,10 @@ class NTNF(object):
             self.rate = rate
             self.price = price
 
+        self.mod_duration, self.convexity = self.calculate_risk
+        self.macaulay = self.mod_duration * (1. + self.rate)
+        self.dv01 = (self.mod_duration / 100.) * self.price
+
     def payment_dates(self):
 
         payd = [dc.following(self.expiry)]
@@ -136,9 +145,24 @@ class NTNF(object):
         return float(pv)
 
     def rate_from_price(self):
-        p = lambda x: sum([LTN(d, rate=x, principal=p,
-                               ref_date=self.ref_date).price
-                           for d, p in self.cash_flows.items()])
-        error = lambda x: (self.price - float(p(x)))
+        theor_p = lambda x: sum([LTN(d, rate=x, principal=p,
+                                     ref_date=self.ref_date).price
+                                 for d, p in self.cash_flows.items()])
+        error = lambda x: (self.price - float(theor_p(x)))
 
         return optimize.brentq(error, 0., 1.)
+
+    @property
+    def calculate_risk(self):
+        macaulay = 0.
+        convexity = 0.
+        for d, p in self.cash_flows.items():
+            pv = p / (1. + self.rate) ** dc.tf(self.ref_date, d)
+            t = dc.tf(self.ref_date, d)
+            macaulay += t * pv
+            convexity += t * (1 + t) * pv
+        macaulay = macaulay / self.price
+        mod_duration = macaulay / (1. + self.rate)
+        convexity = (convexity / self.price) / (1. + self.rate) ** 2
+
+        return mod_duration, convexity
