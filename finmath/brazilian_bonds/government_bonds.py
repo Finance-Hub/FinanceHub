@@ -52,10 +52,6 @@ class LTN(object):
             self.price = price
 
         self.ref_date = pd.to_datetime(ref_date).date()
-        self.cash_flows = pd.Series(index=[dc.following(self.ref_date),
-                                           dc.following(self.expiry)],
-                                    data=[-self.price, self.principal])
-
         self.macaulay = self.ytm
         self.mod_duration = self.macaulay / (1. + self.rate)
         self.dv01 = (self.mod_duration / 100.) * self.price
