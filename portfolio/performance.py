@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Performance(object):
@@ -247,3 +248,62 @@ class Performance(object):
     #                 case_pt = self.get_monthly_return_table_single(index_ts[case].dropna().sort_index(), index_name=case)
     #                 tables = pd.concat([tables,case_pt],axis=1)
     #             return tables
+
+
+class Drawdowns(object):
+
+    def __init__(self, data, n=5):
+        self.tracker = data.copy()
+        self.tracker.index = pd.to_datetime(self.tracker.index)
+        name = data.columns[0]
+        data['expanding max'] = data[name].expanding().max()
+        data['dd'] = data[name]/data['expanding max'] - 1
+        data['iszero'] = data['dd'] == 0
+        data['current min'] = 0
+        data['last start'] = data.index[0]
+        data['end'] = data.index[0]
+
+        for date, datem1 in zip(data.index[1:], data.index[:-1]):
+            if data.loc[date, 'iszero']:
+                data.loc[date, 'current min'] = 0
+            elif data.loc[date, 'dd'] < data.loc[datem1, 'current min']:
+                data.loc[date, 'current min'] = data.loc[date, 'dd']
+            else:
+                data.loc[date, 'current min'] = data.loc[datem1, 'current min']
+
+        for date, datem1 in zip(data.index[1:], data.index[:-1]):
+            if data.loc[date, 'iszero']:
+                data.loc[date, 'last start'] = date
+            else:
+                data.loc[date, 'last start'] = data.loc[datem1, 'last start']
+
+        for date, datem1 in zip(data.index[1:], data.index[:-1]):
+            if data.loc[date, 'current min'] < data.loc[datem1, 'current min']:
+                data.loc[date, 'end'] = date
+            else:
+                data.loc[date, 'end'] = data.loc[datem1, 'end']
+
+        data['dd duration'] = (pd.to_datetime(data['end'], dayfirst=True) - pd.to_datetime(data['last start'], dayfirst=True)).dt.days
+        data['dd duration shift'] = data['dd duration'].shift(-1)
+        data['isnegative'] = data['dd duration shift'] < 0
+
+        data = data.reset_index()
+
+        data = data[data['isnegative']]
+
+        data = data.sort_values('dd', ascending=True)
+
+        data = data[['dd', 'last start', 'end', 'dd duration']].head(n).reset_index().drop('index', axis=1)
+
+        self.data = data
+
+    def plot_dd(self):
+        ax = self.tracker.plot()
+        for dd in self.data.index:
+            ax.plot(self.tracker.loc[pd.to_datetime(self.data.loc[dd, 'last start'], dayfirst=True): pd.to_datetime(self.data.loc[dd, 'end'], dayfirst=True)])
+
+        plt.show()
+
+
+# dd plot
+# underwater chart
