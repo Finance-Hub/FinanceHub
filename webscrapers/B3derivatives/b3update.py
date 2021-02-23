@@ -19,19 +19,19 @@ connect_dict = {'flavor': 'postgres+psycopg2',
 
 b3 = ScraperB3Derivatives(connect_dict)
 
-month_start = pd.date_range(start='01/01/2009',
-                            end='12/31/2009',
+month_start = pd.date_range(start='01/01/2020',
+                            end='2/22/2021',
                             freq='MS')
 
-month_end = pd.date_range(start='01/01/2009',
-                          end='12/31/2009',
+month_end = pd.date_range(start='01/01/2020',
+                          end='2/22/2021',
                           freq='M')
 
 for dt_ini, dt_end in zip(month_start, month_end):
 
     print(dt_ini.month_name())
 
-    df = b3.scrape(contract='DAP',
+    df = b3.scrape(contract='DI1',
                    start_date=dt_ini,
                    end_date=dt_end,
                    update_db=True)
