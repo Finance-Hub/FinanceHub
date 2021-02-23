@@ -42,7 +42,7 @@ class B3AbstractDerivative(object):
         Gets all of the available contracts codes for date 't'.
         If 't' is None, all contract codes are returned.
         :param t: any format accepted by pandas.to_datetime()
-        :return: list of timestamps
+        :return: list of contract codes
         """
         if t is None:
             mm = self.time_series.index.levels[1]
@@ -120,12 +120,11 @@ class B3AbstractDerivative(object):
         return v
 
     def pnl(self):
-        # TODO implement
+        # TODO implement (precisa da série do CDI, mas acho que da pra pegar com a API do SGS)
         pass
 
     def build_df(self):
         # TODO implement
-        df = self.time_series.reset_index([0, 1])
         return
 
     def filter(self):
@@ -133,11 +132,14 @@ class B3AbstractDerivative(object):
         pass
 
     def _get_time_series(self):
+        """
+        Fetches the whole database for the given contract
+        """
 
         sql_query = self._time_series_query()
 
         df = pd.read_sql(sql=sql_query,
-                         con=self.conn,
+                         con=self.conn.connection,
                          parse_dates={'time_stamp': '%Y-%m-%d'})
 
         df = df.set_index(['time_stamp', 'maturity_code'])
@@ -160,17 +162,62 @@ class DI1(B3AbstractDerivative):
     pilar_day = 1
     roll_method = 'forward'
 
-    def implied_yield(self):
-        pass
+    def implied_yield(self, code, t=None):
+        """
+        returns the quote at the close of date 't'.
+        If 't' is None, returns a pandas Series of the quotes for 'code'.
+        """
 
-    def theoretical_price(self):
-        pass
+        if t is None:
+            filter_contract = self.time_series.index.get_loc_level(code, 1)[0]
+            y = self.time_series[filter_contract]['last_price'].droplevel(1)
+        else:
+            y = self.time_series['last_price'].loc[t, code]
 
-    def duration(self):
-        pass
+        return y
 
-    def modified_duration(self):
-        pass
+    def theoretical_price(self, code, t):
+        """
+        compute the theoretical price based on the last quote of date t.
+        :param code: contract code
+        :param t: reference date
+        """
+        y = self.time_series['last_price'].loc[t, code]
+        du = self.du2maturity(t, code)
+        price = 100000 / ((1 + y)**(du/252))
+        return price
 
-    def dv01(self):
-        pass
+    def dv01(self, code, t):
+        """
+        compute the dv01 based on the last quote of date t.
+        :param code: contract code
+        :param t: reference date
+        """
+        du = self.du2maturity(t, code)
+        y = self.implied_yield(code, t)
+        dPdy = - 100000 * (du / 252) / ((1 + y) ** (du / 252 + 1))
+
+        return dPdy
+
+    def duration(self, code, t):
+        """
+        compute the duration based on the last quote of date t.
+        :param code: contract code
+        :param t: reference date
+        """
+        dPdy = self.dv01(code, t)
+        duration = dPdy / self.theoretical_price(code, t)
+        return duration
+
+    def convexity(self, code, t):
+        """
+        compute the convexity based on the last quote of date t.
+        :param code: contract code
+        :param t: reference date
+        """
+        du = self.du2maturity(t, code)
+        y = self.implied_yield(code, t)
+        dPdy2 = 100000 * (du / 252) * (du / 252 + 1) / ((1 + y) ** (du / 252 + 2))
+        return dPdy2/self.theoretical_price(code, t)
+
+
