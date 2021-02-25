@@ -147,7 +147,7 @@ class B3AbstractDerivative(object):
         return df
 
     def _time_series_query(self):
-        path = r'query_b3_timeseries.sql'
+        path = r'dataapi/AWS/query_b3_timeseries.sql'
 
         with open(path, 'r') as file:
             sql_query = file.read() % {'name': self.contract}

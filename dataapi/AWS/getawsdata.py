@@ -15,7 +15,7 @@ class TrackerFeeder(object):
         Feeder construction
         :param db_connect: sql connection engine from sqlalchemy
         """
-        self.conn = db_connect
+        self.conn = db_connect.connection
 
     def fetch(self, fh_ticker):
         """
