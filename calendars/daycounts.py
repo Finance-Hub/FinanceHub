@@ -14,23 +14,23 @@ from numpy import busday_count, busday_offset, busdaycalendar, asarray, \
 
 class DayCounts(object):
     # Constants
-    WKMASK      = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    BUS         = 'BUS'
-    ACT         = 'ACT'
-    SEP         = '/'
-    NL_DC       = ['nl/365']
-    OO_DC       = ['1/1']
-    BUS_DC      = ['bus/30', 'bus/252', 'bus/1', 'bus/bus']
-    ACT_DC      = ['act/act isda', 'act/365', 'act/365a', 'act/365f',
-                   'act/364', 'act/360', 'act/365l', 'act/act afb',
-                   'act/act icma']
-    XX360_DC    = ['30a/360', '30e/360', '30e+/360', '30e/360 isda', '30u/360']
+    WKMASK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    BUS = 'BUS'
+    ACT = 'ACT'
+    SEP = '/'
+    NL_DC = ['nl/365']
+    OO_DC = ['1/1']
+    BUS_DC = ['bus/30', 'bus/252', 'bus/1', 'bus/bus']
+    ACT_DC = ['act/act isda', 'act/365', 'act/365a', 'act/365f',
+              'act/364', 'act/360', 'act/365l', 'act/act afb',
+              'act/act icma']
+    XX360_DC = ['30a/360', '30e/360', '30e+/360', '30e/360 isda', '30u/360']
     # Properties
-    __dc        = None
-    __cal       = None
-    __adj       = None
-    __adjo      = None
-    __busc      = None
+    __dc = None
+    __cal = None
+    __adj = None
+    __adjo = None
+    __busc = None
 
     def __init__(self, dc, adj=None, calendar=None,
                  weekmask='Mon Tue Wed Thu Fri', adjoffset=0):
@@ -53,8 +53,8 @@ class DayCounts(object):
                 - 'preceding' denotes previous valid date
                 - 'modifiedfollowing' ('modifiedpreceding') is the next
                 (previous) valid date unless it is across a month boundary,
-                in which case it takes the first valid date earlier (later) in
-                time
+                in which case it takes the first valid date earlier (later)
+                in time
 
         calendar : None, str
             If specified, it must be the name of a calendar supported by the
@@ -97,12 +97,12 @@ class DayCounts(object):
             by pandas.to_datetime() without optional inputs. Several methods
             from these packaged are used.
         """
-        self.dc         = dc
-        self.adj        = adj
-        self.adjoffset  = adjoffset
-        h               = Holidays.holidays(cdr=calendar)
-        self.__busc     = busdaycalendar(weekmask=weekmask, holidays=h)
-        self.calendar   = calendar
+        self.dc = dc
+        self.adj = adj
+        self.adjoffset = adjoffset
+        h = Holidays.holidays(cdr=calendar)
+        self.__busc = busdaycalendar(weekmask=weekmask, holidays=h)
+        self.calendar = calendar
 
     def tf(self, d1, d2):
         """Calculates time fraction (in year fraction) between two dates given
@@ -112,7 +112,7 @@ class DayCounts(object):
         # Save adjustment state and set it to none, so we can safely use the
         # days and dib functions of "date splits" we produce in for some
         # day counts
-        state    = self.adj
+        state = self.adj
         self.adj = None
         if self.dc == 'ACT/ACT ICMA':
             raise AttributeError('The time fraction function cannot be used '
@@ -132,9 +132,9 @@ class DayCounts(object):
                 if d1.year == d2.year:
                     yf = self.days(d1, d2) / self.dib(d1, d2)
                 else:
-                    ey1 = to_datetime(str(d1.year)+'-12-31')
-                    ey2 = to_datetime(str(d2.year-1)+'-12-31')
-                    yf = (d2.year-d1.year-1) + \
+                    ey1 = to_datetime(str(d1.year) + '-12-31')
+                    ey2 = to_datetime(str(d2.year - 1) + '-12-31')
+                    yf = (d2.year - d1.year - 1) + \
                          (self.days(d1, ey1) / self.dib(d1, d1)) + \
                          (self.days(ey2, d2) / self.dib(d2, d2))
             else:  # This is the dreaded vectorized case that, for now,
@@ -195,7 +195,7 @@ class DayCounts(object):
                 offset = 0
                 while d2 - DateOffset(years=1) >= d1:
                     if d2.day == 29 and d2.month == 2:
-                        offset += 1/366
+                        offset += 1 / 366
                     n += 1
                     d2 = d2 - DateOffset(years=1)
                 yf = n + offset + (self.days(d1, d2) / self.dib(d1, d2))
@@ -242,7 +242,7 @@ class DayCounts(object):
                     (~self.isleap(y2) & (d2 == 28) & (m2 == 2))
             mask1 = (self.isleap(y1) & (d1 == 29) & (m1 == 2)) | \
                     (~self.isleap(y1) & (d1 == 28) & (m1 == 2))
-            mask  = mask1 & mask2
+            mask = mask1 & mask2
             d2[mask] = 30
             # (ii) If d1 is the last day of Feb, change it to 30
             d1[mask1] = 30
@@ -250,7 +250,7 @@ class DayCounts(object):
             #  or 31
             mask2 = d2 == 31
             mask1 = (d1 == 30) | (d1 == 31)
-            mask  = mask1 & mask2
+            mask = mask1 & mask2
             d2[mask] = 30
             # (iv) If d1 is 31, change it to 30
             mask = d1 == 31
@@ -303,7 +303,7 @@ class DayCounts(object):
             y1, m1, d1, y2, m2, d2 = self._date_parser(d1, d2)
             # Adjustments:
             # (i) if d1 is 31, set d1 to 30
-            d1      = minimum(d1, 30)
+            d1 = minimum(d1, 30)
             # (ii) if d2 = 31, set date to first day of next month
             mask = d2 == 31
             d2[mask] = 1
@@ -344,9 +344,9 @@ class DayCounts(object):
         d1 = self.adjust(d1)
         d2 = self.adjust(d2)
         if isinstance(d1, Timestamp) and isinstance(d2, Timestamp):
-            return (d2-d1).days
+            return (d2 - d1).days
         else:
-            return (d2-d1).days.values
+            return (d2 - d1).days.values
 
     def dib(self, d1=None, d2=None):
         """Days in base according to day count convention of the object
@@ -419,7 +419,7 @@ class DayCounts(object):
             base = asarray(366 * leap + 365 * ~leap, dtype='int64')
             # Guarantee dimension conformity
             d2, base = broadcast_arrays(d2, base)
-            d2   = DatetimeIndex(d2)
+            d2 = DatetimeIndex(d2)
             mask = (d2.day == 29) & (d2.month == 2)
             base[mask] = 366
             return base
@@ -464,7 +464,7 @@ class DayCounts(object):
                         nmask = not mask
                     else:
                         nmask = ~mask
-                    return asarray(base*nmask + 365.25*mask, dtype='float64')
+                    return asarray(base * nmask + 365.25 * mask, dtype='float64')
                 else:
                     base = base.astype('float64')
                     base[mask] = 365.25
@@ -475,7 +475,7 @@ class DayCounts(object):
     def bdy(self, d):
         """Business days in year of date(s) d"""
         assert d is not None, 'User may not pass None to BDY function'
-        d   = self.adjust(d)
+        d = self.adjust(d)
         if isinstance(d, Timestamp):
             res = busday_count(str(d.year), str(d.year + 1),
                                busdaycal=self.buscore)
@@ -564,7 +564,7 @@ class DayCounts(object):
             # We only have to care about the open lower bound if we are
             # exactly at a Feb 29th. Given that we are we will use pandas
             # for this, we can pass a parameter to date_range to handle it.
-            drange   = date_range(d1, d2, closed='right')
+            drange = date_range(d1, d2, closed='right')
             return count_nonzero((drange.day == 29) & (drange.month == 2))
         else:
             result = list()
@@ -578,9 +578,9 @@ class DayCounts(object):
         d = self.adjust(d)
         leap = self.isleap(d)
         if isinstance(d, Timestamp):
-            return 366*leap + 365*(not leap)
+            return 366 * leap + 365 * (not leap)
         else:
-            return asarray(366*leap + 365*~leap, dtype='int64')
+            return asarray(366 * leap + 365 * ~leap, dtype='int64')
 
     def isleap(self, d):
         """Determine if year for input date(s) is leap (True) or not (False)"""
@@ -673,7 +673,7 @@ class DayCounts(object):
         For an explanation of what offset does, please refer to EOM method
         """
         # We delegate the casting to base function
-        d   = self.eom(d, offset)
+        d = self.eom(d, offset)
         return self.preceding(d)
 
     def eom_following(self, d, offset=0):
@@ -684,7 +684,7 @@ class DayCounts(object):
         For an explanation of what offset does, please refer to EOM method
         """
         # We delegate the casting to base function
-        d   = self.eom(d, offset)
+        d = self.eom(d, offset)
         return self.following(d)
 
     @staticmethod
@@ -709,7 +709,7 @@ class DayCounts(object):
         For an explanation of what offset does, please refer to EOY method
         """
         # We delegate the casting to base function
-        d   = self.eoy(d, offset)
+        d = self.eoy(d, offset)
         return self.preceding(d)
 
     def eoy_following(self, d, offset=0):
@@ -719,7 +719,7 @@ class DayCounts(object):
         For an explanation of what offset does, please refer to EOY method
         """
         # We delegate the casting to base function
-        d   = self.eoy(d, offset)
+        d = self.eoy(d, offset)
         return self.following(d)
 
     def gendates(self, start_date, end_date):
@@ -729,17 +729,17 @@ class DayCounts(object):
         Note: only scalar values are accepted
         """
         start_date = self.adjust(start_date)
-        end_date   = self.adjust(end_date)
+        end_date = self.adjust(end_date)
         assert isinstance(start_date, Timestamp), 'Start date must be scalar'
         assert isinstance(end_date, Timestamp), 'End date must be scalar'
         if start_date == end_date:
             start_date = self.preceding(start_date)
         else:
-            start_date  = self.following(start_date)
-        end_date    = self.preceding(end_date)
+            start_date = self.following(start_date)
+        end_date = self.preceding(end_date)
         while start_date <= end_date:
             yield start_date
-            start_date  = self.workday(start_date, 1)
+            start_date = self.workday(start_date, 1)
 
     @property
     def buscore(self):
@@ -835,8 +835,8 @@ class DayCounts(object):
         """"Given string, code attempts to parse it to something known in the
         domain. If attempt fails, code raises and error."""
         assert isinstance(dc, str), 'Day count must be a string'
-        n   = dc
-        dc  = dc.upper()
+        n = dc
+        dc = dc.upper()
         # User is giving a properly formatted dc
         if dc in DayCounts.dc_domain():
             return dc
@@ -864,7 +864,7 @@ class DayCounts(object):
         fails. If day count is not of business type but is in internal domain,
         function will return it as well."""
         assert isinstance(dc, str), 'Day count must be a string'
-        n  = dc
+        n = dc
         dc = dc.upper()
         domain = DayCounts.dc_domain()
         # The trivial case where we have nothing to do
@@ -874,7 +874,7 @@ class DayCounts(object):
         if len(parts) != 2:
             raise NotImplementedError('Convention %s cannot be parsed as a '
                                       'business day count' % n)
-        rp  = list()
+        rp = list()
         for dc in parts:
             # Bigger words first
             dc = dc.replace('BUSINESS', DayCounts.BUS)
@@ -908,8 +908,8 @@ class DayCounts(object):
         dc = dc.upper()
         domain = DayCounts.dc_domain()
         # Safe replace
-        dc  = dc.replace('ACTUAL', 'ACT')
-        dc  = dc.replace('A/', 'ACT/')
+        dc = dc.replace('ACTUAL', 'ACT')
+        dc = dc.replace('A/', 'ACT/')
         # Trivial case after capitalization
         if dc in domain:
             return dc
@@ -1056,7 +1056,7 @@ class DayCounts(object):
         Function takes date split into year, month, days (each of which is
         an integer or integer array)
         """
-        return (y2-y1)*360+(m2-m1)*30+(d2-d1)
+        return (y2 - y1) * 360 + (m2 - m1) * 30 + (d2 - d1)
 
     @staticmethod
     def _date_parser(d1, d2):
@@ -1089,12 +1089,12 @@ class DayCounts(object):
         which are in EOM"""
         febeom = (self.isleap(year) & (days == 29) & (months == 2)) | \
                  (~self.isleap(year) & (days == 28) & (months == 2))
-        m30    = (days == 30) & ((months == 4) | (months == 6) |
-                                 (months == 9) | (months == 11))
-        m31    = (days == 31) & ((months == 1) | (months == 3) |
-                                 (months == 5) | (months == 7) |
-                                 (months == 8) | (months == 10) |
-                                 (months == 12))
+        m30 = (days == 30) & ((months == 4) | (months == 6) |
+                              (months == 9) | (months == 11))
+        m31 = (days == 31) & ((months == 1) | (months == 3) |
+                              (months == 5) | (months == 7) |
+                              (months == 8) | (months == 10) |
+                              (months == 12))
         return (febeom | m30) | m31
 
     @staticmethod
@@ -1106,4 +1106,3 @@ class DayCounts(object):
         else:
             d = datetime64(d).astype('datetime64[D]')
         return d
-
