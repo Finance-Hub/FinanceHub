@@ -3,8 +3,10 @@ Author: Gustavo Amarante
 """
 
 import pandas as pd
+import numpy as np
 from datetime import date
 from calendars import DayCounts
+
 
 
 class B3AbstractDerivative(object):
@@ -184,7 +186,7 @@ class DI1(B3AbstractDerivative):
         """
         y = self.time_series['last_price'].loc[t, code]
         du = self.du2maturity(t, code)
-        price = 100000 / ((1 + y)**(du/252))
+        price = 100000 / ((1 + y / 100.)**(du/252))
         return price
 
     def dv01(self, code, t):
@@ -194,7 +196,7 @@ class DI1(B3AbstractDerivative):
         :param t: reference date
         """
         du = self.du2maturity(t, code)
-        y = self.implied_yield(code, t)
+        y = self.implied_yield(code, t) / 100.
         dPdy = - 100000 * (du / 252) / ((1 + y) ** (du / 252 + 1))
 
         return dPdy
@@ -216,8 +218,58 @@ class DI1(B3AbstractDerivative):
         :param t: reference date
         """
         du = self.du2maturity(t, code)
-        y = self.implied_yield(code, t)
+        y = self.implied_yield(code, t) / 100.
         dPdy2 = 100000 * (du / 252) * (du / 252 + 1) / ((1 + y) ** (du / 252 + 2))
         return dPdy2/self.theoretical_price(code, t)
 
+    def curve(self, t):
+        """
+        returns the di curve at the close of date 't'.
+        :param t: reference date or list of valid settlement dates
+        """
 
+        curve = self.time_series.loc[t, 'last_price']
+
+        if isinstance(curve.index, pd.MultiIndex):
+            d_and_m_tuples = [(d, self.maturity(c)) for d,c in curve.index]
+            curve.index = pd.MultiIndex.from_tuples(d_and_m_tuples,
+                                            names=['time_stamp', 'maturity'])
+        else:
+            curve.index = [self.maturity(c) for c in curve.index]
+            curve.index.name = 'maturity'
+
+        curve = curve[curve>0].sort_index().astype(float)
+
+        return curve
+
+    def discount_factor(self, code, t):
+        """
+        returns the discount factor at the close of date 't'.
+        """
+        y = self.time_series['last_price'].loc[t, code]
+        du = self.du2maturity(t, code)
+        df = 1 / ((1 + y / 100.) ** (du/252))
+        return df
+
+    def interpolated_yield(self, m, t):
+        """
+        returns the Piecewise Flat Forward Rate (Andersen and Piterbarg,
+        2010) for date 'm' at the close of date 't'.
+        """
+
+        curve = self.curve(t)
+
+        t1 = max([x for x in curve.index if x<=m])
+        t2 = min([x for x in curve.index if x>=m])
+
+        if t1<t2:
+            y1, y2 = np.log(1. + curve[t1]), np.log(1 + curve[t2])
+            t1, t2 = self.dc.days(t, t1) / 252., self.dc.days(t, t2) / 252.
+
+            x = self.dc.days(t, m) / 252.
+            y = t1 * y1 + (x - t1) / (t2 - t1) * (t2 * y2 - t1 * y1)
+            y = np.exp(y / x)
+        else:
+            y = curve[m]
+
+        return y
