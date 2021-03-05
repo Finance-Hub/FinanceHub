@@ -1,6 +1,7 @@
 """
 Author: Gustavo Soares
 """
+
 from typing import Union, Collection, Optional, Tuple
 import pandas as pd
 import numpy as np
@@ -12,26 +13,55 @@ import warnings
 ANBIMA_LAMBDAS = np.array([2.2648, 0.3330])
 
 
+def forward_rate(t1: float, t2: float, zero_curve: pd.Series) -> float:
+    t1, t2 = sorted([t1, t2])
+    y1 = flat_forward_interpolation(t1, zero_curve)
+    y2 = flat_forward_interpolation(t2, zero_curve)
+
+    return (((1. + y2) ** t2) / ((1. + y1) ** t1)) ** (1 / (t2 - t1)) - 1.
+
+
+def _clean_curve(curve: pd.Series,
+                 dc: Optional[DayCounts] = None,
+                 ref_date: Optional[Date] = None) -> pd.Series:
+    date_types = list(Date.__args__) + [pd.Timestamp]
+
+    if all([type(t) in date_types for t in curve.index]):
+        msg = 'Parameter ref_date as Date required!'
+        assert type(ref_date) in date_types, msg
+        assert dc is not None, 'Parameter dc as DayCounts required!'
+        dates = [dc.tf(pd.to_datetime(ref_date).date(), t) for t in curve.index]
+        clean_curve = pd.Series(curve.values, dates).astype(float)
+    else:
+        clean_curve = pd.Series(curve.values,
+                                [float(t) for t in curve.index]).astype(float)
+
+    return clean_curve.dropna().sort_index()
+
+
 def flat_forward_interpolation(t: Union[float, Date],
                                zero_curve: pd.Series,
                                dc: Optional[DayCounts] = None,
                                ref_date: Optional[Date] = None) -> float:
     if isinstance(t, float) or isinstance(t, int):
         t = float(t)
+        clean_curve = _clean_curve(zero_curve)
     else:
         if type(dc) is not DayCounts:
             msg = f'Parameter t as Date requires parameter dc as DayCounts'
             raise TypeError(msg)
-        if type(ref_date) not in Date.__args__:
+        if type(ref_date) not in Date.__args__ + [pd.Timestamp]:
             msg = f'Parameter t as Date requires parameter ref_date as Date'
             raise TypeError(msg)
         else:
             t = dc.tf(pd.to_datetime(ref_date).date(), t)
+            clean_curve = _clean_curve(zero_curve, dc=dc, ref_date=ref_date)
 
-    zero_curve = zero_curve.dropna().sort_index()
+        t = float(t)
+
+    zero_curve = clean_curve.dropna().sort_index()
     t0 = min(zero_curve.index)
     tn = max(zero_curve.index)
-
     if t <= t0:
         y = zero_curve[t0]
     elif t >= tn:
@@ -368,7 +398,7 @@ class CurveBootstrap(object):
         tmax = max(self.zero_curve.index)
         for i in range(len(cash_flows)):
             cf = list(cash_flows)[i]
-            if len(cf)>1 and self.dc.tf(self.ref_date, max(cf.index)) > tmax:
+            if len(cf) > 1 and self.dc.tf(self.ref_date, max(cf.index)) > tmax:
                 if rates is None or list(rates)[i] is None:
                     new_curve = self._expand_zero_curve(bond_cash_flows=cf,
                                                         rate=None,
