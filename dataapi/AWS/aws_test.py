@@ -1,10 +1,11 @@
 from dataapi import TrackerFeeder, DBConnect
+from sqlalchemy import create_engine
 import matplotlib.pyplot as plt
 
-dbc = DBConnect(username='fhreadonly', password='finquant')
+db_connect = DBConnect('fhreadonly', 'finquant')
 
 # ===== Examples =====
-tf = TrackerFeeder(db_connect=dbc)
+tf = TrackerFeeder(db_connect)
 
 # Fetch the full metadata table (useful for filtering)
 df = tf.fetch_metadata()
