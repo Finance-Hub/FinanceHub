@@ -147,10 +147,12 @@ class B3AbstractDerivative(object):
         return df
 
     def _time_series_query(self):
-        path = r'dataapi/AWS/query_b3_timeseries.sql'
 
-        with open(path, 'r') as file:
-            sql_query = file.read() % {'name': self.contract}
+        sql_query = f'SELECT TIME_STAMP, MATURITY_CODE, OPEN_INTEREST_OPEN, OPEN_INTEREST_CLOSE, ' \
+                    f'NUMBER_OF_TRADES, TRADING_VOLUME, FINANCIAL_VOLUME, PREVIOUS_SETTLEMENT, ' \
+                    f'INDEXED_SETTLEMENT, OPENING_PRICE, MINIMUM_PRICE, MAXIMUM_PRICE, AVERAGE_PRICE, ' \
+                    f'LAST_PRICE, SETTLEMENT_PRICE, LAST_BID, LAST_OFFER FROM "B3futures" ' \
+                    f'WHERE CONTRACT=\'{self.contract}\' ORDER BY(TIME_STAMP, MATURITY_CODE);'
 
         return sql_query
 
@@ -174,7 +176,7 @@ class DI1(B3AbstractDerivative):
         else:
             y = self.time_series['last_price'].loc[t, code]
 
-        return y
+        return y/100
 
     def theoretical_price(self, code, t):
         """
@@ -182,7 +184,7 @@ class DI1(B3AbstractDerivative):
         :param code: contract code
         :param t: reference date
         """
-        y = self.time_series['last_price'].loc[t, code]
+        y = self.implied_yield(code, t)
         du = self.du2maturity(t, code)
         price = 100000 / ((1 + y)**(du/252))
         return price
@@ -195,9 +197,11 @@ class DI1(B3AbstractDerivative):
         """
         du = self.du2maturity(t, code)
         y = self.implied_yield(code, t)
-        dPdy = - 100000 * (du / 252) / ((1 + y) ** (du / 252 + 1))
+        pu = self.theoretical_price(code, t)
+        dPdy = pu * (-du/252) / (1 + y)
+        dv01 = dPdy/10000  # changes to 1bp move
 
-        return dPdy
+        return dv01
 
     def duration(self, code, t):
         """
