@@ -8,7 +8,6 @@ from datetime import date
 from calendars import DayCounts
 
 
-
 class B3AbstractDerivative(object):
 
     monthdict = {'F': 1, 'G': 2, 'H': 3, 'J':  4, 'K':  5, 'M':  6,
@@ -188,7 +187,7 @@ class DI1(B3AbstractDerivative):
         """
         y = self.implied_yield(code, t)
         du = self.du2maturity(t, code)
-        price = 100000 / ((1 + y / 100.)**(du/252))
+        price = 100000 / ((1 + y)**(du/252))
         return price
 
     def dv01(self, code, t):
@@ -211,7 +210,7 @@ class DI1(B3AbstractDerivative):
         :param t: reference date
         """
         dPdy = self.dv01(code, t)
-        duration = dPdy / self.theoretical_price(code, t)
+        duration = 10000 * dPdy / self.theoretical_price(code, t)
         return duration
 
     def convexity(self, code, t):
