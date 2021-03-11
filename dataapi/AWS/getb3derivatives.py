@@ -188,7 +188,7 @@ class DI1(B3AbstractDerivative):
         """
         y = self.implied_yield(code, t)
         du = self.du2maturity(t, code)
-        price = 100000 / ((1 + y / 100.)**(du/252))
+        price = 100000 / ((1 + y)**(du/252))
         return price
 
     def dv01(self, code, t):
