@@ -210,7 +210,7 @@ class DI1(B3AbstractDerivative):
         :param code: contract code
         :param t: reference date
         """
-        dPdy = self.dv01(code, t)
+        dPdy = 10000 * self.dv01(code, t)
         duration = dPdy / self.theoretical_price(code, t)
         return duration
 
