@@ -1,4 +1,4 @@
-
+from selenium import webdriver
 
 class FocusIPCA(object):
     """
@@ -6,4 +6,8 @@ class FocusIPCA(object):
     - Selenium Webdriver
     """
 
-    pass
+    def __init__(self):
+        self.driver_options = webdriver.ChromeOptions()
+
+    def scrape(self, initial_date, end_date):
+        pass
