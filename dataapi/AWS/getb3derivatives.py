@@ -121,7 +121,7 @@ class B3AbstractDerivative(object):
 
         return v
 
-    def pnl(self):
+    def pnl(self, code, t):
         # TODO implement (precisa da série do CDI, mas acho que da pra pegar com a API do SGS)
         pass
 
@@ -276,3 +276,7 @@ class DI1(B3AbstractDerivative):
             y = curve[m]
 
         return y
+
+    def pnl(self, code, t):
+        return self.time_series.loc[t, code]['settlement_price'] \
+               - self.time_series.loc[t, code]['previous_settlement']
