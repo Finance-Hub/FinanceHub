@@ -38,13 +38,13 @@ class FocusIPCA(object):
         browser.find_element_by_xpath(xpath).click()
 
         # dates in datetime format
-        initial_date = pd.to_datetime(initial_date)
-        end_date = pd.to_datetime(end_date)
+        initial_date = pd.to_datetime(initial_date, format='%d/%m/%Y')
+        end_date = pd.to_datetime(end_date, format='%d/%m/%Y')
 
         aux_initial_date = initial_date  # to grab the data each 2 year
         list_df = []  # to concat all the df at the end
-        grab = True  # to stop the while
-        while grab:
+        stop_grab = False  # to stop the while
+        while True:
             if end_date.year - initial_date.year >= 2:
                 aux_end_date = aux_initial_date + dt.timedelta(days=729)  # adjust the end date
                 more_than_2years = 1  # identify if the range is more than 2 years
@@ -53,19 +53,18 @@ class FocusIPCA(object):
                 # that's why we adjust the aux_end_date to grab the rest of the data between initial_date and end_date
                 if aux_end_date >= end_date:
                     aux_end_date = end_date  # adjust the end date
-                    grab = False  # final loop
+                    stop_grab = True  # final loop
             else:
-                grab = False  # in this case, the first is the final loop
                 more_than_2years = 0  # identify if the range is less than 2 years
                 aux_end_date = end_date
 
             # fill the dates
             xpath = r'//*[@id="tfDataInicial1"]'
-            browser.find_element_by_xpath(xpath).send_keys(aux_initial_date.strftime('%m/%d/%Y'))
+            browser.find_element_by_xpath(xpath).send_keys(aux_initial_date.strftime('%d/%m/%Y'))
 
             # fill the dates
             xpath = r'//*[@id="tfDataFinal2"]'
-            browser.find_element_by_xpath(xpath).send_keys(aux_end_date.strftime('%m/%d/%Y'))
+            browser.find_element_by_xpath(xpath).send_keys(aux_end_date.strftime('%d/%m/%Y'))
 
             # fill initial month
             xpath = r'//*[@id="mesReferenciaInicial"]/option[{a}]'.format(a=aux_initial_date.month + 1)
@@ -76,7 +75,7 @@ class FocusIPCA(object):
             browser.find_element_by_xpath(xpath).click()
 
             # fill final month
-            xpath = r'//*[@id="mesReferenciaFinal"]/option[{a}]'.format(a=aux_end_date.month)
+            xpath = r'//*[@id="mesReferenciaFinal"]/option[{a}]'.format(a=aux_end_date.month + 1)
             browser.find_element_by_xpath(xpath).click()
 
             # fill final year
@@ -88,11 +87,17 @@ class FocusIPCA(object):
             xpath = r'//*[@id="btnXLSa"]'
             browser.find_element_by_xpath(xpath).click()
 
-            # give some time for the download to finish
-            time.sleep(6)
-
             # saves the time the file was downloaded
             download_save_time = dt.datetime.now()
+
+            # clear initial date and end date fo the next loop
+            xpath = r'//*[@id="tfDataInicial1"]'
+            browser.find_element_by_xpath(xpath).clear()
+            xpath = r'//*[@id="tfDataFinal2"]'
+            browser.find_element_by_xpath(xpath).clear()
+
+            # give some time for the download to finish
+            time.sleep(6)
 
             # get the default download directory
             username = os.getlogin()
@@ -112,11 +117,7 @@ class FocusIPCA(object):
             # read the file and clean the dataframe
             df = pd.read_excel(file_path, skiprows=1, na_values=[' '])
 
-            df['Data'] = pd.to_datetime(df['Data'], dayfirst=True)
-            df = df.set_index('Data')
-
-            df = pd.read_excel(file_path, skiprows=1, na_values=[' '])
-
+            # data to datetime and setting data as index
             df['Data'] = pd.to_datetime(df['Data'], dayfirst=True)
             df = df.set_index('Data')
 
@@ -124,8 +125,11 @@ class FocusIPCA(object):
                 list_df.append(df)  # df's that will be concatenated
                 aux_initial_date = aux_end_date + dt.timedelta(days=1)  # adjust the initial date
 
-                if not grab:
-                    df = pd.concant(list_df)  # concatenate all the data grabbed
+                if stop_grab:
+                    df = pd.concat(list_df)  # concatenate all the data grabbed
+                    break
+            else:
+                break
 
         browser.close()
 
