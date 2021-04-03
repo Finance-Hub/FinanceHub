@@ -222,6 +222,7 @@ class NTNB(object):
         :param price: bond price
         :param principal: bond principal
         :param coupon_rate: bond coupon rate
+        :param vna: the inflation index used for the price calculation
         :param ref_date: reference date for price or rate calculation
         """
 
@@ -239,7 +240,6 @@ class NTNB(object):
         self.expiry = pd.to_datetime(expiry).date()
         self.ref_date = pd.to_datetime(ref_date).date()
         self.principal = principal
-        self.vna = vna
 
         interest = ((1. + coupon_rate) ** (1. / 2.) - 1.) * self.principal
         cash_flows = pd.Series(index=self.payment_dates(),
@@ -248,25 +248,28 @@ class NTNB(object):
 
         self.cash_flows = cash_flows
 
-        if price is not None and rate is not None:
+        if price is not None and rate is not None and vna is None:
             self.price = float(price)
             self.rate = float(rate)
             base_price = self.price_from_rate(principal=self.principal, rate=self.rate, vna=1000)
             self.vna = np.round(self.price / base_price * 1000, 6)
-        if rate is not None and price is None and vna is not None:
+        elif rate is not None and price is None and vna is not None:
+            self.vna = float(vna)
             self.rate = float(rate)
             self.price = self.price_from_rate(principal=self.principal, rate=self.rate, vna=self.vna)
         elif rate is None and price is not None and vna is not None:
+            self.vna = float(vna)
             self.price = float(price)
             self.rate = self.rate_from_price(price=self.price, vna=self.vna)
 
         else:
-            pt = self.price_from_rate(principal=self.principal, rate=rate)
+            pt = self.price_from_rate(principal=self.principal, rate=rate, vna=vna)
             if np.abs(pt - float(price)) / self.principal > 0.1:
                 msg = 'Given price and rate are incompatible!'
                 warnings.warn(msg)
             self.rate = rate
             self.price = price
+            self.vna = float(vna)
 
         self.mod_duration, self.convexity = self.calculate_risk
         self.macaulay = self.mod_duration * (1. + self.rate)
