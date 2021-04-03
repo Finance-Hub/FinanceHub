@@ -8,6 +8,7 @@ from datetime import date
 from calendars import DayCounts
 
 
+
 class B3AbstractDerivative(object):
 
     monthdict = {'F': 1, 'G': 2, 'H': 3, 'J':  4, 'K':  5, 'M':  6,
@@ -120,7 +121,7 @@ class B3AbstractDerivative(object):
 
         return v
 
-    def pnl(self):
+    def pnl(self, code, t):
         # TODO implement (precisa da série do CDI, mas acho que da pra pegar com a API do SGS)
         pass
 
@@ -209,8 +210,8 @@ class DI1(B3AbstractDerivative):
         :param code: contract code
         :param t: reference date
         """
-        dPdy = self.dv01(code, t)
-        duration = 10000 * dPdy / self.theoretical_price(code, t)
+        dPdy = 10000 * self.dv01(code, t)
+        duration = dPdy / self.theoretical_price(code, t)
         return duration
 
     def convexity(self, code, t):
@@ -275,3 +276,7 @@ class DI1(B3AbstractDerivative):
             y = curve[m]
 
         return y
+
+    def pnl(self, code, t):
+        return self.time_series.loc[t, code]['settlement_price'] \
+               - self.time_series.loc[t, code]['previous_settlement']
