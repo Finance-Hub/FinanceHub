@@ -3,25 +3,52 @@ import datetime as dt
 import pandas as pd
 import os
 import time as time
+import platform
+import getpass
 
 
 class FocusIPCA(object):
     """
     Classe para puxar os dados de IPCA do focus.
-    - Selenium Webdriver
     """
+    metric_dict = {'mean': '2', 'median': '3', 'std': '4', 'vc': '5',
+                   'max': '6', 'min': '7'}
+    freq_dict = {'monthly': '2', 'yearly': '3'}
 
-    def __init__(self):
+    def __init__(self, driver_path):
+        """
+        Parameters
+        ----------
+        driver_path: path of the chromedriver executable
+        """
         self.driver_options = webdriver.ChromeOptions()
+        self.driver_path = driver_path
 
-    def scrape(self, initial_date, end_date):
-        browser = webdriver.Chrome("C:/Users/mathe/Downloads/chromedriver_win32/chromedriver.exe",
-                                   chrome_options=self.driver_options)
+    def scrape(self, initial_date, end_date, metric='median', frequency='yearly'):
+        """
+        Parameters
+        ----------
+        initial_date: must be understandable by pandas.to_datetime
+        end_date: must be understandable by pandas.to_datetime
+        metric: str with the staistical metric. Possible values are FocusIPCA.metric_dict
+        frequency: str with the frequency of the forecast. Possible values are FocusIPCA.frequncy_dict
+
+        Returns
+        -------
+        pandas DataFrame with the timeseries of each forecast horizon available.
+        """
+
+        # assert that the chosen parameters exists
+        assert metric in self.metric_dict.keys(), f"the metric {metric} is not available"
+        assert frequency in self.freq_dict.keys(), f"the frequency {frequency} is not available"
+
+        # open the browser
+        browser = webdriver.Chrome(self.driver_path, chrome_options=self.driver_options)
 
         # navigating to the page
         browser.get("https://www3.bcb.gov.br/expectativas/publico/consulta/serieestatisticas")
 
-        # select the indicator
+        # select the indicator - always chooses the IPCA
         xpath = r'//*[@id="indicador"]/option[5]'
         browser.find_element_by_xpath(xpath).click()
 
@@ -29,59 +56,64 @@ class FocusIPCA(object):
         xpath = r'// *[ @ id = "grupoIndicePreco:opcoes_6"]'
         browser.find_element_by_xpath(xpath).click()
 
-        # select the metric - median
-        xpath = r'//*[@id="calculo"]/option[3]'
+        # select the metric
+        xpath = f'//*[@id="calculo"]/option[{self.metric_dict[metric]}]'
         browser.find_element_by_xpath(xpath).click()
 
-        # select the periodicity - monthly
-        xpath = r'//*[@id="periodicidade"]/option[2]'
+        # select the periodicity
+        xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
         browser.find_element_by_xpath(xpath).click()
 
         # dates in datetime format
-        initial_date = pd.to_datetime(initial_date, format='%d/%m/%Y')
-        end_date = pd.to_datetime(end_date, format='%d/%m/%Y')
+        initial_date = pd.to_datetime(initial_date)
+        end_date = pd.to_datetime(end_date)
 
-        aux_initial_date = initial_date  # to grab the data each 2 year
-        list_df = []  # to concat all the df at the end
-        stop_grab = False  # to stop the while
-        while True:
-            if end_date.year - initial_date.year >= 2:
-                aux_end_date = aux_initial_date + dt.timedelta(days=729)  # adjust the end date
-                more_than_2years = 1  # identify if the range is more than 2 years
+        # generate the date_ranges in 18-month intervals (approximatly)
+        dates = pd.date_range(initial_date, end_date, freq='18m')
+        dates = list(dates)
+        dates[0] = initial_date
 
-                # it means the time range is less than two years after some loops
-                # that's why we adjust the aux_end_date to grab the rest of the data between initial_date and end_date
-                if aux_end_date >= end_date:
-                    aux_end_date = end_date  # adjust the end date
-                    stop_grab = True  # final loop
-            else:
-                more_than_2years = 0  # identify if the range is less than 2 years
-                aux_end_date = end_date
+        # loops on all date pairs
+        list_df = []
+
+        for init_d, end_d in zip(dates[:-1], dates[1:]):
 
             # fill the dates
             xpath = r'//*[@id="tfDataInicial1"]'
-            browser.find_element_by_xpath(xpath).send_keys(aux_initial_date.strftime('%d/%m/%Y'))
-
-            # fill the dates
+            browser.find_element_by_xpath(xpath).send_keys(init_d.strftime('%d/%m/%Y'))
             xpath = r'//*[@id="tfDataFinal2"]'
-            browser.find_element_by_xpath(xpath).send_keys(aux_end_date.strftime('%d/%m/%Y'))
+            browser.find_element_by_xpath(xpath).send_keys(end_d.strftime('%d/%m/%Y'))
 
-            # fill initial month
-            xpath = r'//*[@id="mesReferenciaInicial"]/option[{a}]'.format(a=aux_initial_date.month + 1)
-            browser.find_element_by_xpath(xpath).click()
+            # fill starting prediction scope (always chooses the first element of the dropdown menu)
+            if frequency == 'monthly':
+                xpath_m = r'//*[@id="mesReferenciaInicial"]/option[text()="janeiro"]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]/option[text()="1999"]'
+                browser.find_element_by_xpath(xpath_m).click()
+                browser.find_element_by_xpath(xpath).click()
 
-            # fill initial year
-            xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]/option[{a}]'.format(a=aux_initial_date.year - 1997)
-            browser.find_element_by_xpath(xpath).click()
+            elif frequency == 'yearly':
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select/option[text()="1999"]'
+                browser.find_element_by_xpath(xpath).click()
+            else:
+                raise ValueError('Frequency selection is not treated by code.')
 
-            # fill final month
-            xpath = r'//*[@id="mesReferenciaFinal"]/option[{a}]'.format(a=aux_end_date.month + 1)
-            browser.find_element_by_xpath(xpath).click()
+            # fill ending prediction scope (always chooses the last element of the dropdown menu)
+            if frequency == 'monthly':
+                xpath_m = r'//*[@id="mesReferenciaFinal"]/option[text()="dezembro"]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[2]'
+                browser.find_element_by_xpath(xpath_m).click()
 
-            # fill final year
-            xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[2]/option[{a}]'.format(
-                a=aux_end_date.year - 1997)
-            browser.find_element_by_xpath(xpath).click()
+            elif frequency == 'yearly':
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select'
+
+            else:
+                raise ValueError('Frequency selection is not treated by code.')
+
+            # Pick final option in list (whatever year that is)
+            sel = browser.find_element_by_xpath(xpath)
+            sel.click()
+            options = sel.find_elements_by_tag_name('option')
+            options[len(options) - 1].click()
 
             # click the download button
             xpath = r'//*[@id="btnXLSa"]'
@@ -90,29 +122,33 @@ class FocusIPCA(object):
             # saves the time the file was downloaded
             download_save_time = dt.datetime.now()
 
-            # clear initial date and end date fo the next loop
-            xpath = r'//*[@id="tfDataInicial1"]'
-            browser.find_element_by_xpath(xpath).clear()
-            xpath = r'//*[@id="tfDataFinal2"]'
-            browser.find_element_by_xpath(xpath).clear()
-
             # give some time for the download to finish
             time.sleep(6)
 
-            # get the default download directory
-            username = os.getlogin()
-            download_path = r'C:/Users/{}/Downloads'.format(username)
+            # get the default download directory based on the operating system
+            if platform.system() == 'Windows':
+                username = os.getlogin()
+                download_path = f'C:/Users/{username}/Downloads'
 
+            elif platform.system() == 'Darwin':  # MacOS
+                username = getpass.getuser()
+                download_path = f'/Users/{username}/Downloads'
+
+            else:
+                raise SystemError('This code can only run on Windows or MacOS')
+
+            # reads the downloaded file
+            file_path = None
             for (dirpath, dirnames, filenames) in os.walk(download_path):
 
                 for f in filenames:
 
                     if 'Séries de estatísticas' in f:
-                        file_save_time = os.path.getmtime(dirpath + '\\' + f)
+                        file_save_time = os.path.getmtime(os.path.join(dirpath, f))
                         file_save_time = dt.datetime.fromtimestamp(file_save_time)
 
                         if file_save_time > download_save_time:
-                            file_path = dirpath + '\\' + f
+                            file_path = os.path.join(dirpath, f)
 
             # read the file and clean the dataframe
             df = pd.read_excel(file_path, skiprows=1, na_values=[' '])
@@ -121,16 +157,16 @@ class FocusIPCA(object):
             df['Data'] = pd.to_datetime(df['Data'], dayfirst=True)
             df = df.set_index('Data')
 
-            if more_than_2years == 1:
-                list_df.append(df)  # df's that will be concatenated
-                aux_initial_date = aux_end_date + dt.timedelta(days=1)  # adjust the initial date
+            list_df.append(df)
 
-                if stop_grab:
-                    df = pd.concat(list_df)  # concatenate all the data grabbed
-                    break
-            else:
-                break
+            # clear initial date and end date fo the next loop
+            xpath = r'//*[@id="tfDataInicial1"]'
+            browser.find_element_by_xpath(xpath).clear()
+            xpath = r'//*[@id="tfDataFinal2"]'
+            browser.find_element_by_xpath(xpath).clear()
 
         browser.close()
+        df = pd.concat(list_df)
+        df = df.drop_duplicates()
 
         return df
