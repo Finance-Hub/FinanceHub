@@ -123,12 +123,12 @@ class FocusIPCA(object):
             # fill ending prediction scope (always chooses the last element of the dropdown menu)
             if frequency == 'monthly':
                 xpath_m = r'//*[@id="mesReferenciaFinal"]/option[text()="dezembro"]'
-                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[2]'
                 browser.find_element_by_xpath(xpath_m).click()
 
             elif frequency == 'quarterly':
                 xpath_m = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[1]/option[text()="outubro a dezembro"]'
-                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[2]'
                 browser.find_element_by_xpath(xpath_m).click()
 
             elif frequency == 'yearly':
