@@ -37,7 +37,7 @@ class FocusIPCA(object):
         indicator: str with the indicator. Possible values are FocusIPCA.indicator_dict
         initial_date: must be understandable by pandas.to_datetime
         end_date: must be understandable by pandas.to_datetime
-        metric: str with the staistical metric. Possible values are FocusIPCA.metric_dict
+        metric: str with the statistical metric. Possible values are FocusIPCA.metric_dict
         frequency: str with the frequency of the forecast. Possible values are FocusIPCA.frequncy_dict
 
         Returns
@@ -49,6 +49,10 @@ class FocusIPCA(object):
         assert indicator in self.indicator_dict.keys(), f"the indicator {indicator} is not available"
         assert metric in self.metric_dict.keys(), f"the metric {metric} is not available"
         assert frequency in self.freq_dict.keys(), f"the frequency {frequency} is not available"
+
+        # ckeck if the indicator and frequency match
+        if (indicator == 'pib' and metric == 'monthly') or (indicator == 'ipca' and metric == 'quarterly'):
+            raise ValueError('Periodicity selected is not available for the indicator chosen.')
 
         # open the browser
         browser = webdriver.Chrome(self.driver_path, chrome_options=self.driver_options)
@@ -62,10 +66,10 @@ class FocusIPCA(object):
 
         # select the price index or the gdp group
         if indicator == 'pib':
-            xpath = '// *[ @ id = "grupoPib:opcoes_3"]'
+            xpath = '//*[@id="grupoPib:opcoes_3"]'
             browser.find_element_by_xpath(xpath).click()
         else:
-            xpath = r'// *[ @ id = "grupoIndicePreco:opcoes_6"]'
+            xpath = r'//*[@id="grupoIndicePreco:opcoes_6"]'
             browser.find_element_by_xpath(xpath).click()
 
         # select the metric
@@ -73,14 +77,8 @@ class FocusIPCA(object):
         browser.find_element_by_xpath(xpath).click()
 
         # select the periodicity
-        if indicator == 'pib' and frequency == 'quarterly' or 'yearly':
-            xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
-            browser.find_element_by_xpath(xpath).click()
-        elif indicator == 'ipca' and frequency == 'monthly' or 'yearly':
-            xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
-            browser.find_element_by_xpath(xpath).click()
-        else:
-            raise ValueError('Periodicity selected is not available for the indicator chosen.')
+        xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
+        browser.find_element_by_xpath(xpath).click()
 
         # dates in datetime format
         initial_date = pd.to_datetime(initial_date)
@@ -182,6 +180,9 @@ class FocusIPCA(object):
 
             # read the file and clean the dataframe
             df = pd.read_excel(file_path, skiprows=1, na_values=[' '])
+
+            if indicator == 'pib':
+                df = df.iloc[:-3]  # delete the 3 final lines of the gdp file because they are comments
 
             # data to datetime and setting data as index
             df['Data'] = pd.to_datetime(df['Data'], dayfirst=True)

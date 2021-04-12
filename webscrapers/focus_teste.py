@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # focus = FocusIPCA(r'/Users/gustavoamarante/Desktop/chromedriver')
 focus = FocusIPCA(r'C:/Users/mathe/Downloads/chromedriver_win32/chromedriver.exe')
 
-df = focus.scrape(indicator='pib', initial_date='2018-01-01', end_date='2021-12-31')
+df = focus.scrape(indicator='ipca', initial_date='2018-01-01', end_date='2021-12-31', frequency='quarterly')
 
 df.plot()
 plt.show()
