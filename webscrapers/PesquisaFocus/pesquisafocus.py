@@ -10,10 +10,16 @@ import getpass
 class FocusIPCA(object):
     """
     Classe para puxar os dados de IPCA do focus.
+
+    Indicadores aceitos:
+        * PIB total
+        * IPCA
+
     """
+    indicator_dict = {'ipca': '5', 'pib': '9'}
     metric_dict = {'mean': '2', 'median': '3', 'std': '4', 'vc': '5',
                    'max': '6', 'min': '7'}
-    freq_dict = {'monthly': '2', 'yearly': '3'}
+    freq_dict = {'monthly': '2', 'quarterly': '2', 'yearly': '3'}
 
     def __init__(self, driver_path):
         """
@@ -24,10 +30,11 @@ class FocusIPCA(object):
         self.driver_options = webdriver.ChromeOptions()
         self.driver_path = driver_path
 
-    def scrape(self, initial_date, end_date, metric='median', frequency='yearly'):
+    def scrape(self, indicator, initial_date, end_date, metric='median', frequency='yearly'):
         """
         Parameters
         ----------
+        indicator: str with the indicator. Possible values are FocusIPCA.indicator_dict
         initial_date: must be understandable by pandas.to_datetime
         end_date: must be understandable by pandas.to_datetime
         metric: str with the staistical metric. Possible values are FocusIPCA.metric_dict
@@ -39,6 +46,7 @@ class FocusIPCA(object):
         """
 
         # assert that the chosen parameters exists
+        assert indicator in self.indicator_dict.keys(), f"the indicator {indicator} is not available"
         assert metric in self.metric_dict.keys(), f"the metric {metric} is not available"
         assert frequency in self.freq_dict.keys(), f"the frequency {frequency} is not available"
 
@@ -48,21 +56,31 @@ class FocusIPCA(object):
         # navigating to the page
         browser.get("https://www3.bcb.gov.br/expectativas/publico/consulta/serieestatisticas")
 
-        # select the indicator - always chooses the IPCA
-        xpath = r'//*[@id="indicador"]/option[5]'
+        # select the indicator - chooses PIB or IPCA
+        xpath = f'//*[@id="indicador"]/option[{self.indicator_dict[indicator]}]'
         browser.find_element_by_xpath(xpath).click()
 
-        # select the price index
-        xpath = r'// *[ @ id = "grupoIndicePreco:opcoes_6"]'
-        browser.find_element_by_xpath(xpath).click()
+        # select the price index or the gdp group
+        if indicator == 'pib':
+            xpath = '// *[ @ id = "grupoPib:opcoes_3"]'
+            browser.find_element_by_xpath(xpath).click()
+        else:
+            xpath = r'// *[ @ id = "grupoIndicePreco:opcoes_6"]'
+            browser.find_element_by_xpath(xpath).click()
 
         # select the metric
         xpath = f'//*[@id="calculo"]/option[{self.metric_dict[metric]}]'
         browser.find_element_by_xpath(xpath).click()
 
         # select the periodicity
-        xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
-        browser.find_element_by_xpath(xpath).click()
+        if indicator == 'pib' and frequency == 'quarterly' or 'yearly':
+            xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
+            browser.find_element_by_xpath(xpath).click()
+        elif indicator == 'ipca' and frequency == 'monthly' or 'yearly':
+            xpath = f'//*[@id="periodicidade"]/option[{self.freq_dict[frequency]}]'
+            browser.find_element_by_xpath(xpath).click()
+        else:
+            raise ValueError('Periodicity selected is not available for the indicator chosen.')
 
         # dates in datetime format
         initial_date = pd.to_datetime(initial_date)
@@ -91,16 +109,28 @@ class FocusIPCA(object):
                 browser.find_element_by_xpath(xpath_m).click()
                 browser.find_element_by_xpath(xpath).click()
 
+            elif frequency == 'quarterly':
+                xpath_m = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[1]/option[text()="janeiro a março"]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]/option[text()="1999"]'
+                browser.find_element_by_xpath(xpath_m).click()
+                browser.find_element_by_xpath(xpath).click()
+
             elif frequency == 'yearly':
                 xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select/option[text()="1999"]'
                 browser.find_element_by_xpath(xpath).click()
+
             else:
                 raise ValueError('Frequency selection is not treated by code.')
 
             # fill ending prediction scope (always chooses the last element of the dropdown menu)
             if frequency == 'monthly':
                 xpath_m = r'//*[@id="mesReferenciaFinal"]/option[text()="dezembro"]'
-                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[2]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]'
+                browser.find_element_by_xpath(xpath_m).click()
+
+            elif frequency == 'quarterly':
+                xpath_m = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[4]/select[1]/option[text()="outubro a dezembro"]'
+                xpath = r'//*[@id="form4"]/div[2]/table/tbody[3]/tr/td[2]/select[2]'
                 browser.find_element_by_xpath(xpath_m).click()
 
             elif frequency == 'yearly':
