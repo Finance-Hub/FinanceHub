@@ -7,13 +7,9 @@ import platform
 import getpass
 
 
-class FocusIPCA(object):
+class Focus(object):
     """
-    Classe para puxar os dados de IPCA do focus.
-
-    Indicadores aceitos:
-        * PIB total
-        * IPCA
+    Classe para puxar os dados do PIB total e IPCA do focus.
 
     """
     indicator_dict = {'ipca': '5', 'pib': '9'}
@@ -34,11 +30,11 @@ class FocusIPCA(object):
         """
         Parameters
         ----------
-        indicator: str with the indicator. Possible values are FocusIPCA.indicator_dict
+        indicator: str with the indicator. Possible values are Focus.indicator_dict
         initial_date: must be understandable by pandas.to_datetime
         end_date: must be understandable by pandas.to_datetime
-        metric: str with the statistical metric. Possible values are FocusIPCA.metric_dict
-        frequency: str with the frequency of the forecast. Possible values are FocusIPCA.frequncy_dict
+        metric: str with the statistical metric. Possible values are Focus.metric_dict
+        frequency: str with the frequency of the forecast. Possible values are Focus.frequncy_dict
 
         Returns
         -------
@@ -66,10 +62,10 @@ class FocusIPCA(object):
 
         # select the price index or the gdp group
         if indicator == 'pib':
-            xpath = '//*[@id="grupoPib:opcoes_3"]'
+            xpath = '//*[@id="grupoPib:opcoes_3"]'  # total gdp
             browser.find_element_by_xpath(xpath).click()
         else:
-            xpath = r'//*[@id="grupoIndicePreco:opcoes_6"]'
+            xpath = r'//*[@id="grupoIndicePreco:opcoes_6"]'  # IPCA
             browser.find_element_by_xpath(xpath).click()
 
         # select the metric
@@ -181,8 +177,9 @@ class FocusIPCA(object):
             # read the file and clean the dataframe
             df = pd.read_excel(file_path, skiprows=1, na_values=[' '])
 
+            # delete the 3 last lines of the gdp file because they are comments
             if indicator == 'pib':
-                df = df.iloc[:-3]  # delete the 3 final lines of the gdp file because they are comments
+                df = df.iloc[:-3]
 
             # data to datetime and setting data as index
             df['Data'] = pd.to_datetime(df['Data'], dayfirst=True)
