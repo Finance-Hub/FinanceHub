@@ -200,7 +200,7 @@ class FHBacktestAncilliaryFunctions(object):
     def static_weights(weighting_scheme, cov=None, vol_target=0.1):
         """
         This method calculates static non-negative weights for a given weighting scheme
-        This method largely makes the functions in portfolio/port_construction.py obsolete
+        This method largely makes the functions in portfolio/construction.py obsolete
 
         Parameters
         ----------

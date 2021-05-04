@@ -57,7 +57,10 @@ class FRED(object):
         series_start = df[df[df.columns[0]].str.contains('DATE\s+VALUE')].index[0] + 1
         df = df.loc[series_start:]
         df = df[df.columns[0]].str.split('\s+', expand=True)
-        df = pd.DataFrame(data=df[1].values.astype(float), index=pd.to_datetime(df[0]), columns=[series_id])
+        df = df[~(df[1] == '.')]
+        df = pd.DataFrame(data=df[1].values.astype(float),
+                          index=pd.to_datetime(df[0]),
+                          columns=[series_id])
         df.index.rename('Date', inplace=True)
 
         return df
