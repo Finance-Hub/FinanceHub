@@ -210,7 +210,6 @@ class NTNB(object):
                  expiry: Date,
                  rate: Optional[float] = None,
                  price: Optional[float] = None,
-                 principal: float = 1e6,
                  coupon_rate: float = 0.06,
                  vna: Optional[float] = None,
                  ref_date: Date = TODAY):
@@ -220,7 +219,6 @@ class NTNB(object):
         :param expiry: bond expiry date
         :param rate: bond yield
         :param price: bond price
-        :param principal: bond principal
         :param coupon_rate: bond coupon rate
         :param vna: the inflation index used for the price calculation
         :param ref_date: reference date for price or rate calculation
@@ -239,32 +237,31 @@ class NTNB(object):
 
         self.expiry = pd.to_datetime(expiry).date()
         self.ref_date = pd.to_datetime(ref_date).date()
-        self.principal = principal
 
-        interest = ((1. + coupon_rate) ** (1. / 2.) - 1.) * self.principal
+        interest = ((1. + coupon_rate) ** (1. / 2.) - 1.) * 100
         cash_flows = pd.Series(index=self.payment_dates(),
                                data=interest).sort_index()
-        cash_flows.iloc[-1] += self.principal
+        cash_flows.iloc[-1] += 100
 
         self.cash_flows = cash_flows
 
         if price is not None and rate is not None and vna is None:
             self.price = float(price)
             self.rate = float(rate)
-            base_price = self.price_from_rate(principal=self.principal, rate=self.rate, vna=1000)
+            base_price = self.price_from_rate(rate=self.rate, vna=1000)
             self.vna = np.round(self.price / base_price * 1000, 6)
         elif rate is not None and price is None and vna is not None:
             self.vna = float(vna)
             self.rate = float(rate)
-            self.price = self.price_from_rate(principal=self.principal, rate=self.rate, vna=self.vna)
+            self.price = self.price_from_rate(rate=self.rate, vna=self.vna)
         elif rate is None and price is not None and vna is not None:
             self.vna = float(vna)
             self.price = float(price)
             self.rate = self.rate_from_price(price=self.price, vna=self.vna)
 
         else:
-            pt = self.price_from_rate(principal=self.principal, rate=rate, vna=vna)
-            if np.abs(pt - float(price)) / self.principal > 0.1:
+            pt = self.price_from_rate(rate=rate, vna=vna)
+            if np.abs(pt - float(price)) > 0.1:
                 msg = 'Given price and rate are incompatible!'
                 warnings.warn(msg)
             self.rate = rate
@@ -286,25 +283,22 @@ class NTNB(object):
         return sorted(payd)
 
     def price_from_rate(self,
-                        principal: Optional[float] = None,
                         rate: Optional[float] = None,
                         vna: Optional[float] = None,
                         truncate_price: bool = True) -> float:
         pv = 0.
-        principal = self.principal if principal is None else principal
         rate = self.rate if rate is None else rate
         vna = self.vna if vna is None else vna
 
         for d, p in self.cash_flows.items():
             # Adjusting according the Anbima specifications
-            p = np.round(100 * p / principal, 6)
+            p = np.round(p , 6)
             pv += LTN(d, ref_date=self.ref_date, price=p).price_from_rate(p, rate, None, False)
 
         pv = truncate(pv, 4) * np.round(vna, 6) / 100
         if truncate_price:
             pv = truncate(pv, 6)
-        # Adjusting back according to the intended principal
-        return pv * principal / 1000
+        return pv
 
     def rate_from_price(self,
                         price: Optional[float] = None,
@@ -313,7 +307,7 @@ class NTNB(object):
         price = self.price if price is None else price
         vna = self.vna if vna is None else vna
         price /= vna
-        price *= self.principal
+        price *= 100
 
         theor_p = lambda x: sum([
             LTN(d, ref_date=self.ref_date, price=p).price_from_rate(p, x, None, False)
