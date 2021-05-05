@@ -19,33 +19,33 @@ def tail_risk_table(index_ts: Union[pd.Series, pd.DataFrame],
 
     Arguments
     ----------
-        param index_ts: Pandas Series or DataFrame
+        index_ts: Pandas Series or DataFrame
              Daily time series data for performance calculation.
 
-        param ref_index: Pandas Series or DataFrame 
+        ref_index: Pandas Series or DataFrame 
             Daily time series data for reference benchmark index. 
             If DataFrame has more than one column, the first column will be used as reference benchmark index.
         
-        param same_window: bool (default = True)
+        same_window: bool (default = True)
             If true, it indicates whether the performance metrics are to be calculated for all columns in the index_ts DataFrame over the same time frame.
             or, just using as much data as possible for each column. 
 
-        param window: int (Optional)
+        window: int (Optional)
             Window size for fixed window dd calculation. 
             Defaults to computing unrestricted drawdowns.
 
-        param k: int (Optional)
+        k: int (Optional)
             Maximum number of drawdowns to use in calculations. 
             Defaults to using all available drawdowns.
 
-        param summary_table: bool (Optional, default = True)
+        summary_table: bool (Optional, default = True)
             If true, it indicates whether the function should return a summary of performance metrics
             or the performance for each of the drawdowns.
 
-        param annualize_ret: bool (default = True)
+        annualize_ret: bool (default = True)
             If true, indicates whether returns should be annualized.
 
-    Returns:
+    Returns
     --------
         Pandas DataFrame with performance in tail risk events of the reference benchmark index containing:
 
@@ -170,12 +170,12 @@ def _window_dd_single(index_ts: Union[pd.Series, pd.DataFrame],
     Calculates fixed window non-overlapping drawdowns for given time series data
 
     Arguments
-    ---------
-        param index_ts: Pandas Series or DataFrame 
+    ----------
+        index_ts: Pandas Series or DataFrame 
             A single column with daily data. 
             If DataFrame has more than one column, the first column will be used to calculate drawdowns.
 
-        param window: int
+        window: int
             Window size for fixed window drawdown calculation.
 
     Returns
@@ -220,7 +220,7 @@ def _unr_dd_single(index_ts: Union[pd.Series, pd.DataFrame]) -> pd.Series:
 
     Arguments
     ----------
-        param index_ts: Pandas Series or DataFrame
+        index_ts: Pandas Series or DataFrame
             A single column with daily data. 
             If DataFrame has more than one column, the first column will be used to calculate drawdowns.
 
