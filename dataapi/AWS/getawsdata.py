@@ -122,3 +122,6 @@ class TrackerFeeder(object):
         df = df.sort_index()
 
         return df
+
+class FocusFeeder(object):
+    pass
