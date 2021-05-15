@@ -8,7 +8,7 @@ from time import time
 focus = Focus(r'/Users/gustavoamarante/Desktop/chromedriver')
 
 # ADD DATABASE INFO
-dbc = DBConnect('gustavo.amarante', 'pY-L4bF!nan!ns3r')
+dbc = DBConnect('username', 'password')
 
 # indicators to scrape and their frequency
 indicators = {'ipca': ['monthly', 'yearly'],
