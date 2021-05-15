@@ -8,7 +8,7 @@ from time import time
 focus = Focus(r'/Users/gustavoamarante/Desktop/chromedriver')
 
 # ADD DATABASE INFO
-dbc = DBConnect('username', 'password')
+dbc = DBConnect('gustavo.amarante', 'pY-L4bF!nan!ns3r')
 
 # indicators to scrape and their frequency
 indicators = {'ipca': ['monthly', 'yearly'],
@@ -16,7 +16,7 @@ indicators = {'ipca': ['monthly', 'yearly'],
 
 rename_dict = {'Data': 'date'}
 
-start_date = pd.to_datetime('2002-01-01')  # TODO query to find the latest date and correct the scrapper class to handle shorter periods
+start_date = pd.to_datetime('2020-01-01')  # TODO query to find the latest date and correct the scrapper class to handle shorter periods
 end_date = pd.to_datetime('today')
 
 # loops all indicators and frequencies
@@ -34,7 +34,7 @@ for ind in indicators.keys():
 
         df = df.rename(rename_dict, axis=1)
 
-        df['variable'] = ind
+        df['index'] = ind
         df['frequency'] = freq
         df = df.dropna()
 

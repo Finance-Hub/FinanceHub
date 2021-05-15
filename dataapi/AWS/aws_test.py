@@ -1,10 +1,24 @@
-from dataapi import TrackerFeeder, DBConnect
+from dataapi import TrackerFeeder, DBConnect, FocusFeeder
 from sqlalchemy import create_engine
 import matplotlib.pyplot as plt
+import pandas as pd
 
 db_connect = DBConnect('fhreadonly', 'finquant')
 
-# ===== Examples =====
+# ===== Exemples of the focus feeder =====
+ff = FocusFeeder(db_connect)
+df = ff.fetch('IPCA', 'yearly')
+df.plot()
+plt.show()
+
+ff = FocusFeeder(db_connect)
+df1 = ff.years_ahead('IPCA', 1)
+df2 = ff.years_ahead('IPCA', 2)
+df = pd.concat([df1, df2], axis=1)
+df.plot()
+plt.show()
+
+# ===== Examples of the tracker feeder =====
 tf = TrackerFeeder(db_connect)
 
 # Fetch the full metadata table (useful for filtering)
