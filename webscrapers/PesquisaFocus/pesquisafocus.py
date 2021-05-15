@@ -65,7 +65,7 @@ class Focus(object):
             xpath = '//*[@id="grupoPib:opcoes_3"]'  # total gdp
             browser.find_element_by_xpath(xpath).click()
         else:
-            xpath = r'//*[@id="grupoIndicePreco:opcoes_6"]'  # IPCA
+            xpath = r'//*[@id="grupoIndicePreco:opcoes_5"]'  # IPCA
             browser.find_element_by_xpath(xpath).click()
 
         # select the metric
@@ -176,6 +176,8 @@ class Focus(object):
 
             # read the file and clean the dataframe
             df = pd.read_excel(file_path, skiprows=1, na_values=[' '])
+
+            # TODO delete the read worksheet
 
             # delete the 3 last lines of the gdp file because they are comments
             if indicator == 'pib':
