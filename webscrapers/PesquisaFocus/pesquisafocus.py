@@ -83,6 +83,10 @@ class Focus(object):
         # generate the date_ranges in 18-month intervals (approximatly)
         dates = pd.date_range(initial_date, end_date, freq='18m')
         dates = list(dates)
+
+        if len(dates) == 1:
+            dates.append(end_date)
+
         dates[0] = initial_date
 
         # loops on all date pairs
