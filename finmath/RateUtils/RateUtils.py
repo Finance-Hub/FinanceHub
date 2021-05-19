@@ -21,7 +21,7 @@ class RateUtils:
 
     def __accrual_act(self, rates, dates):
         n_days = [self.dc.days(t0, t1) for t0, t1 in zip(dates[1:], dates[:-1])]
-        accrual = n_days * rates/100
+        accrual = n_days * (rates/100)/365
         return self.__accrual(accrual)
 
     def __accrual_bus(self, rates, dates):
