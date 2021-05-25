@@ -9,7 +9,7 @@ class DBConnect(object):
         self.connection = self._create_connection()
 
     def _create_connection(self):
-        connect_dict = {'flavor': 'postgres+psycopg2',
+        connect_dict = {'flavor': 'postgresql+psycopg2',
                         'database': 'labfinan',
                         'schema': 'public',
                         'user': self.username,
