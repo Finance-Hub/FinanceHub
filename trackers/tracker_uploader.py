@@ -3,24 +3,11 @@ from time import time
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from trackers import SingleNameEquity, BondFutureTracker, FXForwardTrackers, CommFutureTracker, FwdIRSTrackers
+from dataapi import DBConnect
 
 # ===== DATABASE CONNECTION =====
-connect_dict = {'flavor': 'postgres+psycopg2',
-                'database': '[DATABASE NAME]',
-                'schema': '[DATABASE SCHEMA]',
-                'user': '[USERNAME]',
-                'password': '[PASSWORD]',
-                'host': '[HOST ADDRESS]',
-                'port': '[PORT NUMBER]'}
 
-
-db_connect = create_engine("{flavor}://{username}:{password}@{host}:{port}/{database}"
-                           .format(host=connect_dict['host'],
-                                   database=connect_dict['database'],
-                                   username=connect_dict['user'],
-                                   password=connect_dict['password'],
-                                   port=connect_dict['port'],
-                                   flavor=connect_dict['flavor']))
+db_connect = DBConnect('[USERNAME]', '[PASSWORD]')
 
 
 # ===============================
