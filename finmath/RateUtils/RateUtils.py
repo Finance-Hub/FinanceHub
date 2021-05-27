@@ -25,7 +25,7 @@ class RateUtils:
         return self.__accrual(accrual)
 
     def __accrual_bus(self, rates, dates):
-        return self.__accrual((rates/100)/252)
+        return ((1 + rates/100)**(1/252)).cumprod()
 
     def accrual(self, rates: pd.Series, dates: pd.Series, method: str):
         try:
